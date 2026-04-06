@@ -197,25 +197,46 @@ Check your Browserslist config to be sure that your targets are set up correctly
             width: 100%;
             border-collapse: collapse;
             font-size: 0.875rem;
+            table-layout: fixed;
         }
         
         .data-table th {
             background: #f8f9fa;
-            padding: 10px 8px;
+            padding: 10px 6px;
             text-align: left;
             font-weight: 600;
             color: #333;
             border-bottom: 2px solid #e5e7eb;
+            word-break: break-all;
+            white-space: normal;
         }
         
         .data-table td {
-            padding: 10px 8px;
+            padding: 8px 6px;
             border-bottom: 1px solid #f0f0f0;
+            word-break: break-all;
+            white-space: normal;
+            vertical-align: middle;
         }
         
         .data-table tr:hover {
             background: #f8f9fa;
         }
+
+        /* 各列宽度控制 */
+        .data-table col.col-rank   { width: 42px; }
+        .data-table col.col-big    { width: 72px; }
+        .data-table col.col-region { width: 72px; }
+        .data-table col.col-person { width: 56px; }
+        .data-table col.col-target { width: 82px; }
+        .data-table col.col-complete { width: 82px; }
+        .data-table col.col-yoy    { width: 80px; }
+        .data-table col.col-rate   { width: 110px; }
+
+        /* 数字列右对齐 */
+        .data-table .text-right { text-align: right; }
+        .data-table th:nth-child(5),
+        .data-table th:nth-child(6) { text-align: right; }
         
         .text-green { color: #10b981; }
         .text-red { color: #ef4444; }
@@ -352,6 +373,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <h3 class="text-sm font-semibold mb-3 text-gray-700">地区完成情况（按完成金额排名）</h3>
         <div class="overflow-x-auto">
             <table class="data-table">
+                <colgroup>
+                    <col class="col-rank">
+                    <col class="col-big">
+                    <col class="col-region">
+                    <col class="col-person">
+                    <col class="col-target">
+                    <col class="col-complete">
+                    <col class="col-yoy">
+                    <col class="col-rate">
+                </colgroup>
                 <thead>
                     <tr>
                         <th>排名</th>
@@ -634,16 +665,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 
                 row.innerHTML = `
                     <td><span class="${rankClass}">${rank}</span></td>
-                    <td class="font-semibold">${item.big_region}</td>
-                    <td>${item.region}</td>
-                    <td>${item.person}</td>
-                    <td>${item.target.toFixed(1)}</td>
-                    <td>${item.complete.toFixed(1)}</td>
+                    <td class="font-semibold" style="word-break:break-all;">${item.big_region}</td>
+                    <td style="word-break:break-all;">${item.region}</td>
+                    <td style="word-break:break-all;">${item.person}</td>
+                    <td class="text-right">${item.target.toFixed(1)}</td>
+                    <td class="text-right">${item.complete.toFixed(1)}</td>
                     <td class="${yoyColor} font-medium">${yoyDisplay}</td>
                     <td>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs w-12">${item.rate}%</span>
-                            <div class="progress-bar flex-1" style="min-width: 60px;">
+                        <div class="flex items-center gap-1">
+                            <span class="text-xs" style="min-width:34px;text-align:right;">${item.rate}%</span>
+                            <div class="progress-bar flex-1" style="min-width: 40px;">
                                 <div class="progress-fill ${progressClass}" style="width: ${Math.min(item.rate, 100)}%"></div>
                             </div>
                         </div>
