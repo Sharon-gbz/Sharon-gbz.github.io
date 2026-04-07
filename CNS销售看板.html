@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>药友制药·CNS组销售看板 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  /* ─── CSS变量：药友蓝+洞庭青浅色系 ─── */
+  :root {
+    --primary: #1565C0;       /* 药友深蓝 */
+    --primary-light: #E3F0FF; /* 浅蓝背景 */
+    --primary-mid: #4A90D9;   /* 中蓝 */
+    --teal: #00838F;          /* 洞庭青 */
+    --teal-light: #E0F7FA;
+    --accent: #E65100;        /* 强调橙（负数/警示）*/
+    --success: #2E7D32;       /* 达成绿 */
+    --success-light: #E8F5E9;
+    --warn: #F57F17;          /* 警示黄 */
+    --warn-light: #FFF8E1;
+    --bg: #F4F7FC;            /* 页面背景 */
+    --card-bg: #FFFFFF;
+    --border: #DCE6F2;
+    --text: #1A2B45;
+    --text-sub: #5A6F8A;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(21,101,192,0.08);
+    --shadow-hover: 0 6px 24px rgba(21,101,192,0.16);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'PingFang SC','Microsoft YaHei',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: linear-gradient(135deg, #0D3B6E 0%, #1565C0 45%, #00838F 100%);
+    padding: 0 24px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 4px 20px rgba(13,59,110,0.3);
+  }
+  .header-inner {
+    max-width: 1600px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header-logo {
+    width: 44px; height: 44px; background: rgba(255,255,255,0.15);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid rgba(255,255,255,0.3);
+  }
+  .header-logo svg { width: 28px; height: 28px; }
+  .header-titles { }
+  .header-title {
+    font-size: 20px; font-weight: 700; color: #fff; letter-spacing: 1px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .header-sub { font-size: 11px; color: rgba(255,255,255,0.7); letter-spacing: 2px; margin-top: 2px; }
+  .header-right { display: flex; align-items: center; gap: 20px; }
+  .header-tag {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px; padding: 4px 14px; font-size: 12px; color: rgba(255,255,255,0.85);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .header-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: #4FC3F7; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  .refresh-btn {
+    background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.4);
+    border-radius: 8px; padding: 7px 16px; color: #fff; font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+  }
+  .refresh-btn:hover { background: rgba(255,255,255,0.25); }
+  .update-time { font-size: 11px; color: rgba(255,255,255,0.6); }
+
+  /* ─── 神经元装饰背景 ─── */
+  .header-deco {
+    position: absolute; right: 0; top: 0; width: 200px; height: 100%; overflow: hidden; opacity: 0.08; pointer-events: none;
+  }
+
+  /* ─── MAIN CONTAINER ─── */
+  .container { max-width: 1600px; margin: 0 auto; padding: 20px 24px 40px; }
+
+  /* ─── 部门切片器 ─── */
+  .dept-slicer-wrap {
+    background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 14px 20px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    border: 1px solid var(--border);
+  }
+  .slicer-label { font-size: 13px; color: var(--text-sub); font-weight: 600; white-space: nowrap; }
+  .slicer-sep { width: 1px; height: 20px; background: var(--border); }
+  /* ─── 卡片内部门Tab切片器 ─── */
+  .dept-tab-bar { display: flex; gap: 6px; }
+  .dept-tab-btn {
+    background: #F0F4FA; border: 1.5px solid transparent;
+    border-radius: 8px; padding: 5px 14px; font-size: 12px; font-weight: 600;
+    color: var(--text-sub); cursor: pointer; transition: all 0.2s;
+  }
+  .dept-tab-btn:hover { background: var(--primary-light); color: var(--primary); }
+  .dept-tab-btn.active {
+    background: var(--primary); color: #fff; border-color: var(--primary);
+  }
+  .dept-btn {
+    padding: 7px 20px; border-radius: 20px; border: 1.5px solid var(--border);
+    background: #fff; color: var(--text-sub); font-size: 13px; cursor: pointer;
+    transition: all 0.2s; font-weight: 500;
+  }
+  .dept-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 8px rgba(21,101,192,0.3); }
+  .dept-btn:hover:not(.active) { border-color: var(--primary-mid); color: var(--primary); }
+
+  /* ─── KPI卡片行 ─── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+  .kpi-card {
+    background: var(--card-bg); border-radius: var(--radius); padding: 20px 24px;
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .kpi-card:hover { box-shadow: var(--shadow-hover); }
+  .kpi-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .kpi-card.blue::before { background: linear-gradient(90deg, var(--primary), var(--primary-mid)); }
+  .kpi-card.teal::before { background: linear-gradient(90deg, var(--teal), #26C6DA); }
+  .kpi-card.green::before { background: linear-gradient(90deg, var(--success), #66BB6A); }
+  .kpi-card.orange::before { background: linear-gradient(90deg, var(--warn), #FFB300); }
+  .kpi-icon {
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-size: 22px; opacity: 0.12;
+  }
+  .kpi-label { font-size: 12px; color: var(--text-sub); font-weight: 500; letter-spacing: 0.5px; }
+  .kpi-value { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.1; }
+  .kpi-unit { font-size: 13px; color: var(--text-sub); font-weight: 400; margin-left: 2px; }
+  .kpi-sub { font-size: 12px; color: var(--text-sub); }
+  .kpi-badge {
+    display: inline-flex; align-items: center; gap: 3px; font-size: 12px;
+    padding: 2px 8px; border-radius: 10px; font-weight: 600;
+  }
+  .badge-up { background: var(--success-light); color: var(--success); }
+  .badge-down { background: #FFEBEE; color: var(--accent); }
+  .badge-mid { background: var(--warn-light); color: var(--warn); }
+
+  /* ─── 分组行 ─── */
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .row-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .row-full { margin-bottom: 20px; }
+
+  /* ─── 卡片通用 ─── */
+  .card {
+    background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
+    border: 1px solid var(--border); overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px 12px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-title-wrap { display: flex; align-items: center; gap: 10px; }
+  .card-title-bar { width: 4px; height: 18px; border-radius: 2px; background: linear-gradient(180deg, var(--primary), var(--teal)); }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--text); }
+  .card-sub-title { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+  .card-body { padding: 16px 20px; }
+  .chart-container { position: relative; }
+
+  /* ─── 部门进度图 ─── */
+  .dept-progress-wrap { padding: 12px 20px; }
+  .dept-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .dept-name { width: 140px; font-size: 13px; font-weight: 600; color: var(--text); flex-shrink: 0; }
+  .dept-bar-wrap { flex: 1; }
+  .dept-bar-bg { background: #EEF2FA; border-radius: 6px; height: 12px; overflow: hidden; }
+  .dept-bar-fill { height: 12px; border-radius: 6px; transition: width 0.8s ease; }
+  .dept-bar-nums { display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; color: var(--text-sub); }
+  .dept-rate { width: 60px; text-align: right; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+
+  /* ─── 产品发货量排名 ─── */
+  .rank-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .rank-table th {
+    background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 600;
+    padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--border);
+  }
+  .rank-table td { padding: 7px 10px; border-bottom: 1px solid #F0F4FA; vertical-align: middle; }
+  .rank-table tr:last-child td { border-bottom: none; }
+  .rank-table tr:hover td { background: #F8FAFF; }
+  .rank-num { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+  .rank-1 { background: #FFD700; color: #7B5800; }
+  .rank-2 { background: #C0C0C0; color: #444; }
+  .rank-3 { background: #CD7F32; color: #fff; }
+  .rank-n { background: #EEF2FA; color: var(--text-sub); }
+  .mini-bar-wrap { display: flex; align-items: center; gap: 6px; }
+  .mini-bar-bg { flex: 1; background: #EEF2FA; border-radius: 4px; height: 6px; overflow: hidden; }
+  .mini-bar-fill { height: 6px; border-radius: 4px; }
+  .rate-chip { font-size: 11px; padding: 2px 7px; border-radius: 8px; font-weight: 600; white-space: nowrap; }
+  .chip-good { background: var(--success-light); color: var(--success); }
+  .chip-mid { background: var(--warn-light); color: var(--warn); }
+  .chip-low { background: #FFEBEE; color: var(--accent); }
+
+  /* ─── 地区进度表 ─── */
+  .region-table-wrap { overflow-y: auto; max-height: 420px; }
+  .region-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .region-table thead th {
+    background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 600;
+    padding: 9px 10px; text-align: left; position: sticky; top: 0; border-bottom: 2px solid var(--border);
+  }
+  .region-table td { padding: 7px 10px; border-bottom: 1px solid #F0F4FA; vertical-align: middle; }
+  .region-table tr:last-child td { border-bottom: none; }
+  .region-table tr:hover td { background: #F8FAFF; }
+  .region-bar { background: #EEF2FA; border-radius: 3px; height: 5px; overflow: hidden; margin-top: 3px; }
+  .region-bar-fill { height: 5px; border-radius: 3px; }
+  .rate-good { color: var(--success); font-weight: 600; }
+  .rate-mid { color: var(--warn); font-weight: 600; }
+  .rate-low { color: var(--accent); font-weight: 600; }
+  .gap-pos { color: var(--success); font-weight: 600; }
+  .gap-neg { color: var(--accent); font-weight: 600; }
+
+  /* ─── 重点产品切片器卡片 ─── */
+  .kp-slicer-section { margin-bottom: 20px; }
+  .kp-slicer-header { padding: 0 0 12px 0; display: flex; align-items: center; gap: 10px; }
+  .kp-cards-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .kp-card {
+    background: var(--card-bg); border-radius: var(--radius); border: 2px solid var(--border);
+    cursor: pointer; transition: all 0.2s; overflow: hidden; position: relative;
+    box-shadow: var(--shadow);
+  }
+  .kp-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+  .kp-card.active { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(21,101,192,0.15); }
+  .kp-card-top {
+    background: linear-gradient(135deg, var(--primary-light) 0%, #fff 100%);
+    padding: 14px 16px 10px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .kp-card.active .kp-card-top { background: linear-gradient(135deg, var(--primary-light) 0%, #EAF2FF 100%); }
+  .kp-img-wrap {
+    width: 70px; height: 50px; flex-shrink: 0; overflow: hidden; border-radius: 6px;
+    background: #F0F4FA; display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border);
+  }
+  .kp-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
+  .kp-img-placeholder { font-size: 22px; }
+  .kp-card-info { flex: 1; min-width: 0; }
+  .kp-prod-name { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .kp-spec { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+  .kp-maker { font-size: 10px; color: var(--text-sub); margin-top: 1px; opacity: 0.8; }
+  .kp-card-body { padding: 12px 16px; }
+  .kp-data-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
+  .kp-num-group { }
+  .kp-num-label { font-size: 10px; color: var(--text-sub); }
+  .kp-num-val { font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.1; }
+  .kp-num-unit { font-size: 11px; color: var(--text-sub); }
+  .kp-rate-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; border: 3px solid;
+  }
+  .kp-rate-circle .rate-unit { font-size: 9px; font-weight: 400; }
+  .kp-progress-bar { background: #EEF2FA; border-radius: 6px; height: 6px; overflow: hidden; margin-bottom: 6px; }
+  .kp-progress-fill { height: 6px; border-radius: 6px; transition: width 0.8s; }
+  .kp-gap-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+  .kp-active-indicator {
+    position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--primary); display: none;
+  }
+  .kp-card.active .kp-active-indicator { display: block; }
+
+  /* ─── 重点产品详情区 ─── */
+  .kp-detail-section {
+    background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
+    border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden;
+  }
+  .kp-detail-header {
+    background: linear-gradient(90deg, var(--primary-light), #fff);
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .kp-detail-prod-name { font-size: 16px; font-weight: 700; color: var(--primary); }
+  .kp-detail-spec { font-size: 12px; color: var(--text-sub); }
+  .kp-detail-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .kp-detail-left { padding: 16px 20px; border-right: 1px solid var(--border); }
+  .kp-detail-right { padding: 16px 20px; }
+  .kp-detail-chart-title { font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 10px; }
+
+  /* ─── 地区明细表 ─── */
+  .kp-region-table-wrap { overflow-y: auto; max-height: 380px; }
+  .kp-region-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .kp-region-table thead th {
+    background: var(--primary-light); color: var(--primary); font-size: 11px; font-weight: 600;
+    padding: 8px 8px; text-align: right; position: sticky; top: 0; border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  .kp-region-table thead th:first-child { text-align: left; }
+  .kp-region-table td { padding: 6px 8px; border-bottom: 1px solid #F0F4FA; text-align: right; white-space: nowrap; }
+  .kp-region-table td:first-child { text-align: left; font-weight: 600; }
+  .kp-region-table tr:hover td { background: #F8FAFF; }
+  .yoy-up { color: var(--success); }
+  .yoy-down { color: var(--accent); }
+  .icon-up::before { content: '▲ '; font-size: 10px; }
+  .icon-down::before { content: '▼ '; font-size: 10px; }
+
+  /* ─── 其他产品快筛 ─── */
+  .other-filter-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 6px 16px; border-radius: 16px; border: 1.5px solid var(--border);
+    background: #fff; color: var(--text-sub); font-size: 12px; cursor: pointer; transition: all 0.2s; font-weight: 500;
+  }
+  .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .other-prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .other-card {
+    background: var(--card-bg); border-radius: 10px; border: 1.5px solid var(--border);
+    padding: 12px 14px; transition: box-shadow 0.2s;
+  }
+  .other-card:hover { box-shadow: var(--shadow-hover); }
+  .other-card-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+  .other-dept-tag { font-size: 10px; padding: 1px 6px; border-radius: 6px; font-weight: 500; }
+  .tag-yy { background: var(--primary-light); color: var(--primary); }
+  .tag-dt { background: var(--teal-light); color: var(--teal); }
+  .other-bar-bg { background: #EEF2FA; border-radius: 4px; height: 5px; overflow: hidden; margin: 6px 0; }
+  .other-bar-fill { height: 5px; border-radius: 4px; }
+  .other-nums { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-sub); }
+  .other-gap-row { font-size: 11px; margin-top: 4px; display: flex; justify-content: space-between; }
+
+  /* ─── 月度趋势图 ─── */
+
+  /* ─── 响应式 ─── */
+  @media (max-width: 1200px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .kp-cards-row { grid-template-columns: repeat(2, 1fr); }
+    .kp-detail-body { grid-template-columns: 1fr; }
+    .kp-detail-left { border-right: none; border-bottom: 1px solid var(--border); }
+    .row-2 { grid-template-columns: 1fr; }
+    .row-3 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .kp-cards-row { grid-template-columns: 1fr 1fr; }
+    .container { padding: 12px 12px 30px; }
+    .header-inner { flex-direction: column; align-items: flex-start; gap: 8px; padding: 10px 0; }
+    .header-right { width: 100%; justify-content: space-between; }
+  }
+  @media (max-width: 480px) {
+    .kpi-grid { grid-template-columns: 1fr; }
+    .kp-cards-row { grid-template-columns: 1fr; }
+  }
+
+  /* ─── 月度图Tab ─── */
+  .tab-bar { display: flex; gap: 0; border-radius: 8px; overflow: hidden; border: 1.5px solid var(--border); width: fit-content; }
+  .tab-btn { padding: 6px 16px; font-size: 12px; background: #fff; color: var(--text-sub); border: none; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+  .tab-btn.active { background: var(--primary); color: #fff; }
+
+  /* ─── 动画 ─── */
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+  .fade-in { animation: fadeIn 0.4s ease; }
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-logo">
+        <!-- 神经/脑波图标 -->
+        <svg viewBox="0 0 28 28" fill="none">
+          <path d="M5 14 Q8 8 11 14 Q14 20 17 14 Q20 8 23 14" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="14" cy="7" r="2.5" fill="rgba(255,255,255,0.6)"/>
+          <circle cx="14" cy="21" r="2.5" fill="rgba(255,255,255,0.6)"/>
+          <circle cx="5" cy="14" r="2" fill="white"/>
+          <circle cx="23" cy="14" r="2" fill="white"/>
+        </svg>
+      </div>
+      <div class="header-titles">
+        <div class="header-title">药友制药 · CNS组销售看板</div>
+        <div class="header-sub">YAOPHARMA CO., LTD. · CNS BUSINESS INTELLIGENCE 2026</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-tag">
+        <div class="dot"></div>
+        <span>实时数据</span>
+      </div>
+      <div class="update-time" id="update-time">数据加载中...</div>
+      <button class="refresh-btn" onclick="refreshData()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+        刷新数据
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ─── MAIN ─── -->
+<div class="container">
+
+  <!-- 部门切片器 -->
+  <div class="dept-slicer-wrap">
+    <span class="slicer-label">产品归属部门</span>
+    <div class="slicer-sep"></div>
+    <button class="dept-btn active" onclick="switchDept('all', this)">全部</button>
+    <button class="dept-btn" onclick="switchDept('CNS组（重庆药友）', this)">CNS组（重庆药友）</button>
+    <button class="dept-btn" onclick="switchDept('CNS组（洞庭药业）', this)">CNS组（洞庭药业）</button>
+  </div>
+
+  <!-- KPI卡片 -->
+  <div class="kpi-grid" id="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-icon" style="background:var(--primary);">🎯</div>
+      <div class="kpi-label">2026全年目标</div>
+      <div class="kpi-value"><span id="kpi-target">-</span><span class="kpi-unit">亿元</span></div>
+      <div class="kpi-sub" id="kpi-target-wan">-万元</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-icon" style="background:var(--teal);">📦</div>
+      <div class="kpi-label">当期累计实绩（1-<span id="kpi-month">-</span>月）</div>
+      <div class="kpi-value"><span id="kpi-actual">-</span><span class="kpi-unit">亿元</span></div>
+      <div class="kpi-sub" id="kpi-actual-wan">-万元</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-icon" style="background:var(--success);">📈</div>
+      <div class="kpi-label">目标完成率</div>
+      <div class="kpi-value"><span id="kpi-rate">-</span><span class="kpi-unit">%</span></div>
+      <div class="kpi-sub">时间进度 <span id="time-progress">-</span>%</div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="kpi-icon" style="background:var(--warn);">🔄</div>
+      <div class="kpi-label">同比2025年同期</div>
+      <div class="kpi-value"><span id="kpi-yoy">-</span><span class="kpi-unit">%</span></div>
+      <div class="kpi-sub" id="kpi-yoy-badge"></div>
+    </div>
+  </div>
+
+  <!-- 分部门进度 + 月度趋势 -->
+  <div class="row-2">
+    <!-- 分部门进度 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-wrap">
+          <div class="card-title-bar"></div>
+          <div>
+            <div class="card-title">分部门销售进度</div>
+            <div class="card-sub-title">单位：万元</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:16px 20px;">
+        <div id="dept-progress-list"></div>
+        <div style="height:200px;position:relative;margin-top:10px;">
+          <canvas id="deptChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月度趋势 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-wrap">
+          <div class="card-title-bar"></div>
+          <div>
+            <div class="card-title">月度发货趋势</div>
+            <div class="card-sub-title">2025 vs 2026（万元）</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="height:260px;position:relative;">
+          <canvas id="monthlyChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 产品发货量排名 -->
+  <div class="card row-full">
+    <div class="card-header">
+      <div class="card-title-wrap">
+        <div class="card-title-bar"></div>
+        <div>
+          <div class="card-title">产品发货量排名</div>
+          <div class="card-sub-title" id="rank-dept-label">当前部门 · 按统计发货数量降序</div>
+        </div>
+      </div>
+      <div class="tab-bar" id="rank-dept-tab">
+        <button class="tab-btn active" onclick="switchRankDept('CNS组（重庆药友）', this)">重庆药友</button>
+        <button class="tab-btn" onclick="switchRankDept('CNS组（洞庭药业）', this)">洞庭药业</button>
+      </div>
+    </div>
+    <div class="card-body" style="overflow-x:auto;">
+      <table class="rank-table" id="rank-table">
+        <thead>
+          <tr>
+            <th style="width:40px;">排名</th>
+            <th>产品名称</th>
+            <th style="width:140px;">发货数量（盒）</th>
+            <th style="width:130px;">目标完成率</th>
+            <th style="width:100px;">发货金额（万元）</th>
+            <th style="width:100px;">目标金额（万元）</th>
+          </tr>
+        </thead>
+        <tbody id="rank-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 地区销售进度 -->
+  <div class="card row-full" id="region-card">
+    <div class="card-header">
+      <div class="card-title-wrap">
+        <div class="card-title-bar"></div>
+        <div>
+          <div class="card-title">分地区销售进度</div>
+          <div class="card-sub-title">单位：万元 | 目标差距额 = 当期实绩 - 年目标 / 12 × 当前月份</div>
+        </div>
+      </div>
+      <div class="dept-tab-bar">
+        <button class="dept-tab-btn active" onclick="switchRegionDept('all', this)">全部</button>
+        <button class="dept-tab-btn" onclick="switchRegionDept('CNS组（重庆药友）', this)">重庆药友</button>
+        <button class="dept-tab-btn" onclick="switchRegionDept('CNS组（洞庭药业）', this)">洞庭药业</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="region-table-wrap">
+        <table class="region-table" id="region-table">
+          <thead>
+            <tr>
+              <th>地区</th>
+              <th>当期实绩（万元）</th>
+              <th>年目标（万元）</th>
+              <th>完成率</th>
+              <th>目标差距额（万元）</th>
+              <th>同比</th>
+            </tr>
+          </thead>
+          <tbody id="region-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 重点产品切片器 ─── -->
+  <div class="kp-slicer-section">
+    <div class="kp-slicer-header">
+      <div class="card-title-bar"></div>
+      <div class="card-title">重点产品销售分析</div>
+      <div style="font-size:12px;color:var(--text-sub);margin-left:4px;">点击产品卡片切换详情</div>
+    </div>
+    <div class="kp-cards-row" id="kp-cards-row"></div>
+  </div>
+
+  <!-- 重点产品详情 -->
+  <div class="kp-detail-section">
+    <div class="kp-detail-header">
+      <div class="card-title-bar"></div>
+      <div>
+        <div class="kp-detail-prod-name" id="kp-detail-name">富马酸喹硫平片</div>
+        <div class="kp-detail-spec" id="kp-detail-spec"></div>
+      </div>
+    </div>
+    <div class="kp-detail-body">
+      <div class="kp-detail-left">
+        <div class="kp-detail-chart-title">月度发货趋势（万元）</div>
+        <div style="height:260px;position:relative;">
+          <canvas id="kpMonthlyChart"></canvas>
+        </div>
+      </div>
+      <div class="kp-detail-right">
+        <div class="kp-detail-chart-title">分地区发货明细（按发货数量降序）</div>
+        <div class="kp-region-table-wrap">
+          <table class="kp-region-table">
+            <thead>
+              <tr>
+                <th style="text-align:left;">地区</th>
+                <th>发货金额<br><span style="font-weight:400;">(万元)</span></th>
+                <th>完成率</th>
+                <th>目标差距额<br><span style="font-weight:400;">(万元)</span></th>
+                <th>发货数量<br><span style="font-weight:400;">(盒)</span></th>
+                <th>数量同比</th>
+              </tr>
+            </thead>
+            <tbody id="kp-region-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 其他产品快筛 -->
+  <div class="card row-full" id="other-prod-card">
+    <div class="card-header">
+      <div class="card-title-wrap">
+        <div class="card-title-bar"></div>
+        <div>
+          <div class="card-title">其他产品</div>
+          <div class="card-sub-title">目标差距额 = 当期实绩 - 年目标 / 12 × 当前月份（万元）</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <div class="dept-tab-bar">
+          <button class="dept-tab-btn active" onclick="switchOtherDept('all', this)">全部</button>
+          <button class="dept-tab-btn" onclick="switchOtherDept('CNS组（重庆药友）', this)">重庆药友</button>
+          <button class="dept-tab-btn" onclick="switchOtherDept('CNS组（洞庭药业）', this)">洞庭药业</button>
+        </div>
+        <div class="other-filter-bar">
+          <button class="filter-btn active" onclick="filterOther('all', this)">全部显示</button>
+          <button class="filter-btn" onclick="filterOther('achieved', this)">目标进度达成</button>
+          <button class="filter-btn" onclick="filterOther('not', this)">目标进度未达成</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="other-prod-grid" id="other-prod-grid"></div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ════════════════════════════════════════════════════════
+//  数据加载与状态
+// ════════════════════════════════════════════════════════
+let D = null; // 全部数据
+let currentDept = 'all';
+let currentKP = null;
+let currentRankDept = 'CNS组（重庆药友）';
+let currentRegionDept = 'all';
+let currentOtherDept = 'all';
+let charts = {};
+
+const COLOR_PRIMARY = '#1565C0';
+const COLOR_TEAL = '#00838F';
+const COLOR_ACCENT = '#E65100';
+const COLOR_SUCCESS = '#2E7D32';
+const COLOR_WARN = '#F57F17';
+const COLOR_GRID = '#EEF2FA';
+const COLOR_ACTUAL_26 = '#1565C0';
+const COLOR_ACTUAL_25 = '#B0BEC5';
+
+async function loadData() {
+  try {
+    const r = await fetch('dashboard_data.json?t=' + Date.now());
+    D = await r.json();
+    render();
+    document.getElementById('update-time').textContent = '更新时间: ' + new Date().toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+function refreshData() {
+  loadData();
+}
+
+// ════════════════════════════════════════════════════════
+//  渲染入口
+// ════════════════════════════════════════════════════════
+function render() {
+  renderKPI();
+  renderDeptProgress();
+  renderDeptChart();
+  renderMonthlyChart();
+  renderRankTable(currentRankDept);
+  renderRegionTable();
+  renderKPCards();
+  if (!currentKP) currentKP = D.key_prods[0];
+  renderKPDetail(currentKP);
+  renderOtherProds('all');
+}
+
+// ─── KPI（联动部门切片器）─────────────────────────────────
+function renderKPI() {
+  const m = D.kpi.latest_month;
+  const timePct = (m / 12 * 100).toFixed(1);
+
+  let target, actual, rate, yoy, label_suffix = '';
+
+  if (currentDept === 'all') {
+    // 全局口径
+    target = D.kpi.target;
+    actual = D.kpi.actual;
+    rate = D.kpi.completion;
+    yoy = D.kpi.yoy;
+  } else {
+    // 部门口径
+    const dd = D.dept_data.find(d => d.dept === currentDept) || {};
+    target = dd.target || 0;
+    actual = dd.actual || 0;
+    rate = dd.rate || 0;
+    label_suffix = `（${currentDept.replace('CNS组（','').replace('）','')}）`;
+
+    // 部门同比：当期累计 vs 去年同期累计
+    const dm = D.dept_monthly_data[currentDept];
+    if (dm) {
+      let sum26 = 0, sum25 = 0;
+      for (let i = 0; i < m; i++) {
+        sum26 += dm.actual_26[i] || 0;
+        sum25 += dm.actual_25[i] || 0;
+      }
+      yoy = sum25 > 0 ? ((sum26 - sum25) / sum25 * 100) : 0;
+    } else {
+      yoy = 0;
+    }
+  }
+
+  document.getElementById('kpi-month').textContent = m;
+  // 金额以亿元为单位，保留两位小数
+  document.getElementById('kpi-target').textContent = target.toFixed(2);
+  document.getElementById('kpi-target-wan').textContent = (target * 10000).toFixed(0) + '万元';
+  document.getElementById('kpi-actual').textContent = actual.toFixed(2);
+  document.getElementById('kpi-actual-wan').textContent = (actual * 10000).toFixed(0) + '万元';
+  document.getElementById('kpi-rate').textContent = rate.toFixed(2);
+  document.getElementById('time-progress').textContent = timePct;
+  document.getElementById('kpi-yoy').textContent = (yoy > 0 ? '+' : '') + yoy.toFixed(2);
+  const yoyBadge = document.getElementById('kpi-yoy-badge');
+  yoyBadge.innerHTML = yoy >= 0
+    ? `<span class="kpi-badge badge-up">▲ 同比增长</span>`
+    : `<span class="kpi-badge badge-down">▼ 同比下降</span>`;
+}
+
+// ─── 部门进度条 ──────────────────────────────────────────
+function renderDeptProgress() {
+  const list = document.getElementById('dept-progress-list');
+  let depts = D.dept_data;
+  if (currentDept !== 'all') depts = depts.filter(d => d.dept === currentDept);
+  list.innerHTML = depts.map(d => {
+    const pct = Math.min(d.rate, 120);
+    const color = d.rate >= 100 ? COLOR_SUCCESS : d.rate >= 33 ? COLOR_PRIMARY : COLOR_ACCENT;
+    const rateColor = d.rate >= 100 ? 'rate-good' : d.rate >= 25 ? 'rate-mid' : 'rate-low';
+    return `<div class="dept-row">
+      <div class="dept-name">${d.dept.replace('CNS组（','').replace(')','').replace('）','')}</div>
+      <div class="dept-bar-wrap">
+        <div class="dept-bar-bg">
+          <div class="dept-bar-fill" style="width:${pct}%;background:${color};"></div>
+        </div>
+        <div class="dept-bar-nums">
+          <span>实绩: ${numFmt(d.actual)}万</span>
+          <span>目标: ${numFmt(d.target)}万</span>
+        </div>
+      </div>
+      <div class="dept-rate ${rateColor}">${d.rate.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── 部门柱状图 ──────────────────────────────────────────
+function renderDeptChart() {
+  const ctx = document.getElementById('deptChart').getContext('2d');
+  if (charts.dept) charts.dept.destroy();
+  let depts = D.dept_data;
+  if (currentDept !== 'all') depts = depts.filter(d => d.dept === currentDept);
+  charts.dept = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: depts.map(d => d.dept.replace('CNS组（','').replace(')','').replace('）','')),
+      datasets: [
+        { label: '实绩（万元）', data: depts.map(d => d.actual), backgroundColor: COLOR_PRIMARY + 'CC', borderRadius: 6, order: 1 },
+        { label: '目标（万元）', data: depts.map(d => d.target), backgroundColor: '#E3F0FF', borderColor: COLOR_PRIMARY, borderWidth: 1.5, borderRadius: 6, order: 2 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { font: { size: 11 } } }, tooltip: { callbacks: { label: c => `${c.dataset.label}: ${numFmt(c.raw)}万` } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+        y: { grid: { color: COLOR_GRID }, ticks: { font: { size: 11 }, callback: v => numFmt(v) + '万' } }
+      }
+    }
+  });
+}
+
+// ─── 月度趋势图 ──────────────────────────────────────────
+function renderMonthlyChart() {
+  const ctx = document.getElementById('monthlyChart').getContext('2d');
+  if (charts.monthly) charts.monthly.destroy();
+  const md = D.monthly_data;
+  const m = D.kpi.latest_month;
+  charts.monthly = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: md.months,
+      datasets: [
+        { label: '2026年（万元）', data: md.actual_26, backgroundColor: COLOR_PRIMARY + 'CC', borderRadius: 5, order: 1 },
+        { label: '2025年（万元）', data: md.actual_25, backgroundColor: COLOR_ACTUAL_25 + 'BB', borderRadius: 5, order: 2 },
+        { type: 'line', label: '2026趋势', data: md.actual_26.map((v,i)=>i<m?v:null), borderColor: COLOR_TEAL, borderWidth: 2, pointRadius: 3, fill: false, tension: 0.3, order: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { font: { size: 11 } } }, tooltip: { callbacks: { label: c => `${c.dataset.label}: ${numFmt(c.raw)}万` } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+        y: { grid: { color: COLOR_GRID }, ticks: { font: { size: 10 }, callback: v => numFmt(v) } }
+      }
+    }
+  });
+}
+
+// ─── 产品发货量排名 ──────────────────────────────────────
+function renderRankTable(dept) {
+  currentRankDept = dept;
+  document.getElementById('rank-dept-label').textContent = dept + ' · 按统计发货数量降序';
+  const tbody = document.getElementById('rank-tbody');
+  const rows = D.prod_rank_data[dept] || [];
+  const maxQty = rows[0]?.actual_qty || 1;
+  tbody.innerHTML = rows.map((r, i) => {
+    const rank = i + 1;
+    const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-n';
+    const pct = Math.min((r.actual_qty / maxQty) * 100, 100);
+    const ratePct = Math.min(r.rate, 200);
+    const chipClass = r.rate >= 100 ? 'chip-good' : r.rate >= 33 ? 'chip-mid' : 'chip-low';
+    const barColor = r.rate >= 100 ? COLOR_SUCCESS : r.rate >= 33 ? COLOR_PRIMARY : COLOR_ACCENT;
+    return `<tr>
+      <td><span class="rank-num ${rankClass}">${rank}</span></td>
+      <td style="font-weight:600;">${r.name}</td>
+      <td>
+        <div class="mini-bar-wrap">
+          <div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${pct}%;background:${COLOR_TEAL};"></div></div>
+          <span style="font-size:12px;">${numFmtInt(r.actual_qty)}</span>
+        </div>
+      </td>
+      <td>
+        <div class="mini-bar-wrap">
+          <div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${ratePct}%;background:${barColor};"></div></div>
+          <span class="rate-chip ${chipClass}">${r.rate.toFixed(1)}%</span>
+        </div>
+      </td>
+      <td style="text-align:right;">${numFmt(r.actual_amt)}</td>
+      <td style="text-align:right;">${numFmt(r.target_amt)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── 地区进度表（联动部门切片器）─────────────────────────────
+function renderRegionTable(dept) {
+  const tbody = document.getElementById('region-tbody');
+  const data = dept === 'all'
+    ? (D.dept_region_data['all'] || D.region_data)
+    : (D.dept_region_data[dept] || []);
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-sub);padding:20px;">暂无数据</td></tr>'; return; }
+  const maxAmt = data[0]?.actual || 1;
+  tbody.innerHTML = data.map(r => {
+    const pct = Math.min((r.actual / maxAmt) * 100, 100);
+    const barColor = r.rate >= 100 ? COLOR_SUCCESS : r.rate >= 33 ? COLOR_PRIMARY : COLOR_ACCENT;
+    const rateClass = r.rate >= 100 ? 'rate-good' : r.rate >= 33 ? 'rate-mid' : 'rate-low';
+    const gapClass = r.gap >= 0 ? 'gap-pos' : 'gap-neg';
+    const yoyText = r.yoy > 0 ? `<span class="yoy-up">▲ ${r.yoy.toFixed(1)}%</span>` : `<span class="yoy-down">▼ ${Math.abs(r.yoy).toFixed(1)}%</span>`;
+    return `<tr>
+      <td style="font-weight:600;">${r.name}</td>
+      <td>
+        <div>${numFmt(r.actual)}</div>
+        <div class="region-bar"><div class="region-bar-fill" style="width:${pct}%;background:${barColor};"></div></div>
+      </td>
+      <td>${numFmt(r.target)}</td>
+      <td class="${rateClass}">${r.rate.toFixed(1)}%</td>
+      <td class="${gapClass}">${r.gap >= 0 ? '+' : ''}${numFmt(r.gap)}</td>
+      <td>${yoyText}</td>
+    </tr>`;
+  }).join('');
+}
+
+function switchRegionDept(dept, el) {
+  currentRegionDept = dept;
+  document.querySelectorAll('#region-card .dept-tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderRegionTable(dept);
+}
+
+// ─── 重点产品切片器卡片 ──────────────────────────────────
+function renderKPCards() {
+  const row = document.getElementById('kp-cards-row');
+  const SPECS = D.prod_specs;
+  const IMGS = D.prod_images;
+  row.innerHTML = D.key_prods.map(prod => {
+    const kd = D.key_prod_data[prod];
+    const spec = SPECS[prod] || {};
+    const img = IMGS[prod] ? `<img src="${IMGS[prod]}" alt="${prod}">` : `<span class="kp-img-placeholder">💊</span>`;
+    const rateColor = kd.rate >= 100 ? COLOR_SUCCESS : kd.rate >= 33 ? COLOR_PRIMARY : COLOR_WARN;
+    const gapClass = kd.gap >= 0 ? 'gap-pos' : 'gap-neg';
+    const ratePct = Math.min(kd.rate, 100);
+    const gapSign = kd.gap >= 0 ? '+' : '';
+    return `<div class="kp-card ${prod === D.key_prods[0] ? 'active' : ''}" onclick="selectKP('${prod}', this)" id="kpc-${safeid(prod)}">
+      <div class="kp-active-indicator"></div>
+      <div class="kp-card-top">
+        <div class="kp-img-wrap">${img}</div>
+        <div class="kp-card-info">
+          <div class="kp-prod-name">${prod}</div>
+          <div class="kp-spec">${spec.spec || ''} ${spec.pack || ''}</div>
+          <div class="kp-maker">${spec.brand ? spec.brand+'  ' : ''}${(spec.maker||'').replace('重庆','渝').replace('湖南','湘').replace('药友制药有限责任公司','药友').replace('洞庭药业股份有限公司','洞庭')}</div>
+        </div>
+      </div>
+      <div class="kp-card-body">
+        <div class="kp-data-row">
+          <div class="kp-num-group">
+            <div class="kp-num-label">当期实绩</div>
+            <div class="kp-num-val">${numFmt(kd.actual)}<span class="kp-num-unit">万元</span></div>
+            <div style="font-size:10px;color:var(--text-sub);">目标 ${numFmt(kd.target)}万</div>
+          </div>
+          <div class="kp-rate-circle" style="border-color:${rateColor};color:${rateColor};">
+            ${kd.rate.toFixed(0)}<span class="rate-unit">%</span>
+          </div>
+        </div>
+        <div class="kp-progress-bar">
+          <div class="kp-progress-fill" style="width:${ratePct}%;background:${rateColor};"></div>
+        </div>
+        <div class="kp-gap-row">
+          <span style="color:var(--text-sub);font-size:10px;">目标差距额</span>
+          <span class="${gapClass}" style="font-size:11px;font-weight:700;">${gapSign}${numFmt(kd.gap)}万</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectKP(prod, el) {
+  document.querySelectorAll('.kp-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentKP = prod;
+  renderKPDetail(prod);
+}
+
+// ─── 重点产品详情 ────────────────────────────────────────
+function renderKPDetail(prod) {
+  const SPECS = D.prod_specs;
+  const spec = SPECS[prod] || {};
+  document.getElementById('kp-detail-name').textContent = prod;
+  document.getElementById('kp-detail-spec').textContent = [spec.spec, spec.pack, spec.maker].filter(Boolean).join(' · ');
+
+  // 月度图
+  const ctx = document.getElementById('kpMonthlyChart').getContext('2d');
+  if (charts.kpMonthly) charts.kpMonthly.destroy();
+  const md = D.kp_monthly_data[prod];
+  const m = D.kpi.latest_month;
+  charts.kpMonthly = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: D.monthly_data.months,
+      datasets: [
+        { label: '2026年（万元）', data: md.actual_26, backgroundColor: COLOR_PRIMARY + 'CC', borderRadius: 5, order: 1 },
+        { label: '2025年（万元）', data: md.actual_25, backgroundColor: COLOR_ACTUAL_25 + 'AA', borderRadius: 5, order: 2 },
+        { type: 'line', label: '2026趋势', data: md.actual_26.map((v,i)=>i<m?v:null), borderColor: COLOR_TEAL, borderWidth: 2, pointRadius: 3, fill: false, tension: 0.3, order: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { font: { size: 11 } } }, tooltip: { callbacks: { label: c => `${c.dataset.label}: ${numFmt(c.raw)}万` } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+        y: { grid: { color: COLOR_GRID }, ticks: { font: { size: 10 }, callback: v => numFmt(v) + '万' } }
+      }
+    }
+  });
+
+  // 地区明细表
+  const tbody = document.getElementById('kp-region-tbody');
+  const rows = D.kp_region_data[prod] || [];
+  tbody.innerHTML = rows.map(r => {
+    const gapClass = r.gap >= 0 ? 'gap-pos' : 'gap-neg';
+    const rateClass = r.rate >= 100 ? 'rate-good' : r.rate >= 33 ? 'rate-mid' : 'rate-low';
+    const yoyClass = r.yoy_qty >= 0 ? 'yoy-up icon-up' : 'yoy-down icon-down';
+    const gapSign = r.gap >= 0 ? '+' : '';
+    return `<tr>
+      <td>${r.region}</td>
+      <td>${numFmt(r.amount)}</td>
+      <td class="${rateClass}">${r.rate.toFixed(1)}%</td>
+      <td class="${gapClass}">${gapSign}${numFmt(r.gap)}</td>
+      <td>${numFmtInt(r.qty)}</td>
+      <td class="${yoyClass}">${r.yoy_qty > 0 ? '+' : ''}${r.yoy_qty.toFixed(1)}%</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── 其他产品快筛（独立部门切片器）──────────────────────────
+function switchOtherDept(dept, el) {
+  currentOtherDept = dept;
+  document.querySelectorAll('#other-prod-card .dept-tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  // 重置快筛按钮
+  document.querySelectorAll('#other-prod-card .filter-btn').forEach((b,i) => { if(i===0) b.classList.add('active'); else b.classList.remove('active'); });
+  renderOtherProds('all');
+}
+
+function filterOther(type, el) {
+  document.querySelectorAll('#other-prod-card .filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderOtherProds(type);
+}
+
+function renderOtherProds(type) {
+  const grid = document.getElementById('other-prod-grid');
+  // 使用独立的部门切片器数据，不受顶部"产品归属部门"影响
+  const baseData = currentOtherDept === 'all'
+    ? (D.dept_other_prod_data['all'] || D.other_prod_data)
+    : (D.dept_other_prod_data[currentOtherDept] || []);
+  let prods = baseData;
+  if (type === 'achieved') prods = prods.filter(p => p.achieved);
+  else if (type === 'not') prods = prods.filter(p => !p.achieved);
+  grid.innerHTML = prods.map(p => {
+    const pct = Math.min(p.rate, 100);
+    const barColor = p.rate >= 100 ? COLOR_SUCCESS : p.rate >= 33 ? COLOR_PRIMARY : COLOR_ACCENT;
+    const gapClass = p.achieved ? 'gap-pos' : 'gap-neg';
+    const deptTag = p.dept === 'CNS组（重庆药友）' ? '<span class="other-dept-tag tag-yy">药友</span>' : '<span class="other-dept-tag tag-dt">洞庭</span>';
+    const gapSign = p.gap >= 0 ? '+' : '';
+    return `<div class="other-card">
+      <div class="other-card-name">
+        ${p.name} ${deptTag}
+      </div>
+      <div class="other-bar-bg"><div class="other-bar-fill" style="width:${pct}%;background:${barColor};"></div></div>
+      <div class="other-nums">
+        <span>实绩: ${numFmt(p.actual)}万</span>
+        <span>目标: ${numFmt(p.target)}万</span>
+        <span style="font-weight:700;color:${barColor};">${p.rate.toFixed(1)}%</span>
+      </div>
+      <div class="other-gap-row">
+        <span style="color:var(--text-sub);">差距额</span>
+        <span class="${gapClass}">${gapSign}${numFmt(p.gap)}万</span>
+      </div>
+    </div>`;
+  }).join('') || '<div style="color:var(--text-sub);padding:20px;font-size:14px;">暂无符合条件的产品</div>';
+}
+
+// ─── 部门切片器（顶部"产品归属部门"）─────────────────────────
+function switchDept(dept, el) {
+  currentDept = dept;
+  document.querySelectorAll('.dept-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderKPI();          // KPI卡片联动
+  renderDeptProgress();
+  renderDeptChart();
+  // 注意：其他产品使用独立部门切片器，不受此切片器影响
+}
+
+function switchRankDept(dept, el) {
+  document.querySelectorAll('#rank-dept-tab .tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderRankTable(dept);
+}
+
+// ─── 工具函数 ────────────────────────────────────────────
+function numFmt(v) {
+  if (v === null || v === undefined || isNaN(v)) return '-';
+  const abs = Math.abs(v);
+  const sign = v < 0 ? '-' : '';
+  // 输入单位是万元
+  if (abs >= 10000) return sign + (abs / 10000).toFixed(2) + '亿';
+  if (abs >= 0.01 || abs === 0) return sign + abs.toFixed(2);
+  return sign + abs.toFixed(4);
+}
+function numFmtInt(v) {
+  if (!v && v !== 0) return '-';
+  return Math.round(v).toLocaleString('zh-CN');
+}
+function safeid(s) { return s.replace(/[()（）\s]/g, '_'); }
+
+// ─── 初始化 ──────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
