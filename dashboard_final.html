@@ -237,6 +237,111 @@ Check your Browserslist config to be sure that your targets are set up correctly
         .data-table .text-right { text-align: right; }
         .data-table th:nth-child(5),
         .data-table th:nth-child(6) { text-align: right; }
+
+        /* 固定列样式 */
+        .gsh-table-wrap {
+            position: relative;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .gsh-table-wrap table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .gsh-table-wrap th,
+        .gsh-table-wrap td {
+            background: #fff;
+        }
+        .gsh-table-wrap th.sticky-col,
+        .gsh-table-wrap td.sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            background: #fff;
+        }
+        .gsh-table-wrap th.sticky-col-2,
+        .gsh-table-wrap td.sticky-col-2 {
+            position: sticky;
+            left: 38px;
+            z-index: 10;
+            background: #fff;
+        }
+        .gsh-table-wrap th.sticky-col-3,
+        .gsh-table-wrap td.sticky-col-3 {
+            position: sticky;
+            left: 98px;
+            z-index: 10;
+            background: #fff;
+        }
+        .gsh-table-wrap th.sticky-col {
+            z-index: 20;
+            background: #f8f9fa;
+        }
+        .gsh-table-wrap th.sticky-col-2 {
+            z-index: 20;
+            background: #f8f9fa;
+        }
+        .gsh-table-wrap th.sticky-col-3 {
+            z-index: 20;
+            background: #f8f9fa;
+        }
+        /* 固定列右边框 */
+        .gsh-table-wrap td.sticky-col-3,
+        .gsh-table-wrap th.sticky-col-3 {
+            border-right: 2px solid #e5e7eb;
+        }
+
+        /* 金额完成情况表格固定列 */
+        .amount-table-wrap {
+            position: relative;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .amount-table-wrap table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .amount-table-wrap th,
+        .amount-table-wrap td {
+            background: #fff;
+        }
+        .amount-table-wrap th.sticky-col,
+        .amount-table-wrap td.sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            background: #fff;
+        }
+        .amount-table-wrap th.sticky-col-2,
+        .amount-table-wrap td.sticky-col-2 {
+            position: sticky;
+            left: 42px;
+            z-index: 10;
+            background: #fff;
+        }
+        .amount-table-wrap th.sticky-col-3,
+        .amount-table-wrap td.sticky-col-3 {
+            position: sticky;
+            left: 114px;
+            z-index: 10;
+            background: #fff;
+        }
+        .amount-table-wrap th.sticky-col {
+            z-index: 20;
+            background: #f8f9fa;
+        }
+        .amount-table-wrap th.sticky-col-2 {
+            z-index: 20;
+            background: #f8f9fa;
+        }
+        .amount-table-wrap th.sticky-col-3 {
+            z-index: 20;
+            background: #f8f9fa;
+        }
+        .amount-table-wrap td.sticky-col-3,
+        .amount-table-wrap th.sticky-col-3 {
+            border-right: 2px solid #e5e7eb;
+        }
         
         .text-green { color: #10b981; }
         .text-red { color: #ef4444; }
@@ -298,6 +403,26 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 font-size: 0.65rem;
             }
         }
+
+        /* 页面 Tab */
+        .page-tab {
+            padding: 7px 18px;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            background: #f3f4f6;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .page-tab.active {
+            background: white;
+            color: #047BA5;
+            border-color: #047BA5;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body class="p-4">
@@ -314,6 +439,15 @@ Check your Browserslist config to be sure that your targets are set up correctly
         </div>
     </header>
 
+    <!-- 页面 Tab 导航 -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button class="page-tab active" data-page="amount" onclick="switchPage('amount')">金额完成情况</button>
+        <button class="page-tab" data-page="gsh" onclick="switchPage('gsh')">谷胱甘肽片0.1g</button>
+        <button class="page-tab" data-page="zsy" onclick="switchPage('zsy')">注射用谷胱甘肽</button>
+    </div>
+
+    <!-- ===================== 金额完成情况页面 ===================== -->
+    <div id="page-amount">
     <!-- 销售部门筛选 -->
     <div class="mb-2 flex flex-wrap gap-2 justify-center">
         <button class="filter-btn active" data-filter="all">整体</button>
@@ -368,11 +502,25 @@ Check your Browserslist config to be sure that your targets are set up correctly
         </div>
     </div>
 
-    <!-- 地区完成情况表格 -->
+    <!-- 26年累计发货金额折线图 -->
     <div class="chart-container">
-        <h3 class="text-sm font-semibold mb-3 text-gray-700">地区完成情况（按完成金额排名）</h3>
-        <div class="overflow-x-auto">
-            <table class="data-table">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;">
+            <h3 class="text-sm font-semibold text-gray-700">26年累计发货金额</h3>
+            <span style="font-size:0.72rem;color:#6b7280;">单位：万元</span>
+        </div>
+        <div class="relative" style="height: 280px;">
+            <canvas id="cumulativeAmountChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 地区完成情况表格（仅在医院销售部和新营销部筛选时显示） -->
+    <div id="regionTableContainer" class="chart-container" style="display: none;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;">
+            <h3 class="text-sm font-semibold text-gray-700">地区完成情况（按完成金额排名）</h3>
+            <span style="font-size:0.72rem;color:#6b7280;">单位：万元</span>
+        </div>
+        <div class="amount-table-wrap">
+            <table class="data-table" id="amount-regionTable">
                 <colgroup>
                     <col class="col-rank">
                     <col class="col-big">
@@ -385,14 +533,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 </colgroup>
                 <thead>
                     <tr>
-                        <th>排名</th>
-                        <th>大区</th>
-                        <th>地区</th>
-                        <th>责任人</th>
-                        <th>目标金额(万元)</th>
-                        <th>完成金额(万元)</th>
-                        <th>同比增幅</th>
-                        <th>完成率</th>
+                        <th class="sticky-col" style="text-align:center;font-weight:600;">排名</th>
+                        <th class="sticky-col-2" style="text-align:center;font-weight:600;">大区</th>
+                        <th class="sticky-col-3" style="text-align:center;font-weight:600;">地区</th>
+                        <th style="text-align:center;font-weight:600;">责任人</th>
+                        <th style="text-align:center;font-weight:600;">目标金额</th>
+                        <th style="text-align:center;font-weight:600;">完成金额</th>
+                        <th style="text-align:center;font-weight:600;">同比增幅</th>
+                        <th style="text-align:center;font-weight:600;">完成率</th>
                     </tr>
                 </thead>
                 <tbody id="regionTableBody">
@@ -403,7 +551,778 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     <script>
         // 数据存储
-        let dashboardData = null;
+        let dashboardData = {
+  "latest_date": "2026-04-03",
+  "time_progress": 25.2,
+  "kpi": {
+    "target": 96678.0,
+    "complete": 21576.1,
+    "rate": 22.3,
+    "yoy": 2.3
+  },
+  "kpi_by_dept": {
+    "all": {
+      "target": 96678.0,
+      "complete": 21576.1,
+      "rate": 22.3,
+      "yoy": 2.3
+    },
+    "医院销售部": {
+      "target": 75468.0,
+      "complete": 16852.9,
+      "rate": 22.3,
+      "yoy": 12.2
+    },
+    "新营销部": {
+      "target": 21210.0,
+      "complete": 4723.1,
+      "rate": 22.3,
+      "yoy": -22.2
+    }
+  },
+  "products": [
+    {
+      "product": "谷胱甘肽片0.1g",
+      "target": 78678.0,
+      "complete": 17426.3,
+      "rate": 22.1,
+      "yoy": 3.5
+    },
+    {
+      "product": "注射用谷胱甘肽",
+      "target": 18000.0,
+      "complete": 4149.7,
+      "rate": 23.1,
+      "yoy": -2.5
+    }
+  ],
+  "products_by_dept": {
+    "谷胱甘肽片0.1g": {
+      "医院销售部": {
+        "target": 57468.0,
+        "complete": 12703.2,
+        "rate": 22.1,
+        "yoy": 17.9
+      },
+      "新营销部": {
+        "target": 21210.0,
+        "complete": 4723.1,
+        "rate": 22.3,
+        "yoy": -22.2
+      }
+    },
+    "注射用谷胱甘肽": {
+      "医院销售部": {
+        "target": 18000.0,
+        "complete": 4149.7,
+        "rate": 23.1,
+        "yoy": -2.5
+      },
+      "新营销部": {
+        "target": 0.0,
+        "complete": 0.0,
+        "rate": 0,
+        "yoy": 0
+      }
+    }
+  },
+  "regions": {
+    "华东": {
+      "target": 18030.8,
+      "complete": 4288.3,
+      "regions": [
+        {
+          "big_region": "华东",
+          "region": "上海",
+          "person": "高文龙",
+          "target": 9326.4,
+          "complete": 2622.7,
+          "yoy": 6.9,
+          "rate": 28.1
+        },
+        {
+          "big_region": "华东",
+          "region": "安徽",
+          "person": "汪腾飞",
+          "target": 2013.0,
+          "complete": 203.6,
+          "yoy": -48.1,
+          "rate": 10.1
+        },
+        {
+          "big_region": "华东",
+          "region": "江苏",
+          "person": "杨海波",
+          "target": 4178.0,
+          "complete": 877.6,
+          "yoy": 10.8,
+          "rate": 21.0
+        },
+        {
+          "big_region": "华东",
+          "region": "浙江",
+          "person": "吴光建",
+          "target": 2513.3,
+          "complete": 584.3,
+          "yoy": 0.4,
+          "rate": 23.3
+        }
+      ]
+    },
+    "华北": {
+      "target": 14684.5,
+      "complete": 3487.2,
+      "regions": [
+        {
+          "big_region": "华北",
+          "region": "内蒙古",
+          "person": "卿毅",
+          "target": 172.9,
+          "complete": 48.9,
+          "yoy": 48.0,
+          "rate": 28.3
+        },
+        {
+          "big_region": "华北",
+          "region": "北京",
+          "person": "卢俊",
+          "target": 2486.7,
+          "complete": 297.3,
+          "yoy": -50.2,
+          "rate": 12.0
+        },
+        {
+          "big_region": "华北",
+          "region": "吉林",
+          "person": "卿毅",
+          "target": 972.7,
+          "complete": 382.8,
+          "yoy": 130.5,
+          "rate": 39.4
+        },
+        {
+          "big_region": "华北",
+          "region": "天津",
+          "person": "卢俊",
+          "target": 792.8,
+          "complete": 180.8,
+          "yoy": -3.0,
+          "rate": 22.8
+        },
+        {
+          "big_region": "华北",
+          "region": "山东",
+          "person": "卿毅",
+          "target": 2846.2,
+          "complete": 753.0,
+          "yoy": 28.9,
+          "rate": 26.5
+        },
+        {
+          "big_region": "华北",
+          "region": "山西",
+          "person": "卿毅",
+          "target": 1095.9,
+          "complete": 235.9,
+          "yoy": 1.9,
+          "rate": 21.5
+        },
+        {
+          "big_region": "华北",
+          "region": "河北",
+          "person": "卢俊",
+          "target": 1215.7,
+          "complete": 310.5,
+          "yoy": 52.5,
+          "rate": 25.5
+        },
+        {
+          "big_region": "华北",
+          "region": "辽宁",
+          "person": "卿毅",
+          "target": 2274.2,
+          "complete": 617.4,
+          "yoy": 28.4,
+          "rate": 27.1
+        },
+        {
+          "big_region": "华北",
+          "region": "黑龙江",
+          "person": "卿毅",
+          "target": 2827.4,
+          "complete": 660.5,
+          "yoy": 4.1,
+          "rate": 23.4
+        }
+      ]
+    },
+    "华南": {
+      "target": 23618.2,
+      "complete": 4519.3,
+      "regions": [
+        {
+          "big_region": "华南",
+          "region": "广东",
+          "person": "许占海",
+          "target": 10889.9,
+          "complete": 1428.4,
+          "yoy": 114.8,
+          "rate": 13.1
+        },
+        {
+          "big_region": "华南",
+          "region": "广西",
+          "person": "罗险峰",
+          "target": 3942.7,
+          "complete": 1025.3,
+          "yoy": 22.2,
+          "rate": 26.0
+        },
+        {
+          "big_region": "华南",
+          "region": "江西",
+          "person": "罗险峰",
+          "target": 1674.0,
+          "complete": 302.5,
+          "yoy": 0.7,
+          "rate": 18.1
+        },
+        {
+          "big_region": "华南",
+          "region": "海南",
+          "person": "许占海",
+          "target": 143.7,
+          "complete": 33.3,
+          "yoy": 86.0,
+          "rate": 23.2
+        },
+        {
+          "big_region": "华南",
+          "region": "湖南",
+          "person": "罗险峰",
+          "target": 4381.9,
+          "complete": 1206.9,
+          "yoy": 24.5,
+          "rate": 27.5
+        },
+        {
+          "big_region": "华南",
+          "region": "福建",
+          "person": "许占海",
+          "target": 2586.1,
+          "complete": 523.0,
+          "yoy": 10.9,
+          "rate": 20.2
+        }
+      ]
+    },
+    "华西": {
+      "target": 19134.6,
+      "complete": 4558.1,
+      "regions": [
+        {
+          "big_region": "华西",
+          "region": "云南",
+          "person": "周辉",
+          "target": 1232.4,
+          "complete": 340.7,
+          "yoy": 25.2,
+          "rate": 27.6
+        },
+        {
+          "big_region": "华西",
+          "region": "四川",
+          "person": "薛文",
+          "target": 2496.6,
+          "complete": 597.5,
+          "yoy": 1.2,
+          "rate": 23.9
+        },
+        {
+          "big_region": "华西",
+          "region": "宁夏",
+          "person": "耿福林",
+          "target": 9.2,
+          "complete": 4.2,
+          "yoy": 236.6,
+          "rate": 45.6
+        },
+        {
+          "big_region": "华西",
+          "region": "新疆",
+          "person": "耿福林",
+          "target": 267.4,
+          "complete": 40.7,
+          "yoy": -6.7,
+          "rate": 15.2
+        },
+        {
+          "big_region": "华西",
+          "region": "河南",
+          "person": "黄彩西",
+          "target": 3044.3,
+          "complete": 469.6,
+          "yoy": -5.8,
+          "rate": 15.4
+        },
+        {
+          "big_region": "华西",
+          "region": "海南",
+          "person": "",
+          "target": 0.0,
+          "complete": 0.0,
+          "yoy": 0.0,
+          "rate": 0.0
+        },
+        {
+          "big_region": "华西",
+          "region": "湖北",
+          "person": "陈辉",
+          "target": 3110.3,
+          "complete": 890.1,
+          "yoy": 18.6,
+          "rate": 28.6
+        },
+        {
+          "big_region": "华西",
+          "region": "甘肃",
+          "person": "耿福林",
+          "target": 478.9,
+          "complete": 105.8,
+          "yoy": 25.1,
+          "rate": 22.1
+        },
+        {
+          "big_region": "华西",
+          "region": "西藏",
+          "person": "薛文",
+          "target": 36.1,
+          "complete": 4.1,
+          "yoy": -65.7,
+          "rate": 11.3
+        },
+        {
+          "big_region": "华西",
+          "region": "贵州",
+          "person": "周辉",
+          "target": 1267.5,
+          "complete": 264.2,
+          "yoy": -6.4,
+          "rate": 20.8
+        },
+        {
+          "big_region": "华西",
+          "region": "重庆",
+          "person": "薛文",
+          "target": 5425.5,
+          "complete": 1574.9,
+          "yoy": -1.6,
+          "rate": 29.0
+        },
+        {
+          "big_region": "华西",
+          "region": "陕西",
+          "person": "耿福林",
+          "target": 1663.4,
+          "complete": 249.3,
+          "yoy": -11.0,
+          "rate": 15.0
+        },
+        {
+          "big_region": "华西",
+          "region": "青海",
+          "person": "耿福林",
+          "target": 102.9,
+          "complete": 17.0,
+          "yoy": 66.6,
+          "rate": 16.5
+        }
+      ]
+    },
+    "新营销部": {
+      "target": 21210.0,
+      "complete": 4723.1,
+      "regions": [
+        {
+          "big_region": "新营销部",
+          "region": "B端-壹药网",
+          "person": "庞大智",
+          "target": 7575.0,
+          "complete": 1261.8,
+          "yoy": 135.4,
+          "rate": 16.7
+        },
+        {
+          "big_region": "新营销部",
+          "region": "B端-药师帮",
+          "person": "庞大智",
+          "target": 4040.0,
+          "complete": 690.7,
+          "yoy": -29.4,
+          "rate": 17.1
+        },
+        {
+          "big_region": "新营销部",
+          "region": "C端-京东",
+          "person": "贠嘉宏",
+          "target": 4797.5,
+          "complete": 530.0,
+          "yoy": 2.4,
+          "rate": 11.0
+        },
+        {
+          "big_region": "新营销部",
+          "region": "C端-其他",
+          "person": "贠嘉宏",
+          "target": 757.5,
+          "complete": 503.4,
+          "yoy": 775.3,
+          "rate": 66.5
+        },
+        {
+          "big_region": "新营销部",
+          "region": "C端-阿里",
+          "person": "贠嘉宏",
+          "target": 2525.0,
+          "complete": 14.9,
+          "yoy": -96.6,
+          "rate": 0.6
+        },
+        {
+          "big_region": "新营销部",
+          "region": "KA",
+          "person": "张宇航",
+          "target": 1515.0,
+          "complete": 1722.5,
+          "yoy": -51.4,
+          "rate": 113.7
+        }
+      ]
+    }
+  },
+  "cumulative_amount": {
+    "all": {
+      "dates": [
+        "01-01",
+        "01-04",
+        "01-05",
+        "01-06",
+        "01-07",
+        "01-08",
+        "01-09",
+        "01-12",
+        "01-13",
+        "01-14",
+        "01-15",
+        "01-16",
+        "01-19",
+        "01-20",
+        "01-21",
+        "01-22",
+        "01-23",
+        "01-26",
+        "01-27",
+        "01-28",
+        "01-29",
+        "01-30",
+        "02-02",
+        "02-03",
+        "02-04",
+        "02-05",
+        "02-06",
+        "02-09",
+        "02-10",
+        "02-12",
+        "02-25",
+        "02-26",
+        "02-27",
+        "02-28",
+        "03-02",
+        "03-03",
+        "03-04",
+        "03-05",
+        "03-06",
+        "03-09",
+        "03-10",
+        "03-11",
+        "03-12",
+        "03-13",
+        "03-16",
+        "03-17",
+        "03-18",
+        "03-19",
+        "03-20",
+        "03-23",
+        "03-24",
+        "03-25",
+        "03-26",
+        "03-27",
+        "03-30",
+        "03-31",
+        "04-01",
+        "04-02",
+        "04-03"
+      ],
+      "amounts": [
+        548.2,
+        1511.98,
+        1672.58,
+        1879.17,
+        3932.82,
+        4267.32,
+        4424.88,
+        4480.66,
+        4762.12,
+        5400.26,
+        5577.65,
+        5805.9,
+        6030.94,
+        6561.05,
+        6872.26,
+        6978.34,
+        8014.97,
+        8155.51,
+        8513.14,
+        8969.08,
+        10536.9,
+        10900.51,
+        11004.01,
+        12595.91,
+        13330.85,
+        13592.13,
+        13596.5,
+        13659.25,
+        13702.82,
+        13702.03,
+        13838.33,
+        13802.12,
+        13997.89,
+        14128.95,
+        14169.04,
+        14788.11,
+        14940.55,
+        15175.96,
+        15660.2,
+        15742.52,
+        16484.83,
+        16692.34,
+        16898.37,
+        17040.63,
+        17149.81,
+        17274.14,
+        17378.4,
+        17442.53,
+        17687.67,
+        17807.22,
+        17999.49,
+        18226.14,
+        18712.3,
+        19708.04,
+        20248.47,
+        20271.64,
+        20439.6,
+        20643.39,
+        21576.06
+      ]
+    },
+    "医院销售部": {
+      "dates": [
+        "01-01",
+        "01-04",
+        "01-05",
+        "01-06",
+        "01-07",
+        "01-08",
+        "01-09",
+        "01-12",
+        "01-13",
+        "01-14",
+        "01-15",
+        "01-16",
+        "01-19",
+        "01-20",
+        "01-21",
+        "01-22",
+        "01-23",
+        "01-26",
+        "01-27",
+        "01-28",
+        "01-29",
+        "01-30",
+        "02-02",
+        "02-03",
+        "02-04",
+        "02-05",
+        "02-06",
+        "02-09",
+        "02-10",
+        "02-12",
+        "02-25",
+        "02-26",
+        "02-27",
+        "02-28",
+        "03-02",
+        "03-03",
+        "03-04",
+        "03-05",
+        "03-06",
+        "03-09",
+        "03-10",
+        "03-11",
+        "03-12",
+        "03-13",
+        "03-16",
+        "03-17",
+        "03-18",
+        "03-19",
+        "03-20",
+        "03-23",
+        "03-24",
+        "03-25",
+        "03-26",
+        "03-27",
+        "03-30",
+        "03-31",
+        "04-01",
+        "04-02",
+        "04-03"
+      ],
+      "amounts": [
+        548.2,
+        1511.98,
+        1670.88,
+        1868.12,
+        3664.52,
+        3997.31,
+        4151.05,
+        4203.01,
+        4484.47,
+        4648.49,
+        4796.54,
+        4975.03,
+        5160.51,
+        5661.16,
+        5826.95,
+        5933.03,
+        6930.11,
+        7065.54,
+        7423.17,
+        7879.11,
+        8593.25,
+        8956.87,
+        9060.37,
+        10294.05,
+        10817.07,
+        11078.36,
+        11082.73,
+        11145.47,
+        11189.05,
+        11188.25,
+        11292.66,
+        11169.91,
+        11365.68,
+        11430.4,
+        11436.04,
+        12024.48,
+        12153.97,
+        12228.61,
+        12712.85,
+        12795.17,
+        13319.95,
+        13527.46,
+        13560.63,
+        13702.89,
+        13766.6,
+        13890.93,
+        13995.18,
+        14059.32,
+        14304.46,
+        14377.95,
+        14549.82,
+        14599.51,
+        15085.68,
+        15471.47,
+        15527.77,
+        15550.94,
+        15718.9,
+        15922.69,
+        16852.91
+      ]
+    },
+    "新营销部": {
+      "dates": [
+        "01-05",
+        "01-06",
+        "01-07",
+        "01-08",
+        "01-09",
+        "01-12",
+        "01-14",
+        "01-15",
+        "01-16",
+        "01-19",
+        "01-20",
+        "01-21",
+        "01-23",
+        "01-26",
+        "01-29",
+        "02-03",
+        "02-04",
+        "02-25",
+        "02-26",
+        "02-28",
+        "03-02",
+        "03-03",
+        "03-04",
+        "03-05",
+        "03-10",
+        "03-12",
+        "03-16",
+        "03-23",
+        "03-24",
+        "03-25",
+        "03-27",
+        "03-30",
+        "04-03"
+      ],
+      "amounts": [
+        1.7,
+        11.06,
+        268.3,
+        270.0,
+        273.83,
+        277.66,
+        751.77,
+        781.11,
+        830.87,
+        870.42,
+        899.89,
+        1045.31,
+        1084.86,
+        1089.97,
+        1943.64,
+        2301.85,
+        2513.77,
+        2545.67,
+        2632.21,
+        2698.55,
+        2733.0,
+        2763.62,
+        2786.59,
+        2947.35,
+        3164.88,
+        3337.74,
+        3383.21,
+        3429.27,
+        3449.66,
+        3626.63,
+        4236.57,
+        4720.7,
+        4723.15
+      ]
+    }
+  }
+};
         let charts = {};
         let currentFilter = 'all';
 
@@ -416,7 +1335,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
         // 加载数据（内嵌数据，无需外部文件）
         function loadData() {
             try {
-                dashboardData = {"latest_date": "2026-04-03", "time_progress": 25.2, "kpi": {"target": 96678.0, "complete": 21576.1, "rate": 22.3, "yoy": 2.3}, "kpi_by_dept": {"all": {"target": 96678.0, "complete": 21576.1, "rate": 22.3, "yoy": 2.3}, "医院销售部": {"target": 75468.0, "complete": 16852.9, "rate": 22.3, "yoy": 12.2}, "新营销部": {"target": 21210.0, "complete": 4723.1, "rate": 22.3, "yoy": -22.2}}, "products": [{"product": "谷胱甘肽片0.1g", "target": 78678.0, "complete": 17426.3, "rate": 22.1, "yoy": 3.5}, {"product": "注射用谷胱甘肽", "target": 18000.0, "complete": 4149.7, "rate": 23.1, "yoy": -2.5}], "products_by_dept": {"谷胱甘肽片0.1g": {"医院销售部": {"target": 57468.0, "complete": 12703.2, "rate": 22.1, "yoy": 17.9}, "新营销部": {"target": 21210.0, "complete": 4723.1, "rate": 22.3, "yoy": -22.2}}, "注射用谷胱甘肽": {"医院销售部": {"target": 18000.0, "complete": 4149.7, "rate": 23.1, "yoy": -2.5}, "新营销部": {"target": 0.0, "complete": 0.0, "rate": 0, "yoy": 0}}}, "regions": {"华南": {"target": 23618.200000000004, "complete": 4519.400000000001, "regions": [{"big_region": "华南", "region": "广东", "person": "许占海", "target": 10889.9, "complete": 1428.4, "rate": 13.1, "yoy": 114.8}, {"big_region": "华南", "region": "湖南", "person": "罗险峰", "target": 4381.8, "complete": 1206.9, "rate": 27.5, "yoy": 24.5}, {"big_region": "华南", "region": "广西", "person": "罗险峰", "target": 3942.7, "complete": 1025.3, "rate": 26.0, "yoy": 22.2}, {"big_region": "华南", "region": "福建", "person": "许占海", "target": 2586.1, "complete": 523.0, "rate": 20.2, "yoy": 10.9}, {"big_region": "华南", "region": "江西", "person": "罗险峰", "target": 1674.0, "complete": 302.5, "rate": 18.1, "yoy": 0.7}, {"big_region": "华南", "region": "海南", "person": "许占海", "target": 143.7, "complete": 33.3, "rate": 23.2, "yoy": 86.0}], "rate": 19.1}, "华东": {"target": 18030.699999999997, "complete": 4288.2, "regions": [{"big_region": "华东", "region": "上海", "person": "高文龙", "target": 9326.4, "complete": 2622.7, "rate": 28.1, "yoy": 6.9}, {"big_region": "华东", "region": "江苏", "person": "杨海波", "target": 4178.0, "complete": 877.6, "rate": 21.0, "yoy": 10.8}, {"big_region": "华东", "region": "浙江", "person": "吴光建", "target": 2513.3, "complete": 584.3, "rate": 23.3, "yoy": 0.4}, {"big_region": "华东", "region": "安徽", "person": "汪腾飞", "target": 2013.0, "complete": 203.6, "rate": 10.1, "yoy": -48.1}], "rate": 23.8}, "华西": {"target": 19134.600000000006, "complete": 4558.1, "regions": [{"big_region": "华西", "region": "重庆", "person": "薛文", "target": 5425.5, "complete": 1574.9, "rate": 29.0, "yoy": -1.6}, {"big_region": "华西", "region": "湖北", "person": "陈辉", "target": 3110.3, "complete": 890.1, "rate": 28.6, "yoy": 18.6}, {"big_region": "华西", "region": "四川", "person": "薛文", "target": 2496.6, "complete": 597.5, "rate": 23.9, "yoy": 1.2}, {"big_region": "华西", "region": "河南", "person": "黄彩西", "target": 3044.4, "complete": 469.6, "rate": 15.4, "yoy": -5.8}, {"big_region": "华西", "region": "云南", "person": "周辉", "target": 1232.4, "complete": 340.7, "rate": 27.6, "yoy": 25.2}, {"big_region": "华西", "region": "贵州", "person": "周辉", "target": 1267.4, "complete": 264.2, "rate": 20.8, "yoy": -6.4}, {"big_region": "华西", "region": "陕西", "person": "耿福林", "target": 1663.4, "complete": 249.3, "rate": 15.0, "yoy": -11.0}, {"big_region": "华西", "region": "甘肃", "person": "耿福林", "target": 478.9, "complete": 105.8, "rate": 22.1, "yoy": 25.1}, {"big_region": "华西", "region": "新疆", "person": "耿福林", "target": 267.4, "complete": 40.7, "rate": 15.2, "yoy": -6.7}, {"big_region": "华西", "region": "青海", "person": "耿福林", "target": 102.9, "complete": 17.0, "rate": 16.5, "yoy": 66.6}, {"big_region": "华西", "region": "宁夏", "person": "耿福林", "target": 9.2, "complete": 4.2, "rate": 45.6, "yoy": 236.6}, {"big_region": "华西", "region": "西藏", "person": "薛文", "target": 36.2, "complete": 4.1, "rate": 11.3, "yoy": -65.7}], "rate": 23.8}, "华北": {"target": 14684.499999999998, "complete": 3487.100000000001, "regions": [{"big_region": "华北", "region": "山东", "person": "卿毅", "target": 2846.2, "complete": 753.0, "rate": 26.5, "yoy": 28.9}, {"big_region": "华北", "region": "黑龙江", "person": "卿毅", "target": 2827.4, "complete": 660.5, "rate": 23.4, "yoy": 4.1}, {"big_region": "华北", "region": "辽宁", "person": "卿毅", "target": 2274.2, "complete": 617.4, "rate": 27.1, "yoy": 28.4}, {"big_region": "华北", "region": "吉林", "person": "卿毅", "target": 972.7, "complete": 382.8, "rate": 39.4, "yoy": 130.5}, {"big_region": "华北", "region": "河北", "person": "卢俊", "target": 1215.7, "complete": 310.5, "rate": 25.5, "yoy": 52.5}, {"big_region": "华北", "region": "北京", "person": "卢俊", "target": 2486.7, "complete": 297.3, "rate": 12.0, "yoy": -50.2}, {"big_region": "华北", "region": "山西", "person": "卿毅", "target": 1095.9, "complete": 235.9, "rate": 21.5, "yoy": 1.9}, {"big_region": "华北", "region": "天津", "person": "卢俊", "target": 792.8, "complete": 180.8, "rate": 22.8, "yoy": -3.0}, {"big_region": "华北", "region": "内蒙古", "person": "卿毅", "target": 172.9, "complete": 48.9, "rate": 28.3, "yoy": 48.0}], "rate": 23.7}, "新营销部": {"target": 21210.0, "complete": 4723.3, "regions": [{"big_region": "新营销部", "region": "KA", "person": "张宇航", "target": 1515.0, "complete": 1722.5, "rate": 113.7, "yoy": -51.4}, {"big_region": "新营销部", "region": "B端-壹药网", "person": "庞大智", "target": 7575.0, "complete": 1261.8, "rate": 16.7, "yoy": 135.4}, {"big_region": "新营销部", "region": "B端-药师帮", "person": "庞大智", "target": 4040.0, "complete": 690.7, "rate": 17.1, "yoy": -29.4}, {"big_region": "新营销部", "region": "C端-京东", "person": "贠嘉宏", "target": 4797.5, "complete": 530.0, "rate": 11.0, "yoy": 2.4}, {"big_region": "新营销部", "region": "C端-其他", "person": "贠嘉宏", "target": 757.5, "complete": 503.4, "rate": 66.5, "yoy": 775.3}, {"big_region": "新营销部", "region": "C端-阿里", "person": "贠嘉宏", "target": 2525.0, "complete": 14.9, "rate": 0.6, "yoy": -96.6}], "rate": 22.3}}};
                 updateDashboard('all');
             } catch (error) {
                 console.error('加载数据失败:', error);
@@ -475,8 +1393,19 @@ Check your Browserslist config to be sure that your targets are set up correctly
             // 更新产品图表
             updateProductCharts(filter);
             
-            // 更新地区表格
-            updateRegionTable(filter);
+            // 更新累计发货金额图表
+            renderCumulativeAmountChart(filter);
+            
+            // 控制地区表格显示/隐藏
+            const regionTableContainer = document.getElementById('regionTableContainer');
+            if (regionTableContainer) {
+                if (filter === 'all') {
+                    regionTableContainer.style.display = 'none';
+                } else {
+                    regionTableContainer.style.display = 'block';
+                    updateRegionTable(filter);
+                }
+            }
         }
 
         // 计算KPI
@@ -521,12 +1450,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
             const products = dashboardData.products;
             const timeProgress = getTimeProgress();
             
-            // 控制注射用谷胱甘肽图表的显示/隐藏
             const product2Container = document.getElementById('product2Container');
             const chartsContainer = document.getElementById('productChartsContainer');
             
             if (filter === '新营销部') {
-                // 新营销部没有注射用谷胱甘肽目标，只显示谷胱甘肽片
                 product2Container.style.display = 'none';
                 chartsContainer.classList.remove('grid-cols-2');
                 chartsContainer.classList.add('grid-cols-1');
@@ -620,9 +1547,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
             });
         }
 
-        // 更新地区表格
+        // 更新地区完成情况表格
         function updateRegionTable(filter) {
             const tbody = document.getElementById('regionTableBody');
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
             
             const regions = dashboardData.regions;
@@ -630,9 +1559,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             let displayRegions = [];
             
             // 根据筛选条件确定显示哪些大区
-            if (filter === 'all') {
-                displayRegions = Object.keys(regions);
-            } else if (filter === '新营销部') {
+            if (filter === '新营销部') {
                 displayRegions = ['新营销部'];
             } else if (filter === '医院销售部') {
                 displayRegions = Object.keys(regions).filter(r => r !== '新营销部');
@@ -664,14 +1591,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 const yoyDisplay = yoyValue === 0 ? '-' : `${yoyArrow} ${Math.abs(yoyValue).toFixed(1)}%`;
                 
                 row.innerHTML = `
-                    <td><span class="${rankClass}">${rank}</span></td>
-                    <td class="font-semibold" style="word-break:break-all;">${item.big_region}</td>
-                    <td style="word-break:break-all;">${item.region}</td>
-                    <td style="word-break:break-all;">${item.person}</td>
-                    <td class="text-right">${item.target.toFixed(1)}</td>
-                    <td class="text-right">${item.complete.toFixed(1)}</td>
-                    <td class="${yoyColor} font-medium">${yoyDisplay}</td>
-                    <td>
+                    <td class="sticky-col" style="white-space:nowrap;"><span class="${rankClass}">${rank}</span></td>
+                    <td class="sticky-col-2" style="white-space:nowrap;">${item.big_region}</td>
+                    <td class="sticky-col-3" style="white-space:nowrap;">${item.region}</td>
+                    <td style="white-space:nowrap;">${item.person}</td>
+                    <td class="text-right" style="white-space:nowrap;">${item.target.toFixed(1)}</td>
+                    <td class="text-right" style="white-space:nowrap;">${item.complete.toFixed(1)}</td>
+                    <td class="${yoyColor} font-medium" style="white-space:nowrap;">${yoyDisplay}</td>
+                    <td style="white-space:nowrap;">
                         <div class="flex items-center gap-1">
                             <span class="text-xs" style="min-width:34px;text-align:right;">${item.rate}%</span>
                             <div class="progress-bar flex-1" style="min-width: 40px;">
@@ -684,6 +1611,794 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 tbody.appendChild(row);
             });
         }
+
+        // 渲染26年累计发货金额折线图
+        function renderCumulativeAmountChart(filter) {
+            const ctx = document.getElementById('cumulativeAmountChart');
+            if (!ctx) return;
+            
+            // 根据筛选条件获取对应数据
+            let data;
+            if (filter === '医院销售部' && dashboardData.cumulative_amount['医院销售部']) {
+                data = dashboardData.cumulative_amount['医院销售部'];
+            } else if (filter === '新营销部' && dashboardData.cumulative_amount['新营销部']) {
+                data = dashboardData.cumulative_amount['新营销部'];
+            } else {
+                data = dashboardData.cumulative_amount['all'];
+            }
+            
+            if (!data || !data.dates || !data.amounts) return;
+            
+            // 如果图表已存在，先销毁
+            if (charts.cumulativeAmount) {
+                charts.cumulativeAmount.destroy();
+            }
+            
+            // 创建竖线插件
+            const verticalLinePlugin = {
+                id: 'verticalLine',
+                afterDraw: function(chart) {
+                    if (chart.tooltip?._active?.length) {
+                        const ctx = chart.ctx;
+                        const activePoint = chart.tooltip._active[0];
+                        const x = activePoint.element.x;
+                        const topY = chart.scales.y.top;
+                        const bottomY = chart.scales.y.bottom;
+                        
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(x, topY);
+                        ctx.lineTo(x, bottomY);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = '#047BA5';
+                        ctx.setLineDash([5, 5]);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+            };
+            
+            charts.cumulativeAmount = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.dates,
+                    datasets: [{
+                        label: '累计发货金额',
+                        data: data.amounts,
+                        borderColor: '#047BA5',
+                        backgroundColor: 'rgba(4, 123, 165, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#047BA5',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#374151',
+                            bodyColor: '#047BA5',
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                title: function(context) {
+                                    return '2026-' + context[0].label;
+                                },
+                                label: function(context) {
+                                    return '累计金额: ' + context.parsed.y.toFixed(2) + ' 万元';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 10
+                                },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f3f4f6'
+                            },
+                            ticks: {
+                                font: {
+                                    size: 10
+                                },
+                                callback: function(value) {
+                                    return value.toFixed(0);
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: '万元',
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [verticalLinePlugin]
+            });
+        }
+    </script>
+    </div><!-- end page-amount -->
+
+    <!-- ===================== 谷胱甘肽片0.1g 页面 ===================== -->
+    <div id="page-gsh" style="display:none;">
+
+        <!-- KPI 第一行：目标金额、完成金额、完成率 -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;">
+            <div class="kpi-card" style="text-align:center;">
+                <div class="kpi-value" id="gsh-targetAmount">--</div>
+                <div class="kpi-label">目标金额<br><span style="font-weight:400;">(万元)</span></div>
+            </div>
+            <div class="kpi-card" style="text-align:center;">
+                <div class="kpi-value" id="gsh-completeAmount">--</div>
+                <div class="kpi-label">完成金额<br><span style="font-weight:400;">(万元)</span></div>
+            </div>
+            <div class="kpi-card" style="text-align:center;position:relative;">
+                <div id="gsh-rateHint" style="position:absolute;top:6px;right:8px;font-size:0.65rem;line-height:1.2;max-width:55%;text-align:right;"></div>
+                <div class="kpi-value" id="gsh-completeRate" style="font-size:1.2rem;">--</div>
+                <div class="kpi-label" style="white-space:nowrap;">完成率</div>
+                <div id="gsh-rateStatus" style="font-size:0.72rem;margin-top:4px;"></div>
+            </div>
+        </div>
+        <!-- KPI 第二行：目标发货数、完成数量、同比增幅、近3月环比 -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
+            <div class="kpi-card" style="text-align:center;">
+                <div class="kpi-value" style="font-size:1.1rem;" id="gsh-targetQty">--</div>
+                <div class="kpi-label">目标发货数<br><span style="font-weight:400;">(万盒)</span></div>
+            </div>
+            <div class="kpi-card" style="text-align:center;position:relative;">
+                <div id="gsh-qtyHint" style="position:absolute;top:6px;right:8px;font-size:0.65rem;line-height:1.2;"></div>
+                <div class="kpi-value" style="font-size:1.1rem;" id="gsh-completeQty">--</div>
+                <div class="kpi-label">完成数量<br><span style="font-weight:400;">(万盒)</span></div>
+            </div>
+            <div class="kpi-card" style="text-align:center;">
+                <div class="kpi-value" style="font-size:1.1rem;" id="gsh-yoy">--</div>
+                <div class="kpi-label">同比增幅</div>
+            </div>
+            <div class="kpi-card" style="text-align:center;">
+                <div class="kpi-value" style="font-size:1.1rem;" id="gsh-mom">--</div>
+                <div class="kpi-label">近3月环比</div>
+            </div>
+        </div>
+
+        <!-- 月度发货趋势图表 -->
+        <div class="chart-container" style="margin-bottom:16px;">
+            <h3 style="font-size:0.875rem;font-weight:600;margin-bottom:10px;color:#374151;">月度发货趋势（单位：万盒）</h3>
+            <div style="height:220px; position:relative;">
+                <canvas id="gsh-monthlyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 地区完成情况表格 -->
+        <div class="chart-container">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;">
+                <h3 style="font-size:0.875rem;font-weight:600;color:#374151;margin:0;">地区完成情况（按发货数降序）</h3>
+                <span style="font-size:0.72rem;color:#6b7280;">单位：万</span>
+            </div>
+            <div class="gsh-table-wrap">
+                <table class="data-table" id="gsh-regionTable" style="font-size:0.78rem;">
+                    <thead>
+                        <tr id="gsh-regionTableHead"></tr>
+                    </thead>
+                    <tbody id="gsh-regionTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div><!-- end page-gsh -->
+
+    <!-- ===================== 注射用谷胱甘肽 页面 ===================== -->
+    <div id="page-zsy" style="display:none;">
+        <!-- KPI 第一行：目标金额、完成金额、完成率 -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;">
+            <div class="kpi-card" style="text-align:center;">
+                <div class="kpi-value" id="zsy-targetAmount">--</div>
+                <div class="kpi-label">目标金额<br><span style="font-weight:400;">(万元)</span></div>
+            </div>
+            <div class="kpi-card" style="text-align:center;">
+                <div class="kpi-value" id="zsy-completeAmount">--</div>
+                <div class="kpi-label">完成金额<br><span style="font-weight:400;">(万元)</span></div>
+            </div>
+            <div class="kpi-card" style="text-align:center;position:relative;">
+                <div id="zsy-rateHint" style="position:absolute;top:6px;right:8px;font-size:0.65rem;line-height:1.2;max-width:55%;text-align:right;"></div>
+                <div class="kpi-value" id="zsy-completeRate" style="font-size:1.2rem;">--</div>
+                <div class="kpi-label" style="white-space:nowrap;">完成率</div>
+                <div id="zsy-rateStatus" style="font-size:0.72rem;margin-top:4px;"></div>
+            </div>
+        </div>
+        <!-- KPI 第二行：目标发货数、完成数量、同比增幅、近3月环比 -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
+            <div class="kpi-card" style="text-align:center;">
+                <div class="kpi-value" style="font-size:1.1rem;" id="zsy-targetQty">--</div>
+                <div class="kpi-label">目标发货数<br><span style="font-weight:400;">(万)</span></div>
+            </div>
+            <div class="kpi-card" style="text-align:center;position:relative;">
+                <div id="zsy-qtyHint" style="position:absolute;top:6px;right:8px;font-size:0.65rem;line-height:1.2;"></div>
+                <div class="kpi-value" style="font-size:1.1rem;" id="zsy-completeQty">--</div>
+                <div class="kpi-label">完成数量<br><span style="font-weight:400;">(万)</span></div>
+            </div>
+            <div class="kpi-card" style="text-align:center;">
+                <div class="kpi-value" style="font-size:1.1rem;" id="zsy-yoy">--</div>
+                <div class="kpi-label">同比增幅</div>
+            </div>
+            <div class="kpi-card" style="text-align:center;">
+                <div class="kpi-value" style="font-size:1.1rem;" id="zsy-mom">--</div>
+                <div class="kpi-label">近3月环比</div>
+            </div>
+        </div>
+
+        <!-- 月度发货趋势图表 -->
+        <div class="chart-container" style="margin-bottom:16px;">
+            <h3 style="font-size:0.875rem;font-weight:600;margin-bottom:10px;color:#374151;">月度发货趋势（单位：万）</h3>
+            <div style="height:220px; position:relative;">
+                <canvas id="zsy-monthlyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 地区完成情况表格 -->
+        <div class="chart-container">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;">
+                <h3 style="font-size:0.875rem;font-weight:600;color:#374151;margin:0;">地区完成情况（按发货数降序）</h3>
+                <span style="font-size:0.72rem;color:#6b7280;">单位：万</span>
+            </div>
+            <div class="gsh-table-wrap">
+                <table class="data-table" id="zsy-regionTable" style="font-size:0.78rem;">
+                    <thead>
+                        <tr id="zsy-regionTableHead"></tr>
+                    </thead>
+                    <tbody id="zsy-regionTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div><!-- end page-zsy -->
+
+    <script>
+    // ===================== 页面切换 =====================
+    function switchPage(page) {
+        document.getElementById('page-amount').style.display = page === 'amount' ? '' : 'none';
+        document.getElementById('page-gsh').style.display = page === 'gsh' ? '' : 'none';
+        document.getElementById('page-zsy').style.display = page === 'zsy' ? '' : 'none';
+        document.querySelectorAll('.page-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.page === page);
+        });
+        if (page === 'gsh' && !window._gshInited) {
+            initGshPage();
+            window._gshInited = true;
+        }
+        if (page === 'zsy' && !window._zsyInited) {
+            initZsyPage();
+            window._zsyInited = true;
+        }
+        if (page === 'zsy' && !window._zsyInited) {
+            window._zsyInited = true;
+        }
+    }
+
+    // ===================== 谷胱甘肽片0.1g 数据 =====================
+    const gshData = {"latest_date": "2026-04-03", "time_progress": 26.4, "kpi": {"target_amount": 57468.0, "complete_amount": 12703.17, "complete_rate": 22.1, "target_qty": 12000000, "complete_qty": 2703959, "yoy_pct": 4.9, "mom_pct": -31.0, "recent3_months": [2, 3, 4], "prev3_months": [10, 11, 12]}, "monthly": {"months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "data_26": [1412730.0, 444880.0, 644749.999999, 201600.0, 0, 0, 0, 0, 0, 0, 0, 0], "data_25": [927825.0, 322076.0, 888693.0, 438187.666666, 573917.0, 1148633.0, 404560.0, 670915.999999, 1067531.0, 406160.0, 715775.0, 749378.999998]}, "regions": [{"rank": 1, "big_region": "华东", "region": "上海", "person": "高文龙", "target_qty": 1400000, "qty_26": 415200.0, "yoy_pct": 16.1, "rate": 29.7, "mom_pct": -14.1, "monthly": [180000.0, 0, 115200.0, 120000.0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 2, "big_region": "华西", "region": "重庆", "person": "薛文", "target_qty": 900000, "qty_26": 277120.0, "yoy_pct": 6.6, "rate": 30.8, "mom_pct": -7.3, "monthly": [158800.0, 38640.0, 79680.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 3, "big_region": "华南", "region": "广东", "person": "许占海", "target_qty": 2000000, "qty_26": 264800.0, "yoy_pct": 134.6, "rate": 13.2, "mom_pct": 124.2, "monthly": [124000.0, 140800.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 4, "big_region": "华南", "region": "广西", "person": "罗险峰", "target_qty": 620000, "qty_26": 195040.0, "yoy_pct": 12.6, "rate": 31.5, "mom_pct": 14.0, "monthly": [55040.0, 56000.0, 45999.999999, 38000.0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 5, "big_region": "华南", "region": "湖南", "person": "罗险峰", "target_qty": 650000, "qty_26": 187520.0, "yoy_pct": 14.6, "rate": 28.8, "mom_pct": -59.1, "monthly": [133520.0, 52000.0, 2000.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 6, "big_region": "华西", "region": "湖北", "person": "陈辉", "target_qty": 550000, "qty_26": 155200.0, "yoy_pct": 10.4, "rate": 28.2, "mom_pct": -54.6, "monthly": [94000.0, 2400.0, 54000.0, 4800.0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 7, "big_region": "华北", "region": "山东", "person": "卿毅", "target_qty": 530000, "qty_26": 116640.0, "yoy_pct": -6.5, "rate": 22.0, "mom_pct": -34.1, "monthly": [66000.0, 19200.0, 31440.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 8, "big_region": "华南", "region": "福建", "person": "许占海", "target_qty": 540000, "qty_26": 113280.0, "yoy_pct": -14.0, "rate": 21.0, "mom_pct": -41.8, "monthly": [56160.0, 21600.0, 24720.0, 10800.0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 9, "big_region": "华东", "region": "浙江", "person": "吴光建", "target_qty": 500000, "qty_26": 109200.0, "yoy_pct": -20.4, "rate": 21.8, "mom_pct": 22.0, "monthly": [36000.0, 39600.0, 33600.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 10, "big_region": "华北", "region": "辽宁", "person": "卿毅", "target_qty": 420000, "qty_26": 106800.0, "yoy_pct": 18.7, "rate": 25.4, "mom_pct": -70.7, "monthly": [80400.0, 7200.0, 9600.0, 9600.0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 11, "big_region": "华西", "region": "四川", "person": "薛文", "target_qty": 400000, "qty_26": 102480.0, "yoy_pct": -7.2, "rate": 25.6, "mom_pct": -64.0, "monthly": [70080.0, 0, 28800.0, 3600.0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 12, "big_region": "华西", "region": "河南", "person": "黄彩西", "target_qty": 550000, "qty_26": 94910.0, "yoy_pct": -28.1, "rate": 17.3, "mom_pct": -44.2, "monthly": [46230.0, 7360.0, 41320.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 13, "big_region": "华东", "region": "江苏", "person": "杨海波", "target_qty": 360000, "qty_26": 78960.0, "yoy_pct": -9.1, "rate": 21.9, "mom_pct": -74.2, "monthly": [61440.0, 7920.0, 9600.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 14, "big_region": "华北", "region": "河北", "person": "卢俊", "target_qty": 250000, "qty_26": 61200.0, "yoy_pct": 27.5, "rate": 24.5, "mom_pct": -48.8, "monthly": [34800.0, 0, 26400.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 15, "big_region": "华南", "region": "江西", "person": "罗险峰", "target_qty": 300000, "qty_26": 60000.0, "yoy_pct": -24.9, "rate": 20.0, "mom_pct": -64.8, "monthly": [40000.0, 0, 20000.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 16, "big_region": "华西", "region": "贵州", "person": "周辉", "target_qty": 250000, "qty_26": 54000.0, "yoy_pct": -16.7, "rate": 21.6, "mom_pct": -32.8, "monthly": [24000.0, 0, 30000.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 17, "big_region": "华西", "region": "云南", "person": "周辉", "target_qty": 190000, "qty_26": 45840.0, "yoy_pct": 33.6, "rate": 24.1, "mom_pct": -69.6, "monthly": [38400.0, 480.0, 6960.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 18, "big_region": "华北", "region": "吉林", "person": "卿毅", "target_qty": 120000, "qty_26": 44320.0, "yoy_pct": 94.4, "rate": 36.9, "mom_pct": 13.0, "monthly": [19920.0, 0, 9600.0, 14800.0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 19, "big_region": "华东", "region": "安徽", "person": "汪腾飞", "target_qty": 300000, "qty_26": 41280.0, "yoy_pct": -36.3, "rate": 13.8, "mom_pct": -60.9, "monthly": [30960.0, 0, 10320.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 20, "big_region": "华北", "region": "黑龙江", "person": "卿毅", "target_qty": 250000, "qty_26": 40000.0, "yoy_pct": -9.9, "rate": 16.0, "mom_pct": -49.1, "monthly": [18000.0, 12000.0, 10000.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 21, "big_region": "华北", "region": "北京", "person": "卢俊", "target_qty": 300000, "qty_26": 34080.0, "yoy_pct": -47.4, "rate": 11.4, "mom_pct": -44.5, "monthly": [2400.0, 6000.0, 25680.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 22, "big_region": "华北", "region": "山西", "person": "卿毅", "target_qty": 150000, "qty_26": 32240.0, "yoy_pct": 10.1, "rate": 21.5, "mom_pct": -13.9, "monthly": [7440.0, 24800.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 23, "big_region": "华西", "region": "甘肃", "person": "耿福林", "target_qty": 100000, "qty_26": 21120.0, "yoy_pct": -4.3, "rate": 21.1, "mom_pct": -51.9, "monthly": [12000.0, 0, 9120.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 24, "big_region": "华西", "region": "陕西", "person": "耿福林", "target_qty": 200000, "qty_26": 19430.0, "yoy_pct": -58.9, "rate": 9.7, "mom_pct": -71.5, "monthly": [4320.0, 1920.0, 13190.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 25, "big_region": "华北", "region": "天津", "person": "卢俊", "target_qty": 60000, "qty_26": 13200.0, "yoy_pct": -9.8, "rate": 22.0, "mom_pct": -28.6, "monthly": [7200.0, 6000.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 26, "big_region": "华南", "region": "海南", "person": "许占海", "target_qty": 30000, "qty_26": 7440.0, "yoy_pct": 55.0, "rate": 24.8, "mom_pct": -27.8, "monthly": [4320.0, 0, 3120.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 27, "big_region": "华北", "region": "内蒙古", "person": "卿毅", "target_qty": 20000, "qty_26": 4800.0, "yoy_pct": 67.5, "rate": 24.0, "mom_pct": -44.4, "monthly": [2400.0, 0, 2400.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 28, "big_region": "华西", "region": "新疆", "person": "耿福林", "target_qty": 40000, "qty_26": 4400.0, "yoy_pct": -36.8, "rate": 11.0, "mom_pct": 38.9, "monthly": [2400.0, 0, 2000.0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 29, "big_region": "华西", "region": "青海", "person": "耿福林", "target_qty": 20000, "qty_26": 3120.0, "yoy_pct": -18.8, "rate": 15.6, "mom_pct": -52.0, "monthly": [2160.0, 960.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 30, "big_region": "华西", "region": "西藏", "person": "薛文", "target_qty": 0, "qty_26": 240.0, "yoy_pct": 142.4, "rate": 0.0, "mom_pct": -100.0, "monthly": [240.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"rank": 31, "big_region": "华西", "region": "宁夏", "person": "耿福林", "target_qty": 0, "qty_26": 100.0, "yoy_pct": 0.0, "rate": 0.0, "mom_pct": 0.0, "monthly": [100.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}]};
+
+    // ===================== 注射用谷胱甘肽 数据 =====================
+    const zsyData = {"kpi": {"target_qty": 31879999.999999985, "complete_qty": 7491350.08359, "target_amount": 179999999.99999994, "complete_amount": 45738047.34, "yoy_qty_pct": -9.3, "latest_date": "2026-04-03"}, "monthly": {"data_26": [4193650.04579, 781500.0092000001, 1913600.0274, 602600.0012, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "data_25": [2764710.0214, 1184200.0186, 2328760.0112, 1979353.3489, 1923480.028, 2586800.018, 1934100.0246, 2415576.6860999996, 2688200.0264, 1556483.3457499999, 1930108.019, 2110126.67436]}, "regions": [{"rank": 1, "big_region": "华北", "region": "黑龙江", "person": "卿毅", "target_qty": 3800000.0, "qty_26": 1007000.0, "yoy_pct": -12.7, "rate": 26.5, "mom_pct": 28.0, "monthly": [485000.0, 70000.0, 310000.0, 142000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 2, "big_region": "华东", "region": "上海", "person": "高文龙", "target_qty": 3100000.0, "qty_26": 697000.0196, "yoy_pct": -28.0, "rate": 22.5, "mom_pct": -14.7, "monthly": [319500.01399999997, 7000.0, 246000.0056, 124500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 3, "big_region": "华南", "region": "湖南", "person": "罗险峰", "target_qty": 3000000.0, "qty_26": 939600.0, "yoy_pct": 24.0, "rate": 31.3, "mom_pct": 107.6, "monthly": [559200.0, 168800.0, 211600.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 4, "big_region": "华东", "region": "江苏", "person": "杨海波", "target_qty": 2999999.999999995, "qty_26": 596500.0, "yoy_pct": -24.0, "rate": 19.9, "mom_pct": 15.0, "monthly": [277900.0, 117200.0, 159100.0, 42300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 5, "big_region": "华西", "region": "重庆", "person": "薛文", "target_qty": 1649999.9999999967, "qty_26": 415500.0, "yoy_pct": -21.9, "rate": 25.2, "mom_pct": 31.7, "monthly": [243300.0, 83400.0, 76800.0, 12000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 6, "big_region": "华南", "region": "广东", "person": "许占海", "target_qty": 2480000.000000002, "qty_26": 461100.04299999995, "yoy_pct": 21.5, "rate": 18.6, "mom_pct": 95.5, "monthly": [264300.0194, 72300.0076, 120500.01519999998, 4000.0008, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 7, "big_region": "华北", "region": "北京", "person": "卢俊", "target_qty": 1500000.0, "qty_26": 185400.0, "yoy_pct": -60.1, "rate": 12.4, "mom_pct": -52.0, "monthly": [16100.0, 20300.0, 149000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 8, "big_region": "华东", "region": "安徽", "person": "汪腾飞", "target_qty": 1700000.0, "qty_26": 46500.0, "yoy_pct": -95.0, "rate": 2.7, "mom_pct": -82.0, "monthly": [21000.0, 4500.0, 9000.0, 12000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 9, "big_region": "华北", "region": "吉林", "person": "卿毅", "target_qty": 1000000.0, "qty_26": 406000.0, "yoy_pct": 33.1, "rate": 40.6, "mom_pct": 45.0, "monthly": [270000.0, 0.0, 136000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 10, "big_region": "华北", "region": "山东", "person": "卿毅", "target_qty": 800000.0, "qty_26": 454600.0002, "yoy_pct": 87.9, "rate": 56.8, "mom_pct": 78.3, "monthly": [173500.0, 56000.0, 188600.0, 36500.0002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 11, "big_region": "华南", "region": "广西", "person": "罗险峰", "target_qty": 1499999.9999999981, "qty_26": 224700.0, "yoy_pct": -25.7, "rate": 15.0, "mom_pct": 22.9, "monthly": [150300.0, 10400.0, 26600.0, 37400.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 12, "big_region": "华西", "region": "湖北", "person": "陈辉", "target_qty": 1199999.9999999972, "qty_26": 482500.0, "yoy_pct": 87.7, "rate": 40.2, "mom_pct": 382.5, "monthly": [329000.0, 9500.0, 23400.0, 120600.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 13, "big_region": "华西", "region": "云南", "person": "周辉", "target_qty": 500000.0, "qty_26": 191600.0018, "yoy_pct": -37.7, "rate": 38.3, "mom_pct": 24.3, "monthly": [147600.0014, 25800.000200000002, 17200.0, 1000.0002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 14, "big_region": "华西", "region": "四川", "person": "薛文", "target_qty": 1000000.0000000005, "qty_26": 208000.0, "yoy_pct": 0.7, "rate": 20.8, "mom_pct": -1.0, "monthly": [145600.0, 18000.0, 42000.0, 2400.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 15, "big_region": "华西", "region": "陕西", "person": "耿福林", "target_qty": 1200000.0, "qty_26": 289250.00299, "yoy_pct": 23.8, "rate": 24.1, "mom_pct": 232.7, "monthly": [196750.00279, 40700.0002, 47300.0, 4500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 16, "big_region": "华北", "region": "山西", "person": "卿毅", "target_qty": 620000.0, "qty_26": 135800.0, "yoy_pct": -39.7, "rate": 21.9, "mom_pct": -26.9, "monthly": [124800.0, 6000.0, 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 17, "big_region": "华北", "region": "天津", "person": "卢俊", "target_qty": 720000.0, "qty_26": 178000.0, "yoy_pct": -7.3, "rate": 24.7, "mom_pct": 151.8, "monthly": [146500.0, 10000.0, 21500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 18, "big_region": "华北", "region": "辽宁", "person": "卿毅", "target_qty": 400000.0, "qty_26": 108500.0, "yoy_pct": -7.4, "rate": 27.1, "mom_pct": 63.4, "monthly": [49700.0, 16800.0, 32400.0, 9600.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 19, "big_region": "华东", "region": "浙江", "person": "吴光建", "target_qty": 300000.0, "qty_26": 97000.0, "yoy_pct": 49.9, "rate": 32.3, "mom_pct": 83.0, "monthly": [75000.0, 0.0, 11000.0, 11000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 20, "big_region": "华南", "region": "江西", "person": "罗险峰", "target_qty": 699999.9999999997, "qty_26": 85400.0074, "yoy_pct": -19.2, "rate": 12.2, "mom_pct": 34.9, "monthly": [53600.0032, 4400.0, 27400.0042, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 21, "big_region": "华北", "region": "内蒙古", "person": "卿毅", "target_qty": 150000.0, "qty_26": 51000.0, "yoy_pct": 29.7, "rate": 34.0, "mom_pct": 6.9, "monthly": [25000.0, 14000.0, 12000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 22, "big_region": "华西", "region": "河南", "person": "黄彩西", "target_qty": 1200000.0, "qty_26": 65000.0, "yoy_pct": 92.2, "rate": 5.4, "mom_pct": 316.7, "monthly": [42400.0, 8400.0, 3400.0, 10800.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 23, "big_region": "华西", "region": "新疆", "person": "耿福林", "target_qty": 120000.0, "qty_26": 31000.0062, "yoy_pct": -13.9, "rate": 25.8, "mom_pct": 40.9, "monthly": [13000.0026, 6000.0012, 12000.0024, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 24, "big_region": "华北", "region": "河北", "person": "卢俊", "target_qty": 50000.0, "qty_26": 81000.0, "yoy_pct": 1457.7, "rate": 162.0, "mom_pct": 350.0, "monthly": [27000.0, 10000.0, 14000.0, 30000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 25, "big_region": "华西", "region": "贵州", "person": "周辉", "target_qty": 100000.0, "qty_26": 22100.0018, "yoy_pct": 81.0, "rate": 22.1, "mom_pct": 52.4, "monthly": [16200.0018, 0.0, 3900.0, 2000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 26, "big_region": "华西", "region": "西藏", "person": "薛文", "target_qty": 50000.0, "qty_26": 4000.0006, "yoy_pct": -84.4, "rate": 8.0, "mom_pct": -42.9, "monthly": [4000.0006, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 27, "big_region": "华西", "region": "宁夏", "person": "耿福林", "target_qty": 29999.99999999996, "qty_26": 10800.0, "yoy_pct": 200.0, "rate": 36.0, "mom_pct": 20.0, "monthly": [8400.0, 0.0, 2400.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 28, "big_region": "华西", "region": "青海", "person": "耿福林", "target_qty": 10000.0, "qty_26": 4000.0, "yoy_pct": 300.0, "rate": 40.0, "mom_pct": 100.0, "monthly": [4000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 29, "big_region": "华南", "region": "福建", "person": "许占海", "target_qty": 0.0, "qty_26": 7000.0, "yoy_pct": 0.0, "rate": 0.0, "mom_pct": 0.0, "monthly": [5000.0, 0.0, 2000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 30, "big_region": "华西", "region": "甘肃", "person": "耿福林", "target_qty": 0.0, "qty_26": 5500.0, "yoy_pct": 0.0, "rate": 0.0, "mom_pct": 0.0, "monthly": [0.0, 2000.0, 3500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"rank": 31, "big_region": "华西", "region": "海南", "person": "未知", "target_qty": 0.0, "qty_26": 0.0, "yoy_pct": 0.0, "rate": 0.0, "mom_pct": 0.0, "monthly": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}], "time_progress": 25.5, "mom_pct": 33.4};
+
+    function fmtNum(n, decimal=1) {
+        if (n === null || n === undefined || isNaN(n)) return '--';
+        return Number(n).toFixed(decimal);
+    }
+    function fmtWan(n, decimal=1) {
+        return fmtNum(n / 10000, decimal);
+    }
+
+    // ===================== 注射用谷胱甘肽 页面初始化 =====================
+    function initZsyPage() {
+        const d = zsyData;
+        const kpi = d.kpi;
+        const tp = d.time_progress;
+
+        // 顶部指标 - 金额（单位：万元）
+        document.getElementById('zsy-targetAmount').textContent = (kpi.target_amount / 10000).toFixed(1);
+        document.getElementById('zsy-completeAmount').textContent = (kpi.complete_amount / 10000).toFixed(1);
+
+        const rateEl = document.getElementById('zsy-completeRate');
+        const completeRate = (kpi.complete_amount / kpi.target_amount * 100);
+        rateEl.textContent = completeRate.toFixed(1) + '%';
+        const done = completeRate >= tp;
+        rateEl.style.color = done ? '#10b981' : '#ef4444';
+        
+        // 右上角提示：当前应达成进度（时间进度%）
+        document.getElementById('zsy-rateHint').innerHTML = `<span style="color:#6b7280">应达成${tp.toFixed(1)}%</span>`;
+        
+        // 下方提示：完成/未完成状态
+        const rateStatus = document.getElementById('zsy-rateStatus');
+        rateStatus.innerHTML = done
+            ? '<span style="color:#10b981">✓ 已完成当期进度</span>'
+            : '<span style="color:#ef4444">未达当期进度</span>';
+
+        // 第二行指标 - 数量（单位：万）
+        document.getElementById('zsy-targetQty').textContent = (kpi.target_qty / 10000).toFixed(1);
+
+        const cqEl = document.getElementById('zsy-completeQty');
+        cqEl.textContent = (kpi.complete_qty / 10000).toFixed(1);
+        
+        // 右上角提示：距当期目标差额
+        const periodTarget = kpi.target_qty * tp / 100;
+        const gap = kpi.complete_qty - periodTarget;
+        const gapWan = Math.abs((gap / 10000)).toFixed(1);
+        document.getElementById('zsy-qtyHint').innerHTML = gap >= 0
+            ? `<span style="color:#10b981">+${gapWan}</span>`
+            : `<span style="color:#ef4444">-${gapWan}</span>`;
+
+        // 同比增幅
+        const yoyEl = document.getElementById('zsy-yoy');
+        yoyEl.textContent = (kpi.yoy_qty_pct >= 0 ? '↑ ' : '↓ ') + Math.abs(kpi.yoy_qty_pct).toFixed(1) + '%';
+        yoyEl.style.color = kpi.yoy_qty_pct >= 0 ? '#10b981' : '#ef4444';
+
+        // 近3月环比
+        const momEl = document.getElementById('zsy-mom');
+        momEl.textContent = (d.mom_pct >= 0 ? '↑ ' : '↓ ') + Math.abs(d.mom_pct).toFixed(1) + '%';
+        momEl.style.color = d.mom_pct >= 0 ? '#10b981' : '#ef4444';
+
+        // 月度趋势图（单位：万）
+        const months = [1,2,3,4,5,6,7,8,9,10,11,12].map(m => m + '月');
+        const data26 = d.monthly.data_26.map(v => v > 0 ? parseFloat((v / 10000).toFixed(1)) : null);
+        const data25 = d.monthly.data_25.map(v => parseFloat((v / 10000).toFixed(1)));
+        const ctx = document.getElementById('zsy-monthlyChart').getContext('2d');
+
+        // 柱顶标签插件
+        const topLabelPluginZsy = {
+            id: 'zsyTopLabel',
+            afterDatasetsDraw(chart) {
+                const { ctx: c, data } = chart;
+                chart.data.datasets.forEach((dataset, di) => {
+                    const meta = chart.getDatasetMeta(di);
+                    if (meta.hidden) return;
+                    meta.data.forEach((bar, i) => {
+                        const val = dataset.data[i];
+                        if (val === null || val === undefined) return;
+                        c.save();
+                        c.font = '9px sans-serif';
+                        c.fillStyle = '#374151';
+                        c.textAlign = 'center';
+                        c.textBaseline = 'bottom';
+                        c.fillText(val.toFixed(1), bar.x, bar.y - 2);
+                        c.restore();
+                    });
+                });
+            }
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            plugins: [topLabelPluginZsy],
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: '2026年',
+                        data: data26,
+                        backgroundColor: 'rgba(4,123,165,0.75)',
+                        borderColor: '#047BA5',
+                        borderWidth: 1,
+                        borderRadius: 3,
+                    },
+                    {
+                        label: '2025年',
+                        data: data25,
+                        backgroundColor: 'rgba(197,90,17,0.6)',
+                        borderColor: '#C55A11',
+                        borderWidth: 1,
+                        borderRadius: 3,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: { padding: { top: 18 } },
+                plugins: {
+                    legend: { position: 'top', labels: { font: { size: 11 } } },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: (ctx) => {
+                                const v = ctx.parsed.y;
+                                return v !== null ? `${ctx.dataset.label}: ${v.toFixed(1)}` : '';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { font: { size: 10 } } },
+                    y: {
+                        ticks: {
+                            font: { size: 10 },
+                            callback: v => v.toFixed(1)
+                        }
+                    }
+                }
+            }
+        });
+
+        // 地区完成情况表格
+        renderZsyRegionTable(d);
+    }
+
+    function renderZsyRegionTable(d) {
+        // 只显示到最新有数据的月份
+        const latestMonth = new Date(d.kpi.latest_date).getMonth() + 1;
+        const months = [];
+        for (let m = 1; m <= latestMonth; m++) months.push(m);
+        const tp = d.time_progress;
+
+        // 固定列宽定义（px）
+        const colWidths = {
+            '排名': 38, '地区': 60, '责任人': 50,
+            '目标发货数': 74, '26年发货数': 74,
+            '同比增幅': 64, '26年完成率': 110, '近3月环比': 64
+        };
+        const monthColW = 58;
+
+        // 计算表格总宽度
+        const fixedTotal = Object.values(colWidths).reduce((a, b) => a + b, 0);
+        const tableMinW = fixedTotal + months.length * monthColW;
+
+        // 表头
+        const thead = document.getElementById('zsy-regionTableHead');
+        const fixedCols = Object.keys(colWidths);
+        const monthCols = months.map(m => m + '月');
+        const allCols = [...fixedCols, ...monthCols];
+        const allWidths = [...Object.values(colWidths), ...months.map(() => monthColW)];
+
+        const stickyClasses = ['sticky-col', 'sticky-col-2', 'sticky-col-3', '', '', '', '', ''];
+        thead.innerHTML = allCols.map((c, i) => {
+            const stickyClass = stickyClasses[i] || '';
+            return `<th class="${stickyClass}" style="white-space:nowrap;padding:8px 5px;background:#f8f9fa;font-weight:600;color:#333;border-bottom:2px solid #e5e7eb;font-size:0.78rem;width:${allWidths[i]}px;min-width:${allWidths[i]}px;box-sizing:border-box;text-align:center;">${c}</th>`;
+        }).join('');
+
+        // 给表格设置最小宽度
+        const table = document.getElementById('zsy-regionTable');
+        table.style.minWidth = tableMinW + 'px';
+        table.style.tableLayout = 'fixed';
+        table.style.width = tableMinW + 'px';
+
+        // 表体
+        const tbody = document.getElementById('zsy-regionTableBody');
+        tbody.innerHTML = '';
+        d.regions.forEach((item, idx) => {
+            const rank = idx + 1;
+            const rate = item.rate || 0;
+            const rankClass = rate >= tp ? 'rank-green' : 'rank-red';
+            const progressClass = rate >= tp ? 'blue' : 'orange';
+            const yoyColor = item.yoy_pct >= 0 ? '#10b981' : '#ef4444';
+            const yoyArrow = item.yoy_pct >= 0 ? '↑' : '↓';
+            const yoyDisplay = `<span style="color:${yoyColor}">${yoyArrow} ${Math.abs(item.yoy_pct).toFixed(1)}%</span>`;
+            const momColor = item.mom_pct >= 0 ? '#10b981' : '#ef4444';
+            const momArrow = item.mom_pct >= 0 ? '↑' : '↓';
+            const momDisplay = (item.mom_pct === 0 && item.qty_26 === 0) ? '-' :
+                `<span style="color:${momColor}">${momArrow} ${Math.abs(item.mom_pct).toFixed(1)}%</span>`;
+
+            const progressBar = `
+                <div style="display:flex;align-items:center;gap:3px;">
+                    <span style="font-size:0.72rem;min-width:34px;text-align:right;flex-shrink:0;">${rate.toFixed(1)}%</span>
+                    <div class="progress-bar" style="flex:1;min-width:30px;">
+                        <div class="progress-fill ${progressClass}" style="width:${Math.min(rate,100)}%"></div>
+                    </div>
+                </div>`;
+
+            // 只渲染到最新月份（万单位，1位小数）
+            const monthlyCells = months.map(m => {
+                const v = item.monthly[m - 1];
+                const display = v > 0 ? (v / 10000).toFixed(1) : '-';
+                return `<td style="text-align:right;white-space:nowrap;padding:6px 5px;width:${monthColW}px;box-sizing:border-box;">${display}</td>`;
+            }).join('');
+
+            const tdStyle = 'white-space:nowrap;padding:6px 5px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="sticky-col" style="text-align:center;${tdStyle}width:${colWidths['排名']}px;"><span class="${rankClass}">${rank}</span></td>
+                <td class="sticky-col-2" style="${tdStyle}width:${colWidths['地区']}px;">${item.region}</td>
+                <td class="sticky-col-3" style="${tdStyle}width:${colWidths['责任人']}px;">${item.person}</td>
+                <td style="text-align:right;${tdStyle}width:${colWidths['目标发货数']}px;">${(item.target_qty / 10000).toFixed(1)}</td>
+                <td style="text-align:right;${tdStyle}width:${colWidths['26年发货数']}px;">${(item.qty_26 / 10000).toFixed(1)}</td>
+                <td style="text-align:center;${tdStyle}width:${colWidths['同比增幅']}px;">${yoyDisplay}</td>
+                <td style="width:${colWidths['26年完成率']}px;padding:6px 5px;box-sizing:border-box;">${progressBar}</td>
+                <td style="text-align:center;${tdStyle}width:${colWidths['近3月环比']}px;">${momDisplay}</td>
+                ${monthlyCells}
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function initGshPage() {
+        const d = gshData;
+        const kpi = d.kpi;
+        const tp = d.time_progress;
+
+        // 顶部指标
+        document.getElementById('gsh-targetAmount').textContent = fmtNum(kpi.target_amount, 1);
+        document.getElementById('gsh-completeAmount').textContent = fmtNum(kpi.complete_amount, 1);
+
+        const rateEl = document.getElementById('gsh-completeRate');
+        rateEl.textContent = kpi.complete_rate + '%';
+        const done = kpi.complete_rate >= tp;
+        rateEl.style.color = done ? '#10b981' : '#ef4444';
+        
+        // 计算差额（万盒）
+        const periodTargetQty = kpi.target_qty * tp / 100;
+        const gapQty = kpi.complete_qty - periodTargetQty;
+        const gapQtyWan = Math.abs((gapQty / 10000)).toFixed(1);
+        
+        // 右上角提示：当前应达成进度（时间进度%）
+        document.getElementById('gsh-rateHint').innerHTML = `<span style="color:#6b7280">应达成${tp.toFixed(1)}%</span>`;
+        
+        // 下方提示：完成/未完成状态（居中，只占一行）
+        const rateStatus = document.getElementById('gsh-rateStatus');
+        rateStatus.innerHTML = done
+            ? '<span style="color:#10b981">✓ 已完成当期进度</span>'
+            : '<span style="color:#ef4444">未达当期进度</span>';
+
+        document.getElementById('gsh-targetQty').textContent = fmtWan(kpi.target_qty);
+
+        const cqEl = document.getElementById('gsh-completeQty');
+        cqEl.textContent = fmtWan(kpi.complete_qty);
+        // 右上角提示：距当期目标差额（不显示单位）
+        const periodTarget = kpi.target_qty * tp / 100;
+        const gap = kpi.complete_qty - periodTarget;
+        const gapWan = Math.abs((gap / 10000)).toFixed(1);
+        document.getElementById('gsh-qtyHint').innerHTML = gap >= 0
+            ? `<span style="color:#10b981">+${gapWan}</span>`
+            : `<span style="color:#ef4444">-${gapWan}</span>`;
+
+        const yoyEl = document.getElementById('gsh-yoy');
+        yoyEl.textContent = (kpi.yoy_pct >= 0 ? '↑ ' : '↓ ') + Math.abs(kpi.yoy_pct).toFixed(1) + '%';
+        yoyEl.style.color = kpi.yoy_pct >= 0 ? '#10b981' : '#ef4444';
+
+        // 近3月环比精确到天：最新日期前90天 vs 90-180天
+        const momEl = document.getElementById('gsh-mom');
+        const latestDate = new Date(d.latest_date);
+        const msPerDay = 24 * 60 * 60 * 1000;
+        
+        // 计算前90天和90-180天的日期范围
+        const recent90End = latestDate;
+        const recent90Start = new Date(latestDate.getTime() - 90 * msPerDay);
+        const prev90End = new Date(latestDate.getTime() - 90 * msPerDay - 1);
+        const prev90Start = new Date(latestDate.getTime() - 180 * msPerDay);
+        
+        // 按天比例分摊月度数据计算（支持跨年度）
+        function getDailyDataForRange(startDate, endDate, data2025, data2026) {
+            let total = 0;
+            
+            // 遍历每一天
+            for (let t = startDate.getTime(); t <= endDate.getTime(); t += msPerDay) {
+                const currentDate = new Date(t);
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth(); // 0-indexed
+                const day = currentDate.getDate();
+                
+                // 选择对应年份的数据
+                const monthlyData = year === 2025 ? data2025 : data2026;
+                const monthValue = monthlyData[month] || 0;
+                
+                if (monthValue > 0) {
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    total += monthValue / daysInMonth;
+                }
+            }
+            return total;
+        }
+        
+        const recent90Qty = getDailyDataForRange(recent90Start, recent90End, d.monthly.data_25, d.monthly.data_26);
+        const prev90Qty = getDailyDataForRange(prev90Start, prev90End, d.monthly.data_25, d.monthly.data_26);
+        
+        let momPct = 0;
+        if (prev90Qty > 0) {
+            momPct = ((recent90Qty - prev90Qty) / prev90Qty) * 100;
+        }
+        
+        momEl.textContent = (momPct >= 0 ? '↑ ' : '↓ ') + Math.abs(momPct).toFixed(1) + '%';
+        momEl.style.color = momPct >= 0 ? '#10b981' : '#ef4444';
+
+        // 月度趋势图（单位：万）
+        const months = d.monthly.months.map(m => m + '月');
+        const data26 = d.monthly.data_26.map(v => v > 0 ? parseFloat((v / 10000).toFixed(1)) : null);
+        const data25 = d.monthly.data_25.map(v => parseFloat((v / 10000).toFixed(1)));
+        const ctx = document.getElementById('gsh-monthlyChart').getContext('2d');
+
+        // 柱顶标签插件（内置，无需外部依赖）
+        const topLabelPlugin = {
+            id: 'gshTopLabel',
+            afterDatasetsDraw(chart) {
+                const { ctx: c, data } = chart;
+                chart.data.datasets.forEach((dataset, di) => {
+                    const meta = chart.getDatasetMeta(di);
+                    if (meta.hidden) return;
+                    meta.data.forEach((bar, i) => {
+                        const val = dataset.data[i];
+                        if (val === null || val === undefined) return;
+                        c.save();
+                        c.font = '9px sans-serif';
+                        c.fillStyle = '#374151';
+                        c.textAlign = 'center';
+                        c.textBaseline = 'bottom';
+                        c.fillText(val.toFixed(1), bar.x, bar.y - 2);
+                        c.restore();
+                    });
+                });
+            }
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            plugins: [topLabelPlugin],
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: '2026年',
+                        data: data26,
+                        backgroundColor: 'rgba(4,123,165,0.75)',
+                        borderColor: '#047BA5',
+                        borderWidth: 1,
+                        borderRadius: 3,
+                    },
+                    {
+                        label: '2025年',
+                        data: data25,
+                        backgroundColor: 'rgba(197,90,17,0.6)',
+                        borderColor: '#C55A11',
+                        borderWidth: 1,
+                        borderRadius: 3,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: { padding: { top: 18 } },
+                plugins: {
+                    legend: { position: 'top', labels: { font: { size: 11 } } },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: (ctx) => {
+                                const v = ctx.parsed.y;
+                                return v !== null ? `${ctx.dataset.label}: ${v.toFixed(1)} 万` : '';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { font: { size: 10 } } },
+                    y: {
+                        ticks: {
+                            font: { size: 10 },
+                            callback: v => v.toFixed(1) + '万'
+                        }
+                    }
+                }
+            }
+        });
+
+        // 地区完成情况表格
+        renderGshRegionTable(d);
+    }
+
+    
+    function renderGshRegionTable(d) {
+        // 只显示到最新有数据的月份
+        const latestMonth = new Date(d.latest_date).getMonth() + 1; // 1-indexed
+        const months = [];
+        for (let m = 1; m <= latestMonth; m++) months.push(m);
+        const tp = d.time_progress;
+
+        // 固定列宽定义（px）
+        const colWidths = {
+            '排名': 38, '地区': 60, '责任人': 50,
+            '目标发货数': 74, '26年发货数': 74,
+            '同比增幅': 64, '26年完成率': 110, '近3月环比': 64
+        };
+        const monthColW = 58; // 每个月份列宽
+
+        // 计算表格总宽度
+        const fixedTotal = Object.values(colWidths).reduce((a, b) => a + b, 0);
+        const tableMinW = fixedTotal + months.length * monthColW;
+
+        // 表头
+        const thead = document.getElementById('gsh-regionTableHead');
+        const fixedCols = Object.keys(colWidths);
+        const monthCols = months.map(m => m + '月');
+        const allCols = [...fixedCols, ...monthCols];
+        const allWidths = [...Object.values(colWidths), ...months.map(() => monthColW)];
+
+        // 表头：排名、地区、责任人固定
+        const stickyClasses = ['sticky-col', 'sticky-col-2', 'sticky-col-3', '', '', '', '', ''];
+        thead.innerHTML = allCols.map((c, i) => {
+            const stickyClass = stickyClasses[i] || '';
+            return `<th class="${stickyClass}" style="white-space:nowrap;padding:8px 5px;background:#f8f9fa;font-weight:600;color:#333;border-bottom:2px solid #e5e7eb;font-size:0.78rem;width:${allWidths[i]}px;min-width:${allWidths[i]}px;box-sizing:border-box;text-align:center;">${c}</th>`;
+        }).join('');
+
+        // 给表格设置最小宽度（确保横向滚动生效）
+        const table = document.getElementById('gsh-regionTable');
+        table.style.minWidth = tableMinW + 'px';
+        table.style.tableLayout = 'fixed';
+        table.style.width = tableMinW + 'px';
+
+        // 表体
+        const tbody = document.getElementById('gsh-regionTableBody');
+        tbody.innerHTML = '';
+        d.regions.forEach((item, idx) => {
+            const rank = idx + 1;
+            const rankClass = item.rate >= tp ? 'rank-green' : 'rank-red';
+            const progressClass = item.rate >= tp ? 'blue' : 'orange';
+            const yoyColor = item.yoy_pct >= 0 ? '#10b981' : '#ef4444';
+            const yoyArrow = item.yoy_pct >= 0 ? '↑' : '↓';
+            const yoyDisplay = `<span style="color:${yoyColor}">${yoyArrow} ${Math.abs(item.yoy_pct).toFixed(1)}%</span>`;
+            const momColor = item.mom_pct >= 0 ? '#10b981' : '#ef4444';
+            const momArrow = item.mom_pct >= 0 ? '↑' : '↓';
+            const momDisplay = (item.mom_pct === 0 && item.qty_26 === 0) ? '-' :
+                `<span style="color:${momColor}">${momArrow} ${Math.abs(item.mom_pct).toFixed(1)}%</span>`;
+
+            const progressBar = `
+                <div style="display:flex;align-items:center;gap:3px;">
+                    <span style="font-size:0.72rem;min-width:34px;text-align:right;flex-shrink:0;">${item.rate.toFixed(1)}%</span>
+                    <div class="progress-bar" style="flex:1;min-width:30px;">
+                        <div class="progress-fill ${progressClass}" style="width:${Math.min(item.rate,100)}%"></div>
+                    </div>
+                </div>`;
+
+            // 只渲染到最新月份（万单位，1位小数）
+            const monthlyCells = months.map(m => {
+                const v = item.monthly[m - 1];
+                const display = v > 0 ? (v / 10000).toFixed(1) : '-';
+                return `<td style="text-align:right;white-space:nowrap;padding:6px 5px;width:${monthColW}px;box-sizing:border-box;">${display}</td>`;
+            }).join('');
+
+            const tdStyle = 'white-space:nowrap;padding:6px 5px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="sticky-col" style="text-align:center;${tdStyle}width:${colWidths['排名']}px;"><span class="${rankClass}">${rank}</span></td>
+                <td class="sticky-col-2" style="${tdStyle}width:${colWidths['地区']}px;">${item.region}</td>
+                <td class="sticky-col-3" style="${tdStyle}width:${colWidths['责任人']}px;">${item.person}</td>
+                <td style="text-align:right;${tdStyle}width:${colWidths['目标发货数']}px;">${(item.target_qty / 10000).toFixed(1)}</td>
+                <td style="text-align:right;${tdStyle}width:${colWidths['26年发货数']}px;">${(item.qty_26 / 10000).toFixed(1)}</td>
+                <td style="text-align:center;${tdStyle}width:${colWidths['同比增幅']}px;">${yoyDisplay}</td>
+                <td style="width:${colWidths['26年完成率']}px;padding:6px 5px;box-sizing:border-box;">${progressBar}</td>
+                <td style="text-align:center;${tdStyle}width:${colWidths['近3月环比']}px;">${momDisplay}</td>
+                ${monthlyCells}
+            `;
+            tbody.appendChild(tr);
+        });
+    }
     </script>
 </body>
 </html>
