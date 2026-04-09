@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>抗过敏组凯莱止产品发货看板</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+
+/* ===== RESET & BASE ===== */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Microsoft YaHei','PingFang SC','Helvetica Neue',sans-serif;
+     background:#EEF1F7;color:#2C3E50;min-width:320px;font-size:22px;}
+
+/* ===== HEADER ===== */
+.header{
+  background:linear-gradient(120deg,#0D2554 0%,#1B3A6B 45%,#1E4D8C 100%);
+  color:#fff;padding:0 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:90px;position:relative;overflow:hidden;
+  box-shadow:0 4px 16px rgba(13,37,84,.35);
+}
+.header::before{
+  content:'';position:absolute;right:-60px;top:-40px;
+  width:260px;height:160px;border-radius:50%;
+  background:rgba(245,131,31,.10);
+}
+.header::after{
+  content:'';position:absolute;right:80px;top:10px;
+  width:120px;height:120px;border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.header-left{display:flex;align-items:center;gap:16px;z-index:1;}
+.logo-wrap{
+  width:62px;height:62px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.logo-wrap img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(255,255,255,.3));}
+.header-titles{}
+.header-main-title{font-size:38px;font-weight:700;letter-spacing:3px;
+  text-shadow:0 2px 8px rgba(0,0,0,.25);}
+.header-subtitle{font-size:16px;color:rgba(255,255,255,.65);margin-top:3px;letter-spacing:1px;}
+.header-right{text-align:right;z-index:1;}
+.header-meta{font-size:16px;color:rgba(255,255,255,.75);line-height:2;}
+.header-meta strong{color:#FFB347;font-weight:600;}
+.header-meta .meta-dot{display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:#F5831F;margin-right:6px;vertical-align:middle;}
+
+/* ===== REFRESH BUTTON ===== */
+.nav-right{
+  margin-left:auto;display:flex;align-items:center;padding-right:16px;
+}
+.refresh-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 16px;
+  background:rgba(27,58,107,.08);border:1px solid rgba(27,58,107,.15);
+  color:#1B3A6B;border-radius:8px;cursor:pointer;
+  font-size:14px;font-family:inherit;
+  transition:all .25s ease;
+}
+.refresh-btn:hover{background:rgba(27,58,107,.15);border-color:rgba(27,58,107,.25);}
+.refresh-btn:active{transform:scale(.96);}
+.refresh-btn .refresh-icon{width:16px;height:16px;}
+.refresh-btn.spinning .refresh-icon{
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.refresh-btn.disabled{opacity:.6;cursor:not-allowed;pointer-events:none;}
+.refresh-btn .status-dot{
+  display:inline-block;width:7px;height:7px;border-radius:50%;margin-left:2px;
+}
+.refresh-btn .status-dot.ok{background:#2ECC71;}
+.refresh-btn .status-dot.err{background:#E74C3C;}
+
+/* ===== NAV ===== */
+.nav{
+  background:#fff;display:flex;gap:0;
+  border-bottom:3px solid #E8ECF4;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
+  padding-left:30px;
+}
+.nav-btn{
+  padding:14px 38px;font-size:20px;font-weight:600;border:none;cursor:pointer;
+  background:transparent;color:#7A8BA8;transition:all .25s;
+  border-bottom:3px solid transparent;margin-bottom:-3px;
+  display:flex;align-items:center;gap:8px;
+}
+.nav-btn:hover{color:#1B3A6B;background:rgba(27,58,107,.04);}
+.nav-btn.active{color:#1B3A6B;border-bottom:3px solid #F5831F;background:#fff;}
+.nav-btn .nav-icon{font-size:22px;}
+
+/* ===== MAIN ===== */
+.main{padding:20px 30px 30px;}
+.page{display:none;}
+.page.active{display:block;}
+
+/* ===== SECTION TITLE ===== */
+.section-title{
+  display:flex;align-items:center;gap:10px;
+  font-size:24px;font-weight:700;color:#1B3A6B;
+  margin:22px 0 14px;
+}
+.section-title::before{
+  content:'';display:block;width:4px;height:20px;border-radius:2px;
+  background:linear-gradient(180deg,#F5831F,#E06C10);flex-shrink:0;
+}
+
+/* ===== KPI CARDS ===== */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:4px;}
+.kpi-row-5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:4px;}
+
+.kpi-card{
+  background:#fff;border-radius:14px;padding:18px 20px 16px;
+  box-shadow:0 2px 12px rgba(0,0,0,.06);
+  position:relative;overflow:hidden;border:1px solid #EEF1F7;
+  transition:transform .2s,box-shadow .2s;
+}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.10);}
+.kpi-card .card-icon{
+  position:absolute;right:16px;top:16px;
+  width:42px;height:42px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  opacity:.9;
+}
+.kpi-card.type-blue .card-icon{background:rgba(27,58,107,.10);}
+.kpi-card.type-orange .card-icon{background:rgba(245,131,31,.12);}
+.kpi-card.type-green .card-icon{background:rgba(39,174,96,.12);}
+.kpi-card.type-red .card-icon{background:rgba(231,76,60,.12);}
+.kpi-card.type-purple .card-icon{background:rgba(142,68,173,.12);}
+.kpi-card.type-teal .card-icon{background:rgba(26,188,156,.12);}
+
+.kpi-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 14px 14px;
+}
+.kpi-card.type-blue::after{background:linear-gradient(90deg,#1B3A6B,#2E86DE);}
+.kpi-card.type-orange::after{background:linear-gradient(90deg,#F5831F,#FFB347);}
+.kpi-card.type-green::after{background:linear-gradient(90deg,#27AE60,#58D68D);}
+.kpi-card.type-red::after{background:linear-gradient(90deg,#E74C3C,#FF6B6B);}
+.kpi-card.type-purple::after{background:linear-gradient(90deg,#8E44AD,#BB8FCE);}
+.kpi-card.type-teal::after{background:linear-gradient(90deg,#1ABC9C,#76D7C4);}
+
+.kpi-label{font-size:18px;color:#8C9AB0;font-weight:500;margin-bottom:8px;}
+.kpi-value{font-size:40px;font-weight:700;color:#1B3A6B;line-height:1;margin-bottom:8px;}
+.kpi-value .unit{font-size:16px;font-weight:400;color:#8C9AB0;margin-left:3px;}
+.kpi-sub{font-size:16px;color:#8C9AB0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.kpi-sub .yoy-up{color:#E74C3C;font-weight:600;}
+.kpi-sub .yoy-down{color:#27AE60;font-weight:600;}
+.kpi-sub .yoy-na{color:#AAB2BF;}
+
+.progress-bar-wrap{margin-top:10px;}
+.progress-bar-bg{background:#EEF1F7;border-radius:4px;height:6px;overflow:hidden;}
+.progress-bar-fill{height:6px;border-radius:4px;transition:width .6s ease;}
+.progress-bar-label{font-size:15px;color:#8C9AB0;margin-top:4px;display:flex;justify-content:space-between;}
+
+.badge{
+  padding:2px 8px;border-radius:20px;font-size:15px;font-weight:600;
+  display:inline-block;letter-spacing:.5px;
+}
+.badge-blue{background:#EBF3FD;color:#1B3A6B;}
+.badge-orange{background:#FFF3E8;color:#C96B10;}
+.badge-green{background:#E8F8F0;color:#1E8449;}
+.badge-red{background:#FDECEA;color:#C0392B;}
+.badge-gray{background:#F0F3F7;color:#5D6D7E;}
+
+/* ===== CHARTS ===== */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.chart-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;}
+
+.chart-box{
+  background:#fff;border-radius:14px;padding:20px 22px;
+  box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid #EEF1F7;
+}
+.chart-box h3{
+  font-size:20px;color:#1B3A6B;font-weight:600;
+  margin-bottom:14px;padding-bottom:12px;
+  border-bottom:1px solid #F0F3F7;
+  display:flex;align-items:center;gap:8px;
+}
+.chart-box h3::before{
+  content:'';display:block;width:3px;height:14px;border-radius:2px;
+  background:linear-gradient(180deg,#F5831F,#1B3A6B);flex-shrink:0;
+}
+.chart-box canvas{max-height:340px;}
+
+/* ===== TABLE ===== */
+.table-box{
+  background:#fff;border-radius:14px;padding:20px 22px;
+  box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid #EEF1F7;
+  margin-top:16px;
+}
+.table-box h3{
+  font-size:24px;color:#1B3A6B;font-weight:600;
+  margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #F0F3F7;
+  display:flex;align-items:center;gap:8px;
+}
+.table-box h3::before{
+  content:'';display:block;width:3px;height:14px;border-radius:2px;
+  background:linear-gradient(180deg,#F5831F,#1B3A6B);
+}
+table{width:100%;border-collapse:collapse;font-size:19px;}
+thead tr{background:#F7F9FC;}
+th{
+  color:#4A5568;font-weight:600;padding:14px 13px;
+  text-align:center;border-bottom:2px solid #E8ECF4;
+  font-size:19px;letter-spacing:.4px;
+}
+td{padding:14px 13px;text-align:center;border-bottom:1px solid #F0F3F7;color:#2C3E50;font-size:19px;}
+tbody tr:nth-child(even) td{background:#FAFBFD;}
+tbody tr:hover td{background:#F0F5FF;}
+.text-left{text-align:left!important;}
+.text-right{text-align:right!important;}
+
+/* 表格内进度条 */
+.tbl-progress{width:100%;min-width:90px;}
+.tbl-progress-bar{background:#EEF1F7;border-radius:10px;height:28px;overflow:hidden;position:relative;}
+.tbl-progress-fill{height:100%;border-radius:10px;transition:width .6s ease;min-width:2px;display:flex;align-items:center;justify-content:center;}
+.tbl-progress-text{font-size:14px;color:#fff;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.35);white-space:nowrap;padding:0 8px;}
+.tbl-progress-pct{font-size:14px;font-weight:600;margin-top:4px;text-align:center;}
+
+/* ===== AREA TAG COLORS ===== */
+.area-tag{
+  display:inline-block;padding:2px 10px;border-radius:4px;
+  font-size:15px;font-weight:600;
+}
+.area-huadong{background:#EBF3FD;color:#1B3A6B;}
+.area-huabei{background:#FFF3E8;color:#C96B10;}
+.area-huanan{background:#E8F8F0;color:#1E8449;}
+.area-huaxi{background:#F5EEF8;color:#7D3C98;}
+.area-xinyx{background:#FEF9E7;color:#B7950B;}
+.area-default{background:#F0F3F7;color:#5D6D7E;}
+
+/* ===== FOOTER ===== */
+.footer{
+  text-align:center;padding:14px 30px;
+  color:#AAB2BF;font-size:15px;
+  border-top:1px solid #E8ECF4;
+  background:#fff;margin-top:10px;
+}
+.footer span{color:#F5831F;font-weight:500;}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:#F0F3F7;}
+::-webkit-scrollbar-thumb{background:#BDC8D9;border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:#8C9AB0;}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1200px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)!important;}
+  .kpi-row-5{grid-template-columns:repeat(2,1fr)!important;}
+  .chart-row,.chart-row-3{grid-template-columns:1fr!important;}
+  .chart-row-3 .chart-box:last-child{grid-column:auto;}
+}
+
+@media(max-width:768px){
+  body{font-size:13px;}
+  .header{flex-direction:row;height:auto;padding:10px 14px;gap:8px;align-items:center;}
+  .header-left{flex-shrink:0;}
+  .header-main-title{font-size:18px;letter-spacing:1px;}
+  .header-subtitle{font-size:10px;}
+  .logo-wrap{width:40px;height:40px;border-radius:10px;}
+  .logo-wrap svg{width:24px;height:24px;}
+  .header-right{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;}
+  .header-meta{line-height:1.6;font-size:11px;text-align:right;}
+  .nav{padding-left:0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .nav-btn{padding:10px 18px;font-size:13px;white-space:nowrap;}
+  .nav-right{padding-right:8px;}
+  .refresh-btn{padding:5px 10px;font-size:11px;border-radius:6px;}
+  .refresh-btn .refresh-icon{width:13px;height:13px;}
+  .main{padding:12px 10px 20px;}
+  .kpi-row,.kpi-row-5{grid-template-columns:repeat(4,1fr)!important;gap:6px!important;}
+  .kpi-card{padding:10px 8px 8px;border-radius:10px;}
+  .kpi-label{font-size:10px;margin-bottom:3px;line-height:1.2;white-space:nowrap;}
+  .kpi-value{font-size:18px;margin-bottom:3px;line-height:1;}
+  .kpi-value .unit{font-size:9px;}
+  .kpi-sub{font-size:9px;gap:2px;line-height:1.2;}
+  .kpi-card .card-icon{width:22px;height:22px;font-size:11px;right:4px;top:4px;border-radius:5px;}
+  .progress-bar-wrap{margin-top:4px;}
+  .progress-bar-bg{height:4px;}
+  .progress-bar-label{font-size:8px;margin-top:2px;}
+  .badge{font-size:8px;padding:1px 4px;border-radius:8px;}
+  .chart-row,.chart-row-3{grid-template-columns:1fr!important;gap:10px!important;}
+  .chart-box{padding:14px 12px;border-radius:10px;}
+  .chart-box h3{font-size:13px;margin-bottom:10px;padding-bottom:8px;}
+  .chart-box h3::before{height:10px;width:2px;}
+  .chart-box canvas{max-height:260px;}
+  .section-title{font-size:14px;margin:16px 0 10px;}
+  .table-box{padding:14px 10px;border-radius:10px;margin-top:12px;}
+  .table-box h3{font-size:13px;}
+  table{font-size:12px;}
+  th,td{padding:7px 6px;font-size:11px;white-space:nowrap;}
+  .badge{font-size:10px;padding:1px 6px;}
+  .area-tag{font-size:10px;padding:1px 6px;}
+  .tbl-progress-bar{height:20px;}
+  .tbl-progress-text{font-size:10px;}
+  .footer{font-size:10px;padding:10px 20px;}
+}
+
+@media(max-width:480px){
+  .header-main-title{font-size:15px;}
+  .header-subtitle{display:none;}
+  .nav-btn{padding:8px 14px;font-size:12px;}
+  .nav-btn .nav-icon{display:none;}
+  .kpi-value{font-size:20px;}
+  .kpi-label{font-size:11px;}
+  .chart-box canvas{max-height:220px;}
+}
+
+/* ===== MOBILE TABLE WRAPPER ===== */
+.table-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -2px;}
+
+</style>
+</head>
+<body>
+
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-wrap">
+      <img src="海豚_透明背景.png" alt="logo">
+    </div>
+    <div class="header-titles">
+      <div class="header-main-title">抗过敏组凯莱止产品发货看板</div>
+      <div class="header-subtitle">ANTI-ALLERGY GROUP · KAILEZHI PRODUCT SHIPMENT DASHBOARD</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-meta">
+      <div><span class="meta-dot"></span>数据截止日期：<strong id="dataDate"></strong></div>
+      <div><span class="meta-dot"></span>统计单位：<strong>万元 / 万盒</strong></div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="nav">
+  <button class="nav-btn active" onclick="switchPage('overview')">
+    <span class="nav-icon">▦</span> 总览
+  </button>
+  <button class="nav-btn" onclick="switchPage('hospital')">
+    <span class="nav-icon">＋</span> 医院销售部
+  </button>
+  <button class="nav-btn" onclick="switchPage('marketing')">
+    <span class="nav-icon">◈</span> 新营销部
+  </button>
+  <div class="nav-right">
+    <button class="refresh-btn" id="refreshBtn" onclick="refreshData()" title="从Excel源文件刷新数据">
+      <svg class="refresh-icon" id="refreshIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      <span>刷新数据</span>
+    </button>
+  </div>
+</div>
+
+
+<div class="main">
+  <div id="page-overview" class="page active"></div>
+  <div id="page-hospital" class="page"></div>
+  <div id="page-marketing" class="page"></div>
+</div>
+
+<div class="footer">
+  抗过敏事业部 · <span>凯莱止产品发货数据分析看板</span> · 数据仅供内部参考
+</div>
+
+<script>
+window.__DASHBOARD_CTRL_URL = 'http://localhost:18765';
+const D = {"latestDate": "2026-04-08", "latestMonth": 4, "latestYear": 2026, "latestMMDD": "04-08", "monthly": [{"year": 2025, "month": 1, "label": "2025-01", "qty": 67.2, "amt": 2352.67}, {"year": 2025, "month": 2, "label": "2025-02", "qty": 29.93, "amt": 1046.71}, {"year": 2025, "month": 3, "label": "2025-03", "qty": 49.26, "amt": 1717.34}, {"year": 2025, "month": 4, "label": "2025-04", "qty": 60.9, "amt": 2107.5}, {"year": 2025, "month": 5, "label": "2025-05", "qty": 52.3, "amt": 1818.77}, {"year": 2025, "month": 6, "label": "2025-06", "qty": 72.11, "amt": 2509.51}, {"year": 2025, "month": 7, "label": "2025-07", "qty": 44.09, "amt": 1536.01}, {"year": 2025, "month": 8, "label": "2025-08", "qty": 35.85, "amt": 1237.33}, {"year": 2025, "month": 9, "label": "2025-09", "qty": 55.37, "amt": 1912.49}, {"year": 2025, "month": 10, "label": "2025-10", "qty": 39.09, "amt": 1353.43}, {"year": 2025, "month": 11, "label": "2025-11", "qty": 43.17, "amt": 1485.84}, {"year": 2025, "month": 12, "label": "2025-12", "qty": 44.5, "amt": 1529.45}, {"year": 2026, "month": 1, "label": "2026-01", "qty": 81.91, "amt": 2828.05}, {"year": 2026, "month": 2, "label": "2026-02", "qty": 22.2, "amt": 765.32}, {"year": 2026, "month": 3, "label": "2026-03", "qty": 38.54, "amt": 1339.86}, {"year": 2026, "month": 4, "label": "2026-04", "qty": 10.65, "amt": 362.55}], "deptMonthly": [{"dept": "全部", "year": 2025, "month": 1, "label": "2025-01", "qty": 67.2, "amt": 2352.67}, {"dept": "全部", "year": 2025, "month": 2, "label": "2025-02", "qty": 29.93, "amt": 1046.71}, {"dept": "全部", "year": 2025, "month": 3, "label": "2025-03", "qty": 49.26, "amt": 1717.34}, {"dept": "全部", "year": 2025, "month": 4, "label": "2025-04", "qty": 60.9, "amt": 2107.5}, {"dept": "全部", "year": 2025, "month": 5, "label": "2025-05", "qty": 52.3, "amt": 1818.77}, {"dept": "全部", "year": 2025, "month": 6, "label": "2025-06", "qty": 72.11, "amt": 2509.51}, {"dept": "全部", "year": 2025, "month": 7, "label": "2025-07", "qty": 44.09, "amt": 1536.01}, {"dept": "全部", "year": 2025, "month": 8, "label": "2025-08", "qty": 35.85, "amt": 1237.33}, {"dept": "全部", "year": 2025, "month": 9, "label": "2025-09", "qty": 55.37, "amt": 1912.49}, {"dept": "全部", "year": 2025, "month": 10, "label": "2025-10", "qty": 39.09, "amt": 1353.43}, {"dept": "全部", "year": 2025, "month": 11, "label": "2025-11", "qty": 43.17, "amt": 1485.84}, {"dept": "全部", "year": 2025, "month": 12, "label": "2025-12", "qty": 44.5, "amt": 1529.45}, {"dept": "全部", "year": 2026, "month": 1, "label": "2026-01", "qty": 81.91, "amt": 2828.05}, {"dept": "全部", "year": 2026, "month": 2, "label": "2026-02", "qty": 22.2, "amt": 765.32}, {"dept": "全部", "year": 2026, "month": 3, "label": "2026-03", "qty": 38.54, "amt": 1339.86}, {"dept": "全部", "year": 2026, "month": 4, "label": "2026-04", "qty": 10.65, "amt": 362.55}, {"dept": "医院销售部", "year": 2025, "month": 1, "label": "2025-01", "qty": 60.34, "amt": 2102.11}, {"dept": "医院销售部", "year": 2025, "month": 2, "label": "2025-02", "qty": 25.8, "amt": 899.42}, {"dept": "医院销售部", "year": 2025, "month": 3, "label": "2025-03", "qty": 40.74, "amt": 1412.99}, {"dept": "医院销售部", "year": 2025, "month": 4, "label": "2025-04", "qty": 54.19, "amt": 1868.0}, {"dept": "医院销售部", "year": 2025, "month": 5, "label": "2025-05", "qty": 42.29, "amt": 1461.79}, {"dept": "医院销售部", "year": 2025, "month": 6, "label": "2025-06", "qty": 62.13, "amt": 2153.7}, {"dept": "医院销售部", "year": 2025, "month": 7, "label": "2025-07", "qty": 34.26, "amt": 1185.94}, {"dept": "医院销售部", "year": 2025, "month": 8, "label": "2025-08", "qty": 32.77, "amt": 1126.83}, {"dept": "医院销售部", "year": 2025, "month": 9, "label": "2025-09", "qty": 50.35, "amt": 1732.24}, {"dept": "医院销售部", "year": 2025, "month": 10, "label": "2025-10", "qty": 33.0, "amt": 1135.97}, {"dept": "医院销售部", "year": 2025, "month": 11, "label": "2025-11", "qty": 33.23, "amt": 1134.51}, {"dept": "医院销售部", "year": 2025, "month": 12, "label": "2025-12", "qty": 39.2, "amt": 1340.96}, {"dept": "医院销售部", "year": 2026, "month": 1, "label": "2026-01", "qty": 72.16, "amt": 2476.85}, {"dept": "医院销售部", "year": 2026, "month": 2, "label": "2026-02", "qty": 17.62, "amt": 601.12}, {"dept": "医院销售部", "year": 2026, "month": 3, "label": "2026-03", "qty": 26.96, "amt": 922.32}, {"dept": "医院销售部", "year": 2026, "month": 4, "label": "2026-04", "qty": 9.68, "amt": 326.94}, {"dept": "新营销部", "year": 2025, "month": 1, "label": "2025-01", "qty": 6.87, "amt": 250.57}, {"dept": "新营销部", "year": 2025, "month": 2, "label": "2025-02", "qty": 4.12, "amt": 147.29}, {"dept": "新营销部", "year": 2025, "month": 3, "label": "2025-03", "qty": 8.51, "amt": 304.35}, {"dept": "新营销部", "year": 2025, "month": 4, "label": "2025-04", "qty": 6.71, "amt": 239.49}, {"dept": "新营销部", "year": 2025, "month": 5, "label": "2025-05", "qty": 10.01, "amt": 356.97}, {"dept": "新营销部", "year": 2025, "month": 6, "label": "2025-06", "qty": 9.98, "amt": 355.82}, {"dept": "新营销部", "year": 2025, "month": 7, "label": "2025-07", "qty": 9.82, "amt": 350.07}, {"dept": "新营销部", "year": 2025, "month": 8, "label": "2025-08", "qty": 3.08, "amt": 110.49}, {"dept": "新营销部", "year": 2025, "month": 9, "label": "2025-09", "qty": 5.03, "amt": 180.25}, {"dept": "新营销部", "year": 2025, "month": 10, "label": "2025-10", "qty": 6.09, "amt": 217.46}, {"dept": "新营销部", "year": 2025, "month": 11, "label": "2025-11", "qty": 9.94, "amt": 351.33}, {"dept": "新营销部", "year": 2025, "month": 12, "label": "2025-12", "qty": 5.3, "amt": 188.49}, {"dept": "新营销部", "year": 2026, "month": 1, "label": "2026-01", "qty": 9.75, "amt": 351.21}, {"dept": "新营销部", "year": 2026, "month": 2, "label": "2026-02", "qty": 4.58, "amt": 164.2}, {"dept": "新营销部", "year": 2026, "month": 3, "label": "2026-03", "qty": 11.59, "amt": 417.54}, {"dept": "新营销部", "year": 2026, "month": 4, "label": "2026-04", "qty": 0.97, "amt": 35.62}], "areaMonthly": [{"area": "华东", "dept": "医院销售部", "year": 2025, "month": 1, "label": "2025-01", "qty": 9.22, "amt": 322.22}, {"area": "华东", "dept": "医院销售部", "year": 2025, "month": 2, "label": "2025-02", "qty": 3.23, "amt": 114.63}, {"area": "华东", "dept": "医院销售部", "year": 2025, "month": 3, "label": "2025-03", "qty": 6.56, "amt": 227.84}, {"area": "华东", "dept": "医院销售部", "year": 2025, "month": 4, "label": "2025-04", "qty": 6.41, "amt": 221.65}, {"area": "华东", "dept": "医院销售部", "year": 2025, "month": 5, "label": "2025-05", "qty": 6.19, "amt": 216.56}, {"area": "华东", "dept": "医院销售部", "year": 2025, "month": 6, "label": "2025-06", "qty": 6.67, "amt": 232.18}, {"area": "华东", "dept": "医院销售部", "year": 2025, "month": 7, "label": "2025-07", "qty": 7.99, "amt": 276.55}, {"area": "华东", "dept": "医院销售部", "year": 2025, "month": 8, "label": "2025-08", "qty": 4.5, "amt": 156.63}, {"area": "华东", "dept": "医院销售部", "year": 2025, "month": 9, "label": "2025-09", "qty": 6.94, "amt": 238.35}, {"area": "华东", "dept": "医院销售部", "year": 2025, "month": 10, "label": "2025-10", "qty": 5.7, "amt": 198.57}, {"area": "华东", "dept": "医院销售部", "year": 2025, "month": 11, "label": "2025-11", "qty": 4.24, "amt": 145.8}, {"area": "华东", "dept": "医院销售部", "year": 2025, "month": 12, "label": "2025-12", "qty": 6.71, "amt": 231.81}, {"area": "华东", "dept": "医院销售部", "year": 2026, "month": 1, "label": "2026-01", "qty": 9.07, "amt": 313.22}, {"area": "华东", "dept": "医院销售部", "year": 2026, "month": 2, "label": "2026-02", "qty": 0.38, "amt": 13.08}, {"area": "华东", "dept": "医院销售部", "year": 2026, "month": 3, "label": "2026-03", "qty": 4.01, "amt": 138.12}, {"area": "华东", "dept": "医院销售部", "year": 2026, "month": 4, "label": "2026-04", "qty": 0.75, "amt": 25.47}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 1, "label": "2025-01", "qty": 10.46, "amt": 356.36}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 2, "label": "2025-02", "qty": 5.74, "amt": 196.19}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 3, "label": "2025-03", "qty": 7.58, "amt": 257.41}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 4, "label": "2025-04", "qty": 10.31, "amt": 349.34}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 5, "label": "2025-05", "qty": 7.09, "amt": 238.96}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 6, "label": "2025-06", "qty": 10.28, "amt": 345.06}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 7, "label": "2025-07", "qty": 4.38, "amt": 147.5}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 8, "label": "2025-08", "qty": 5.92, "amt": 198.0}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 9, "label": "2025-09", "qty": 9.06, "amt": 304.96}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 10, "label": "2025-10", "qty": 6.45, "amt": 216.58}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 11, "label": "2025-11", "qty": 4.95, "amt": 165.51}, {"area": "华北", "dept": "医院销售部", "year": 2025, "month": 12, "label": "2025-12", "qty": 6.45, "amt": 216.02}, {"area": "华北", "dept": "医院销售部", "year": 2026, "month": 1, "label": "2026-01", "qty": 11.12, "amt": 373.77}, {"area": "华北", "dept": "医院销售部", "year": 2026, "month": 2, "label": "2026-02", "qty": 4.35, "amt": 145.41}, {"area": "华北", "dept": "医院销售部", "year": 2026, "month": 3, "label": "2026-03", "qty": 5.39, "amt": 181.28}, {"area": "华北", "dept": "医院销售部", "year": 2026, "month": 4, "label": "2026-04", "qty": 2.25, "amt": 74.75}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 1, "label": "2025-01", "qty": 27.26, "amt": 956.48}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 2, "label": "2025-02", "qty": 8.7, "amt": 304.61}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 3, "label": "2025-03", "qty": 15.67, "amt": 546.6}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 4, "label": "2025-04", "qty": 21.79, "amt": 754.14}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 5, "label": "2025-05", "qty": 19.16, "amt": 666.35}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 6, "label": "2025-06", "qty": 31.01, "amt": 1085.32}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 7, "label": "2025-07", "qty": 13.46, "amt": 475.02}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 8, "label": "2025-08", "qty": 13.46, "amt": 468.54}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 9, "label": "2025-09", "qty": 19.61, "amt": 683.21}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 10, "label": "2025-10", "qty": 11.1, "amt": 387.4}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 11, "label": "2025-11", "qty": 14.92, "amt": 509.53}, {"area": "华南", "dept": "医院销售部", "year": 2025, "month": 12, "label": "2025-12", "qty": 18.52, "amt": 638.43}, {"area": "华南", "dept": "医院销售部", "year": 2026, "month": 1, "label": "2026-01", "qty": 32.42, "amt": 1119.52}, {"area": "华南", "dept": "医院销售部", "year": 2026, "month": 2, "label": "2026-02", "qty": 8.1, "amt": 277.77}, {"area": "华南", "dept": "医院销售部", "year": 2026, "month": 3, "label": "2026-03", "qty": 6.75, "amt": 232.05}, {"area": "华南", "dept": "医院销售部", "year": 2026, "month": 4, "label": "2026-04", "qty": 5.55, "amt": 188.62}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 1, "label": "2025-01", "qty": 13.39, "amt": 467.04}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 2, "label": "2025-02", "qty": 8.14, "amt": 283.99}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 3, "label": "2025-03", "qty": 10.93, "amt": 381.14}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 4, "label": "2025-04", "qty": 15.68, "amt": 542.88}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 5, "label": "2025-05", "qty": 9.85, "amt": 339.93}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 6, "label": "2025-06", "qty": 14.17, "amt": 491.13}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 7, "label": "2025-07", "qty": 8.44, "amt": 286.88}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 8, "label": "2025-08", "qty": 8.89, "amt": 303.67}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 9, "label": "2025-09", "qty": 14.74, "amt": 505.72}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 10, "label": "2025-10", "qty": 9.75, "amt": 333.42}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 11, "label": "2025-11", "qty": 9.12, "amt": 313.67}, {"area": "华西", "dept": "医院销售部", "year": 2025, "month": 12, "label": "2025-12", "qty": 7.51, "amt": 254.7}, {"area": "华西", "dept": "医院销售部", "year": 2026, "month": 1, "label": "2026-01", "qty": 19.54, "amt": 670.34}, {"area": "华西", "dept": "医院销售部", "year": 2026, "month": 2, "label": "2026-02", "qty": 4.8, "amt": 164.87}, {"area": "华西", "dept": "医院销售部", "year": 2026, "month": 3, "label": "2026-03", "qty": 10.8, "amt": 370.87}, {"area": "华西", "dept": "医院销售部", "year": 2026, "month": 4, "label": "2026-04", "qty": 1.12, "amt": 38.09}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 1, "label": "2025-01", "qty": 6.87, "amt": 250.57}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 2, "label": "2025-02", "qty": 4.12, "amt": 147.29}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 3, "label": "2025-03", "qty": 8.51, "amt": 304.35}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 4, "label": "2025-04", "qty": 6.71, "amt": 239.49}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 5, "label": "2025-05", "qty": 10.01, "amt": 356.97}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 6, "label": "2025-06", "qty": 9.98, "amt": 355.82}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 7, "label": "2025-07", "qty": 9.82, "amt": 350.07}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 8, "label": "2025-08", "qty": 3.08, "amt": 110.49}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 9, "label": "2025-09", "qty": 5.03, "amt": 180.25}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 10, "label": "2025-10", "qty": 6.09, "amt": 217.46}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 11, "label": "2025-11", "qty": 9.94, "amt": 351.33}, {"area": "新营销部", "dept": "新营销部", "year": 2025, "month": 12, "label": "2025-12", "qty": 5.3, "amt": 188.49}, {"area": "新营销部", "dept": "新营销部", "year": 2026, "month": 1, "label": "2026-01", "qty": 9.75, "amt": 351.21}, {"area": "新营销部", "dept": "新营销部", "year": 2026, "month": 2, "label": "2026-02", "qty": 4.58, "amt": 164.2}, {"area": "新营销部", "dept": "新营销部", "year": 2026, "month": 3, "label": "2026-03", "qty": 11.59, "amt": 417.54}, {"area": "新营销部", "dept": "新营销部", "year": 2026, "month": 4, "label": "2026-04", "qty": 0.97, "amt": 35.62}], "target": [{"dept": "全部", "targetQty": 685.0, "targetAmt": 23710.0}, {"dept": "医院销售部", "targetQty": 545.0, "targetAmt": 18530.0}, {"dept": "新营销部", "targetQty": 140.0, "targetAmt": 5180.0}], "areaTarget": [{"area": "B端", "dept": "新营销部", "targetQty": 63.0, "targetAmt": 2331.0}, {"area": "C端", "dept": "新营销部", "targetQty": 11.0, "targetAmt": 407.0}, {"area": "KA", "dept": "新营销部", "targetQty": 66.0, "targetAmt": 2442.0}, {"area": "华东", "dept": "医院销售部", "targetQty": 82.6, "targetAmt": 2808.4}, {"area": "华北", "dept": "医院销售部", "targetQty": 88.1, "targetAmt": 2995.4}, {"area": "华南", "dept": "医院销售部", "targetQty": 227.3, "targetAmt": 7728.2}, {"area": "华西", "dept": "医院销售部", "targetQty": 147.0, "targetAmt": 4998.0}], "regionTarget": [{"region": "B端-壹药网", "dept": "新营销部", "area": "B端", "owner": "庞大智", "targetQty": 45.0, "targetAmt": 1665.0}, {"region": "B端-药师帮", "dept": "新营销部", "area": "B端", "owner": "庞大智", "targetQty": 18.0, "targetAmt": 666.0}, {"region": "C端-京东", "dept": "新营销部", "area": "C端", "owner": "贠嘉宏", "targetQty": 7.0, "targetAmt": 259.0}, {"region": "C端-其他", "dept": "新营销部", "area": "C端", "owner": "贠嘉宏", "targetQty": 1.0, "targetAmt": 37.0}, {"region": "C端-阿里", "dept": "新营销部", "area": "C端", "owner": "贠嘉宏", "targetQty": 3.0, "targetAmt": 111.0}, {"region": "KA", "dept": "新营销部", "area": "KA", "owner": "张宇航", "targetQty": 66.0, "targetAmt": 2442.0}, {"region": "上海", "dept": "医院销售部", "area": "华东", "owner": "高文龙", "targetQty": 1.6, "targetAmt": 54.4}, {"region": "云南", "dept": "医院销售部", "area": "华西", "owner": "周辉", "targetQty": 6.2, "targetAmt": 210.8}, {"region": "内蒙古", "dept": "医院销售部", "area": "华北", "owner": "卿毅", "targetQty": 2.6, "targetAmt": 88.4}, {"region": "北京", "dept": "医院销售部", "area": "华北", "owner": "卢俊", "targetQty": 5.5, "targetAmt": 187.0}, {"region": "吉林", "dept": "医院销售部", "area": "华北", "owner": "卿毅", "targetQty": 7.5, "targetAmt": 255.0}, {"region": "四川", "dept": "医院销售部", "area": "华西", "owner": "薛文", "targetQty": 19.0, "targetAmt": 646.0}, {"region": "天津", "dept": "医院销售部", "area": "华北", "owner": "卢俊", "targetQty": 0.35, "targetAmt": 11.9}, {"region": "宁夏", "dept": "医院销售部", "area": "华西", "owner": "耿福林", "targetQty": 0.5, "targetAmt": 17.0}, {"region": "安徽", "dept": "医院销售部", "area": "华东", "owner": "汪腾飞", "targetQty": 4.0, "targetAmt": 136.0}, {"region": "山东", "dept": "医院销售部", "area": "华北", "owner": "卿毅", "targetQty": 28.0, "targetAmt": 952.0}, {"region": "山西", "dept": "医院销售部", "area": "华北", "owner": "卿毅", "targetQty": 17.15, "targetAmt": 583.1}, {"region": "广东", "dept": "医院销售部", "area": "华南", "owner": "许占海", "targetQty": 156.0, "targetAmt": 5304.0}, {"region": "广西", "dept": "医院销售部", "area": "华南", "owner": "罗险峰", "targetQty": 30.0, "targetAmt": 1020.0}, {"region": "新疆", "dept": "医院销售部", "area": "华西", "owner": "耿福林", "targetQty": 0.2, "targetAmt": 6.8}, {"region": "江苏", "dept": "医院销售部", "area": "华东", "owner": "杨海波", "targetQty": 34.0, "targetAmt": 1156.0}, {"region": "江西", "dept": "医院销售部", "area": "华南", "owner": "罗险峰", "targetQty": 3.0, "targetAmt": 102.0}, {"region": "河北", "dept": "医院销售部", "area": "华北", "owner": "卢俊", "targetQty": 5.0, "targetAmt": 170.0}, {"region": "河南", "dept": "医院销售部", "area": "华西", "owner": "黄彩西", "targetQty": 26.0, "targetAmt": 884.0}, {"region": "浙江", "dept": "医院销售部", "area": "华东", "owner": "吴光建", "targetQty": 43.0, "targetAmt": 1462.0}, {"region": "海南", "dept": "医院销售部", "area": "华南", "owner": "许占海", "targetQty": 2.5, "targetAmt": 85.0}, {"region": "湖北", "dept": "医院销售部", "area": "华西", "owner": "陈辉", "targetQty": 28.5, "targetAmt": 969.0}, {"region": "湖南", "dept": "医院销售部", "area": "华南", "owner": "罗险峰", "targetQty": 3.8, "targetAmt": 129.2}, {"region": "甘肃", "dept": "医院销售部", "area": "华西", "owner": "耿福林", "targetQty": 0.6, "targetAmt": 20.4}, {"region": "福建", "dept": "医院销售部", "area": "华南", "owner": "许占海", "targetQty": 32.0, "targetAmt": 1088.0}, {"region": "贵州", "dept": "医院销售部", "area": "华西", "owner": "周辉", "targetQty": 6.0, "targetAmt": 204.0}, {"region": "辽宁", "dept": "医院销售部", "area": "华北", "owner": "卿毅", "targetQty": 14.0, "targetAmt": 476.0}, {"region": "重庆", "dept": "医院销售部", "area": "华西", "owner": "薛文", "targetQty": 44.0, "targetAmt": 1496.0}, {"region": "陕西", "dept": "医院销售部", "area": "华西", "owner": "耿福林", "targetQty": 16.0, "targetAmt": 544.0}, {"region": "黑龙江", "dept": "医院销售部", "area": "华北", "owner": "卿毅", "targetQty": 8.0, "targetAmt": 272.0}], "ytd": [{"dept": "全部", "ytd2026Qty": 153.31, "ytd2026Amt": 5295.78, "ytd2025Qty": 153.03, "ytd2025Amt": 5343.82}, {"dept": "医院销售部", "ytd2026Qty": 126.42, "ytd2026Amt": 4327.22, "ytd2025Qty": 133.37, "ytd2025Amt": 4636.23}, {"dept": "新营销部", "ytd2026Qty": 26.89, "ytd2026Amt": 968.56, "ytd2025Qty": 19.66, "ytd2025Amt": 707.59}], "areaYtd": [{"area": "华东", "dept": "医院销售部", "ytd2026Qty": 14.21, "ytd2026Amt": 489.89, "ytd2025Qty": 19.39, "ytd2025Amt": 677.9}, {"area": "华北", "dept": "医院销售部", "ytd2026Qty": 23.11, "ytd2026Amt": 775.21, "ytd2025Qty": 27.26, "ytd2025Amt": 927.69}, {"area": "华南", "dept": "医院销售部", "ytd2026Qty": 52.83, "ytd2026Amt": 1817.96, "ytd2025Qty": 53.06, "ytd2025Amt": 1856.55}, {"area": "华西", "dept": "医院销售部", "ytd2026Qty": 36.27, "ytd2026Amt": 1244.16, "ytd2025Qty": 33.66, "ytd2025Amt": 1174.1}, {"area": "新营销部", "dept": "新营销部", "ytd2026Qty": 26.89, "ytd2026Amt": 968.56, "ytd2025Qty": 19.66, "ytd2025Amt": 707.59}], "regionYtd": [{"region": "B端-壹药网", "dept": "新营销部", "ytd2026Qty": 13.12, "ytd2026Amt": 467.62, "ytd2025Qty": 5.85, "ytd2025Amt": 210.63}, {"region": "B端-药师帮", "dept": "新营销部", "ytd2026Qty": 4.65, "ytd2026Amt": 173.48, "ytd2025Qty": 3.71, "ytd2025Amt": 134.02}, {"region": "C端-京东", "dept": "新营销部", "ytd2026Qty": 0.0, "ytd2026Amt": 0.0, "ytd2025Qty": 0.97, "ytd2025Amt": 35.46}, {"region": "C端-其他", "dept": "新营销部", "ytd2026Qty": 1.09, "ytd2026Amt": 39.64, "ytd2025Qty": 0.08, "ytd2025Amt": 2.87}, {"region": "C端-阿里", "dept": "新营销部", "ytd2026Qty": 0.07, "ytd2026Amt": 2.73, "ytd2025Qty": 0.26, "ytd2025Amt": 9.55}, {"region": "KA", "dept": "新营销部", "ytd2026Qty": 7.95, "ytd2026Amt": 285.09, "ytd2025Qty": 8.78, "ytd2025Amt": 315.06}, {"region": "上海", "dept": "医院销售部", "ytd2026Qty": 0.15, "ytd2026Amt": 5.21, "ytd2025Qty": 0.15, "ytd2025Amt": 5.31}, {"region": "云南", "dept": "医院销售部", "ytd2026Qty": 1.57, "ytd2026Amt": 53.91, "ytd2025Qty": 1.12, "ytd2025Amt": 39.4}, {"region": "内蒙古", "dept": "医院销售部", "ytd2026Qty": 1.2, "ytd2026Amt": 38.94, "ytd2025Qty": 0.6, "ytd2025Amt": 19.83}, {"region": "北京", "dept": "医院销售部", "ytd2026Qty": 1.95, "ytd2026Amt": 65.95, "ytd2025Qty": 1.95, "ytd2025Amt": 67.21}, {"region": "吉林", "dept": "医院销售部", "ytd2026Qty": 1.65, "ytd2026Amt": 55.5, "ytd2025Qty": 2.1, "ytd2025Amt": 71.99}, {"region": "四川", "dept": "医院销售部", "ytd2026Qty": 4.58, "ytd2026Amt": 156.7, "ytd2025Qty": 4.61, "ytd2025Amt": 160.91}, {"region": "天津", "dept": "医院销售部", "ytd2026Qty": 0.03, "ytd2026Amt": 1.05, "ytd2025Qty": 0.07, "ytd2025Amt": 2.63}, {"region": "宁夏", "dept": "医院销售部", "ytd2026Qty": 0.15, "ytd2026Amt": 5.1, "ytd2025Qty": 0.15, "ytd2025Amt": 5.2}, {"region": "安徽", "dept": "医院销售部", "ytd2026Qty": 0.64, "ytd2026Amt": 20.59, "ytd2025Qty": 0.71, "ytd2025Amt": 23.49}, {"region": "山东", "dept": "医院销售部", "ytd2026Qty": 6.9, "ytd2026Amt": 232.51, "ytd2025Qty": 7.88, "ytd2025Amt": 267.98}, {"region": "山西", "dept": "医院销售部", "ytd2026Qty": 3.38, "ytd2026Amt": 111.57, "ytd2025Qty": 4.95, "ytd2025Amt": 165.52}, {"region": "广东", "dept": "医院销售部", "ytd2026Qty": 38.48, "ytd2026Amt": 1326.11, "ytd2025Qty": 35.14, "ytd2025Amt": 1232.23}, {"region": "广西", "dept": "医院销售部", "ytd2026Qty": 6.75, "ytd2026Amt": 227.58, "ytd2025Qty": 7.28, "ytd2025Amt": 248.5}, {"region": "江苏", "dept": "医院销售部", "ytd2026Qty": 6.38, "ytd2026Amt": 216.59, "ytd2025Qty": 9.07, "ytd2025Amt": 313.11}, {"region": "江西", "dept": "医院销售部", "ytd2026Qty": 0.62, "ytd2026Amt": 21.26, "ytd2025Qty": 2.25, "ytd2025Amt": 78.26}, {"region": "河北", "dept": "医院销售部", "ytd2026Qty": 2.25, "ytd2026Amt": 76.3, "ytd2025Qty": 5.1, "ytd2025Amt": 175.36}, {"region": "河南", "dept": "医院销售部", "ytd2026Qty": 5.59, "ytd2026Amt": 187.85, "ytd2025Qty": 5.92, "ytd2025Amt": 202.37}, {"region": "浙江", "dept": "医院销售部", "ytd2026Qty": 7.05, "ytd2026Amt": 247.5, "ytd2025Qty": 9.45, "ytd2025Amt": 335.99}, {"region": "海南", "dept": "医院销售部", "ytd2026Qty": 0.45, "ytd2026Amt": 14.97, "ytd2025Qty": 0.6, "ytd2025Amt": 20.42}, {"region": "湖北", "dept": "医院销售部", "ytd2026Qty": 5.92, "ytd2026Amt": 199.66, "ytd2025Qty": 6.0, "ytd2025Amt": 206.55}, {"region": "湖南", "dept": "医院销售部", "ytd2026Qty": 0.75, "ytd2026Amt": 25.34, "ytd2025Qty": 0.6, "ytd2025Amt": 20.65}, {"region": "福建", "dept": "医院销售部", "ytd2026Qty": 5.78, "ytd2026Amt": 202.69, "ytd2025Qty": 7.2, "ytd2025Amt": 256.48}, {"region": "西藏", "dept": "医院销售部", "ytd2026Qty": 0.01, "ytd2026Amt": 0.17, "ytd2025Qty": 0.0, "ytd2025Amt": 0.12}, {"region": "贵州", "dept": "医院销售部", "ytd2026Qty": 1.35, "ytd2026Amt": 44.46, "ytd2025Qty": 1.29, "ytd2025Amt": 43.34}, {"region": "辽宁", "dept": "医院销售部", "ytd2026Qty": 2.94, "ytd2026Amt": 99.22, "ytd2025Qty": 2.74, "ytd2025Amt": 93.46}, {"region": "重庆", "dept": "医院销售部", "ytd2026Qty": 14.1, "ytd2026Amt": 494.04, "ytd2025Qty": 10.28, "ytd2025Amt": 367.61}, {"region": "陕西", "dept": "医院销售部", "ytd2026Qty": 3.0, "ytd2026Amt": 102.27, "ytd2025Qty": 4.28, "ytd2025Amt": 148.6}, {"region": "黑龙江", "dept": "医院销售部", "ytd2026Qty": 2.81, "ytd2026Amt": 94.17, "ytd2025Qty": 1.88, "ytd2025Amt": 63.69}], "regionMonthly2025": [{"region": "B端-壹药网", "dept": "新营销部", "month": 1, "qty": 1.2, "amt": 45.01}, {"region": "B端-壹药网", "dept": "新营销部", "month": 2, "qty": 1.27, "amt": 45.43}, {"region": "B端-壹药网", "dept": "新营销部", "month": 3, "qty": 3.38, "amt": 120.19}, {"region": "B端-壹药网", "dept": "新营销部", "month": 4, "qty": 1.69, "amt": 60.09}, {"region": "B端-壹药网", "dept": "新营销部", "month": 5, "qty": 3.38, "amt": 120.21}, {"region": "B端-壹药网", "dept": "新营销部", "month": 6, "qty": 5.17, "amt": 184.34}, {"region": "B端-壹药网", "dept": "新营销部", "month": 7, "qty": 9.6, "amt": 342.03}, {"region": "B端-壹药网", "dept": "新营销部", "month": 8, "qty": 0.07, "amt": 2.65}, {"region": "B端-壹药网", "dept": "新营销部", "month": 9, "qty": 0.23, "amt": 7.96}, {"region": "B端-壹药网", "dept": "新营销部", "month": 10, "qty": 4.09, "amt": 145.63}, {"region": "B端-壹药网", "dept": "新营销部", "month": 11, "qty": 4.05, "amt": 144.17}, {"region": "B端-壹药网", "dept": "新营销部", "month": 12, "qty": 4.99, "amt": 177.45}, {"region": "B端-药师帮", "dept": "新营销部", "month": 1, "qty": 1.39, "amt": 51.71}, {"region": "B端-药师帮", "dept": "新营销部", "month": 2, "qty": 0.82, "amt": 29.2}, {"region": "B端-药师帮", "dept": "新营销部", "month": 3, "qty": 1.39, "amt": 49.13}, {"region": "B端-药师帮", "dept": "新营销部", "month": 4, "qty": 1.54, "amt": 54.48}, {"region": "B端-药师帮", "dept": "新营销部", "month": 5, "qty": 1.73, "amt": 61.07}, {"region": "B端-药师帮", "dept": "新营销部", "month": 6, "qty": 1.65, "amt": 58.43}, {"region": "B端-药师帮", "dept": "新营销部", "month": 7, "qty": 0.19, "amt": 6.63}, {"region": "B端-药师帮", "dept": "新营销部", "month": 8, "qty": 0.26, "amt": 9.32}, {"region": "B端-药师帮", "dept": "新营销部", "month": 9, "qty": 0.49, "amt": 17.35}, {"region": "B端-药师帮", "dept": "新营销部", "month": 10, "qty": 0.45, "amt": 16.03}, {"region": "B端-药师帮", "dept": "新营销部", "month": 11, "qty": 0.07, "amt": 2.67}, {"region": "B端-药师帮", "dept": "新营销部", "month": 12, "qty": 0.11, "amt": 4.01}, {"region": "C端-京东", "dept": "新营销部", "month": 1, "qty": 0.41, "amt": 15.0}, {"region": "C端-京东", "dept": "新营销部", "month": 2, "qty": 0.11, "amt": 4.09}, {"region": "C端-京东", "dept": "新营销部", "month": 3, "qty": 0.45, "amt": 16.37}, {"region": "C端-京东", "dept": "新营销部", "month": 4, "qty": 0.41, "amt": 15.0}, {"region": "C端-京东", "dept": "新营销部", "month": 5, "qty": 0.75, "amt": 27.28}, {"region": "C端-京东", "dept": "新营销部", "month": 6, "qty": 0.45, "amt": 16.37}, {"region": "C端-京东", "dept": "新营销部", "month": 8, "qty": 0.6, "amt": 21.82}, {"region": "C端-京东", "dept": "新营销部", "month": 9, "qty": 0.53, "amt": 19.1}, {"region": "C端-京东", "dept": "新营销部", "month": 10, "qty": 0.38, "amt": 13.64}, {"region": "C端-其他", "dept": "新营销部", "month": 1, "qty": 0.01, "amt": 0.06}, {"region": "C端-其他", "dept": "新营销部", "month": 2, "qty": 0.04, "amt": 1.41}, {"region": "C端-其他", "dept": "新营销部", "month": 4, "qty": 0.07, "amt": 2.81}, {"region": "C端-其他", "dept": "新营销部", "month": 5, "qty": 0.07, "amt": 2.81}, {"region": "C端-其他", "dept": "新营销部", "month": 6, "qty": 0.08, "amt": 2.87}, {"region": "C端-其他", "dept": "新营销部", "month": 7, "qty": 0.04, "amt": 1.41}, {"region": "C端-其他", "dept": "新营销部", "month": 8, "qty": 0.08, "amt": 2.89}, {"region": "C端-其他", "dept": "新营销部", "month": 10, "qty": 0.02, "amt": 0.25}, {"region": "C端-其他", "dept": "新营销部", "month": 11, "qty": 0.26, "amt": 5.81}, {"region": "C端-其他", "dept": "新营销部", "month": 12, "qty": 0.09, "amt": 2.94}, {"region": "C端-阿里", "dept": "新营销部", "month": 1, "qty": 0.11, "amt": 4.09}, {"region": "C端-阿里", "dept": "新营销部", "month": 3, "qty": 0.15, "amt": 5.46}, {"region": "C端-阿里", "dept": "新营销部", "month": 5, "qty": 0.19, "amt": 6.82}, {"region": "C端-阿里", "dept": "新营销部", "month": 6, "qty": 0.23, "amt": 8.18}, {"region": "C端-阿里", "dept": "新营销部", "month": 8, "qty": 0.04, "amt": 1.36}, {"region": "C端-阿里", "dept": "新营销部", "month": 9, "qty": 0.07, "amt": 2.73}, {"region": "C端-阿里", "dept": "新营销部", "month": 10, "qty": 0.15, "amt": 5.46}, {"region": "C端-阿里", "dept": "新营销部", "month": 12, "qty": 0.11, "amt": 4.09}, {"region": "KA", "dept": "新营销部", "month": 1, "qty": 3.75, "amt": 134.7}, {"region": "KA", "dept": "新营销部", "month": 2, "qty": 1.88, "amt": 67.16}, {"region": "KA", "dept": "新营销部", "month": 3, "qty": 3.15, "amt": 113.2}, {"region": "KA", "dept": "新营销部", "month": 4, "qty": 3.0, "amt": 107.11}, {"region": "KA", "dept": "新营销部", "month": 5, "qty": 3.9, "amt": 138.78}, {"region": "KA", "dept": "新营销部", "month": 6, "qty": 2.4, "amt": 85.62}, {"region": "KA", "dept": "新营销部", "month": 8, "qty": 2.02, "amt": 72.44}, {"region": "KA", "dept": "新营销部", "month": 9, "qty": 3.71, "amt": 133.11}, {"region": "KA", "dept": "新营销部", "month": 10, "qty": 1.01, "amt": 36.45}, {"region": "KA", "dept": "新营销部", "month": 11, "qty": 5.55, "amt": 198.67}, {"region": "上海", "dept": "医院销售部", "month": 3, "qty": 0.15, "amt": 5.31}, {"region": "上海", "dept": "医院销售部", "month": 4, "qty": 0.15, "amt": 5.31}, {"region": "上海", "dept": "医院销售部", "month": 5, "qty": 0.15, "amt": 5.31}, {"region": "上海", "dept": "医院销售部", "month": 8, "qty": 0.07, "amt": 2.61}, {"region": "上海", "dept": "医院销售部", "month": 9, "qty": 0.07, "amt": 2.61}, {"region": "云南", "dept": "医院销售部", "month": 1, "qty": 0.38, "amt": 13.19}, {"region": "云南", "dept": "医院销售部", "month": 2, "qty": 0.07, "amt": 2.63}, {"region": "云南", "dept": "医院销售部", "month": 3, "qty": 0.45, "amt": 15.71}, {"region": "云南", "dept": "医院销售部", "month": 4, "qty": 0.97, "amt": 33.98}, {"region": "云南", "dept": "医院销售部", "month": 5, "qty": 0.6, "amt": 20.96}, {"region": "云南", "dept": "医院销售部", "month": 6, "qty": 1.12, "amt": 38.86}, {"region": "云南", "dept": "医院销售部", "month": 7, "qty": 0.07, "amt": 2.52}, {"region": "云南", "dept": "医院销售部", "month": 8, "qty": 0.15, "amt": 5.1}, {"region": "云南", "dept": "医院销售部", "month": 9, "qty": 0.53, "amt": 17.93}, {"region": "云南", "dept": "医院销售部", "month": 10, "qty": 0.3, "amt": 10.26}, {"region": "云南", "dept": "医院销售部", "month": 11, "qty": 0.3, "amt": 10.31}, {"region": "云南", "dept": "医院销售部", "month": 12, "qty": 0.07, "amt": 2.52}, {"region": "内蒙古", "dept": "医院销售部", "month": 1, "qty": 0.3, "amt": 9.98}, {"region": "内蒙古", "dept": "医院销售部", "month": 3, "qty": 0.3, "amt": 9.85}, {"region": "内蒙古", "dept": "医院销售部", "month": 4, "qty": 0.15, "amt": 4.92}, {"region": "内蒙古", "dept": "医院销售部", "month": 5, "qty": 0.15, "amt": 4.94}, {"region": "内蒙古", "dept": "医院销售部", "month": 6, "qty": 0.07, "amt": 2.47}, {"region": "内蒙古", "dept": "医院销售部", "month": 8, "qty": 0.38, "amt": 12.31}, {"region": "内蒙古", "dept": "医院销售部", "month": 9, "qty": 0.3, "amt": 9.79}, {"region": "内蒙古", "dept": "医院销售部", "month": 10, "qty": 0.23, "amt": 7.39}, {"region": "内蒙古", "dept": "医院销售部", "month": 11, "qty": 0.23, "amt": 7.39}, {"region": "内蒙古", "dept": "医院销售部", "month": 12, "qty": 0.15, "amt": 4.92}, {"region": "北京", "dept": "医院销售部", "month": 1, "qty": 0.9, "amt": 31.02}, {"region": "北京", "dept": "医院销售部", "month": 2, "qty": 0.53, "amt": 18.1}, {"region": "北京", "dept": "医院销售部", "month": 3, "qty": 0.53, "amt": 18.1}, {"region": "北京", "dept": "医院销售部", "month": 4, "qty": 0.45, "amt": 15.51}, {"region": "北京", "dept": "医院销售部", "month": 5, "qty": 0.6, "amt": 20.68}, {"region": "北京", "dept": "医院销售部", "month": 6, "qty": 0.3, "amt": 10.15}, {"region": "北京", "dept": "医院销售部", "month": 7, "qty": 0.44, "amt": 14.85}, {"region": "北京", "dept": "医院销售部", "month": 8, "qty": 0.3, "amt": 10.15}, {"region": "北京", "dept": "医院销售部", "month": 9, "qty": 0.3, "amt": 10.15}, {"region": "北京", "dept": "医院销售部", "month": 10, "qty": 0.45, "amt": 15.22}, {"region": "北京", "dept": "医院销售部", "month": 12, "qty": 0.38, "amt": 12.68}, {"region": "吉林", "dept": "医院销售部", "month": 1, "qty": 1.12, "amt": 38.57}, {"region": "吉林", "dept": "医院销售部", "month": 2, "qty": 0.3, "amt": 10.28}, {"region": "吉林", "dept": "医院销售部", "month": 3, "qty": 0.53, "amt": 18.0}, {"region": "吉林", "dept": "医院销售部", "month": 4, "qty": 0.75, "amt": 25.52}, {"region": "吉林", "dept": "医院销售部", "month": 5, "qty": 0.6, "amt": 20.18}, {"region": "吉林", "dept": "医院销售部", "month": 6, "qty": 0.75, "amt": 25.23}, {"region": "吉林", "dept": "医院销售部", "month": 7, "qty": 0.3, "amt": 10.09}, {"region": "吉林", "dept": "医院销售部", "month": 8, "qty": 0.07, "amt": 2.52}, {"region": "吉林", "dept": "医院销售部", "month": 9, "qty": 0.68, "amt": 22.71}, {"region": "吉林", "dept": "医院销售部", "month": 10, "qty": 0.6, "amt": 20.18}, {"region": "吉林", "dept": "医院销售部", "month": 11, "qty": 0.15, "amt": 5.05}, {"region": "吉林", "dept": "医院销售部", "month": 12, "qty": 0.6, "amt": 20.18}, {"region": "四川", "dept": "医院销售部", "month": 1, "qty": 1.24, "amt": 43.07}, {"region": "四川", "dept": "医院销售部", "month": 2, "qty": 1.24, "amt": 43.13}, {"region": "四川", "dept": "医院销售部", "month": 3, "qty": 1.99, "amt": 69.46}, {"region": "四川", "dept": "医院销售部", "month": 4, "qty": 1.46, "amt": 50.65}, {"region": "四川", "dept": "医院销售部", "month": 5, "qty": 1.98, "amt": 68.45}, {"region": "四川", "dept": "医院销售部", "month": 6, "qty": 1.12, "amt": 38.62}, {"region": "四川", "dept": "医院销售部", "month": 7, "qty": 1.16, "amt": 39.93}, {"region": "四川", "dept": "医院销售部", "month": 8, "qty": 1.24, "amt": 42.25}, {"region": "四川", "dept": "医院销售部", "month": 9, "qty": 1.61, "amt": 55.29}, {"region": "四川", "dept": "医院销售部", "month": 10, "qty": 2.1, "amt": 71.96}, {"region": "四川", "dept": "医院销售部", "month": 11, "qty": 1.16, "amt": 39.85}, {"region": "四川", "dept": "医院销售部", "month": 12, "qty": 0.99, "amt": 33.75}, {"region": "天津", "dept": "医院销售部", "month": 3, "qty": 0.07, "amt": 2.63}, {"region": "天津", "dept": "医院销售部", "month": 4, "qty": 0.07, "amt": 2.63}, {"region": "天津", "dept": "医院销售部", "month": 8, "qty": 0.03, "amt": 1.03}, {"region": "天津", "dept": "医院销售部", "month": 9, "qty": 0.06, "amt": 2.06}, {"region": "宁夏", "dept": "医院销售部", "month": 1, "qty": 0.07, "amt": 2.6}, {"region": "宁夏", "dept": "医院销售部", "month": 3, "qty": 0.07, "amt": 2.6}, {"region": "宁夏", "dept": "医院销售部", "month": 5, "qty": 0.07, "amt": 2.6}, {"region": "宁夏", "dept": "医院销售部", "month": 6, "qty": 0.07, "amt": 2.6}, {"region": "宁夏", "dept": "医院销售部", "month": 11, "qty": 0.07, "amt": 2.58}, {"region": "安徽", "dept": "医院销售部", "month": 1, "qty": 0.3, "amt": 9.83}, {"region": "安徽", "dept": "医院销售部", "month": 2, "qty": 0.07, "amt": 2.59}, {"region": "安徽", "dept": "医院销售部", "month": 3, "qty": 0.26, "amt": 8.49}, {"region": "安徽", "dept": "医院销售部", "month": 4, "qty": 0.41, "amt": 13.9}, {"region": "安徽", "dept": "医院销售部", "month": 5, "qty": 0.19, "amt": 6.51}, {"region": "安徽", "dept": "医院销售部", "month": 6, "qty": 0.07, "amt": 2.6}, {"region": "安徽", "dept": "医院销售部", "month": 7, "qty": 0.19, "amt": 6.27}, {"region": "安徽", "dept": "医院销售部", "month": 8, "qty": 0.15, "amt": 5.03}, {"region": "安徽", "dept": "医院销售部", "month": 9, "qty": 0.34, "amt": 11.52}, {"region": "安徽", "dept": "医院销售部", "month": 10, "qty": 0.3, "amt": 10.22}, {"region": "安徽", "dept": "医院销售部", "month": 11, "qty": 0.19, "amt": 6.31}, {"region": "安徽", "dept": "医院销售部", "month": 12, "qty": 0.26, "amt": 8.96}, {"region": "山东", "dept": "医院销售部", "month": 1, "qty": 2.85, "amt": 98.14}, {"region": "山东", "dept": "医院销售部", "month": 2, "qty": 1.88, "amt": 63.83}, {"region": "山东", "dept": "医院销售部", "month": 3, "qty": 1.73, "amt": 58.06}, {"region": "山东", "dept": "医院销售部", "month": 4, "qty": 3.9, "amt": 132.66}, {"region": "山东", "dept": "医院销售部", "month": 5, "qty": 1.2, "amt": 39.99}, {"region": "山东", "dept": "医院销售部", "month": 6, "qty": 3.15, "amt": 105.87}, {"region": "山东", "dept": "医院销售部", "month": 7, "qty": 1.12, "amt": 37.9}, {"region": "山东", "dept": "医院销售部", "month": 8, "qty": 1.57, "amt": 52.57}, {"region": "山东", "dept": "医院销售部", "month": 9, "qty": 2.62, "amt": 88.62}, {"region": "山东", "dept": "医院销售部", "month": 10, "qty": 1.65, "amt": 55.92}, {"region": "山东", "dept": "医院销售部", "month": 11, "qty": 1.35, "amt": 44.75}, {"region": "山东", "dept": "医院销售部", "month": 12, "qty": 1.8, "amt": 59.95}, {"region": "山西", "dept": "医院销售部", "month": 1, "qty": 1.95, "amt": 63.9}, {"region": "山西", "dept": "医院销售部", "month": 2, "qty": 1.09, "amt": 37.04}, {"region": "山西", "dept": "医院销售部", "month": 3, "qty": 1.65, "amt": 55.92}, {"region": "山西", "dept": "医院销售部", "month": 4, "qty": 1.91, "amt": 64.19}, {"region": "山西", "dept": "医院销售部", "month": 5, "qty": 1.16, "amt": 38.85}, {"region": "山西", "dept": "医院销售部", "month": 6, "qty": 2.51, "amt": 83.58}, {"region": "山西", "dept": "医院销售部", "month": 7, "qty": 0.23, "amt": 7.43}, {"region": "山西", "dept": "医院销售部", "month": 8, "qty": 0.6, "amt": 19.63}, {"region": "山西", "dept": "医院销售部", "month": 9, "qty": 1.12, "amt": 37.41}, {"region": "山西", "dept": "医院销售部", "month": 10, "qty": 1.43, "amt": 47.0}, {"region": "山西", "dept": "医院销售部", "month": 11, "qty": 1.05, "amt": 34.94}, {"region": "山西", "dept": "医院销售部", "month": 12, "qty": 2.02, "amt": 67.74}, {"region": "广东", "dept": "医院销售部", "month": 1, "qty": 18.79, "amt": 660.24}, {"region": "广东", "dept": "医院销售部", "month": 2, "qty": 6.6, "amt": 231.65}, {"region": "广东", "dept": "医院销售部", "month": 3, "qty": 8.85, "amt": 309.46}, {"region": "广东", "dept": "医院销售部", "month": 4, "qty": 15.49, "amt": 537.69}, {"region": "广东", "dept": "医院销售部", "month": 5, "qty": 12.41, "amt": 433.87}, {"region": "广东", "dept": "医院销售部", "month": 6, "qty": 23.29, "amt": 819.01}, {"region": "广东", "dept": "医院销售部", "month": 7, "qty": 9.56, "amt": 342.02}, {"region": "广东", "dept": "医院销售部", "month": 8, "qty": 6.19, "amt": 217.69}, {"region": "广东", "dept": "医院销售部", "month": 9, "qty": 13.16, "amt": 461.9}, {"region": "广东", "dept": "医院销售部", "month": 10, "qty": 8.32, "amt": 292.71}, {"region": "广东", "dept": "医院销售部", "month": 11, "qty": 10.2, "amt": 347.56}, {"region": "广东", "dept": "医院销售部", "month": 12, "qty": 11.92, "amt": 411.87}, {"region": "广西", "dept": "医院销售部", "month": 1, "qty": 3.45, "amt": 118.67}, {"region": "广西", "dept": "医院销售部", "month": 2, "qty": 0.97, "amt": 33.43}, {"region": "广西", "dept": "医院销售部", "month": 3, "qty": 2.7, "amt": 91.36}, {"region": "广西", "dept": "医院销售部", "month": 4, "qty": 2.17, "amt": 73.35}, {"region": "广西", "dept": "医院销售部", "month": 5, "qty": 1.95, "amt": 65.76}, {"region": "广西", "dept": "医院销售部", "month": 6, "qty": 3.15, "amt": 106.24}, {"region": "广西", "dept": "医院销售部", "month": 7, "qty": 1.95, "amt": 65.82}, {"region": "广西", "dept": "医院销售部", "month": 8, "qty": 2.4, "amt": 81.06}, {"region": "广西", "dept": "医院销售部", "month": 9, "qty": 2.62, "amt": 88.77}, {"region": "广西", "dept": "医院销售部", "month": 10, "qty": 1.27, "amt": 42.89}, {"region": "广西", "dept": "医院销售部", "month": 11, "qty": 2.17, "amt": 73.55}, {"region": "广西", "dept": "医院销售部", "month": 12, "qty": 3.52, "amt": 119.32}, {"region": "江苏", "dept": "医院销售部", "month": 1, "qty": 4.72, "amt": 162.13}, {"region": "江苏", "dept": "医院销售部", "month": 2, "qty": 1.05, "amt": 36.9}, {"region": "江苏", "dept": "医院销售部", "month": 3, "qty": 3.0, "amt": 103.46}, {"region": "江苏", "dept": "医院销售部", "month": 4, "qty": 2.85, "amt": 97.12}, {"region": "江苏", "dept": "医院销售部", "month": 5, "qty": 2.85, "amt": 99.43}, {"region": "江苏", "dept": "医院销售部", "month": 6, "qty": 2.7, "amt": 92.67}, {"region": "江苏", "dept": "医院销售部", "month": 7, "qty": 2.33, "amt": 78.07}, {"region": "江苏", "dept": "医院销售部", "month": 8, "qty": 2.1, "amt": 72.63}, {"region": "江苏", "dept": "医院销售部", "month": 9, "qty": 2.92, "amt": 97.85}, {"region": "江苏", "dept": "医院销售部", "month": 10, "qty": 2.17, "amt": 75.14}, {"region": "江苏", "dept": "医院销售部", "month": 11, "qty": 1.65, "amt": 55.23}, {"region": "江苏", "dept": "医院销售部", "month": 12, "qty": 2.55, "amt": 85.94}, {"region": "江西", "dept": "医院销售部", "month": 1, "qty": 1.05, "amt": 36.62}, {"region": "江西", "dept": "医院销售部", "month": 2, "qty": 0.6, "amt": 20.96}, {"region": "江西", "dept": "医院销售部", "month": 3, "qty": 0.6, "amt": 20.68}, {"region": "江西", "dept": "医院销售部", "month": 4, "qty": 0.97, "amt": 33.35}, {"region": "江西", "dept": "医院销售部", "month": 5, "qty": 1.12, "amt": 38.5}, {"region": "江西", "dept": "医院销售部", "month": 6, "qty": 0.38, "amt": 12.83}, {"region": "江西", "dept": "医院销售部", "month": 7, "qty": 0.82, "amt": 28.11}, {"region": "江西", "dept": "医院销售部", "month": 8, "qty": 1.2, "amt": 41.05}, {"region": "江西", "dept": "医院销售部", "month": 9, "qty": 0.9, "amt": 30.89}, {"region": "江西", "dept": "医院销售部", "month": 10, "qty": 0.45, "amt": 15.39}, {"region": "江西", "dept": "医院销售部", "month": 11, "qty": 0.45, "amt": 15.36}, {"region": "江西", "dept": "医院销售部", "month": 12, "qty": 0.07, "amt": 2.52}, {"region": "河北", "dept": "医院销售部", "month": 1, "qty": 1.8, "amt": 62.18}, {"region": "河北", "dept": "医院销售部", "month": 2, "qty": 0.9, "amt": 31.13}, {"region": "河北", "dept": "医院销售部", "month": 3, "qty": 1.5, "amt": 51.49}, {"region": "河北", "dept": "医院销售部", "month": 4, "qty": 1.27, "amt": 43.17}, {"region": "河北", "dept": "医院销售部", "month": 5, "qty": 1.95, "amt": 66.21}, {"region": "河北", "dept": "医院销售部", "month": 6, "qty": 1.8, "amt": 61.08}, {"region": "河北", "dept": "医院销售部", "month": 7, "qty": 1.12, "amt": 38.18}, {"region": "河北", "dept": "医院销售部", "month": 8, "qty": 0.97, "amt": 32.99}, {"region": "河北", "dept": "医院销售部", "month": 9, "qty": 2.25, "amt": 76.3}, {"region": "河北", "dept": "医院销售部", "month": 10, "qty": 1.05, "amt": 35.54}, {"region": "河北", "dept": "医院销售部", "month": 11, "qty": 0.82, "amt": 27.92}, {"region": "河北", "dept": "医院销售部", "month": 12, "qty": 0.38, "amt": 12.7}, {"region": "河南", "dept": "医院销售部", "month": 1, "qty": 2.55, "amt": 87.42}, {"region": "河南", "dept": "医院销售部", "month": 2, "qty": 1.35, "amt": 46.28}, {"region": "河南", "dept": "医院销售部", "month": 3, "qty": 2.02, "amt": 68.66}, {"region": "河南", "dept": "医院销售部", "month": 4, "qty": 2.96, "amt": 99.75}, {"region": "河南", "dept": "医院销售部", "month": 5, "qty": 1.27, "amt": 42.95}, {"region": "河南", "dept": "医院销售部", "month": 6, "qty": 2.51, "amt": 84.38}, {"region": "河南", "dept": "医院销售部", "month": 7, "qty": 2.06, "amt": 69.41}, {"region": "河南", "dept": "医院销售部", "month": 8, "qty": 1.27, "amt": 42.89}, {"region": "河南", "dept": "医院销售部", "month": 9, "qty": 2.77, "amt": 93.34}, {"region": "河南", "dept": "医院销售部", "month": 10, "qty": 1.65, "amt": 55.43}, {"region": "河南", "dept": "医院销售部", "month": 11, "qty": 0.38, "amt": 12.61}, {"region": "河南", "dept": "医院销售部", "month": 12, "qty": 1.57, "amt": 52.98}, {"region": "浙江", "dept": "医院销售部", "month": 1, "qty": 4.2, "amt": 150.27}, {"region": "浙江", "dept": "医院销售部", "month": 2, "qty": 2.1, "amt": 75.14}, {"region": "浙江", "dept": "医院销售部", "month": 3, "qty": 3.15, "amt": 110.58}, {"region": "浙江", "dept": "医院销售部", "month": 4, "qty": 3.0, "amt": 105.32}, {"region": "浙江", "dept": "医院销售部", "month": 5, "qty": 3.0, "amt": 105.32}, {"region": "浙江", "dept": "医院销售部", "month": 6, "qty": 3.9, "amt": 136.91}, {"region": "浙江", "dept": "医院销售部", "month": 7, "qty": 5.47, "amt": 192.2}, {"region": "浙江", "dept": "医院销售部", "month": 8, "qty": 2.17, "amt": 76.36}, {"region": "浙江", "dept": "医院销售部", "month": 9, "qty": 3.6, "amt": 126.38}, {"region": "浙江", "dept": "医院销售部", "month": 10, "qty": 3.23, "amt": 113.22}, {"region": "浙江", "dept": "医院销售部", "month": 11, "qty": 2.4, "amt": 84.25}, {"region": "浙江", "dept": "医院销售部", "month": 12, "qty": 3.9, "amt": 136.91}, {"region": "海南", "dept": "医院销售部", "month": 1, "qty": 0.45, "amt": 15.26}, {"region": "海南", "dept": "医院销售部", "month": 2, "qty": 0.15, "amt": 5.16}, {"region": "海南", "dept": "医院销售部", "month": 5, "qty": 0.15, "amt": 4.99}, {"region": "海南", "dept": "医院销售部", "month": 9, "qty": 0.15, "amt": 4.99}, {"region": "海南", "dept": "医院销售部", "month": 10, "qty": 0.15, "amt": 4.99}, {"region": "海南", "dept": "医院销售部", "month": 11, "qty": 0.07, "amt": 2.5}, {"region": "海南", "dept": "医院销售部", "month": 12, "qty": 0.23, "amt": 7.49}, {"region": "湖北", "dept": "医院销售部", "month": 1, "qty": 2.85, "amt": 98.44}, {"region": "湖北", "dept": "医院销售部", "month": 2, "qty": 1.05, "amt": 35.94}, {"region": "湖北", "dept": "医院销售部", "month": 3, "qty": 2.1, "amt": 72.17}, {"region": "湖北", "dept": "医院销售部", "month": 4, "qty": 2.85, "amt": 95.94}, {"region": "湖北", "dept": "医院销售部", "month": 5, "qty": 2.62, "amt": 88.65}, {"region": "湖北", "dept": "医院销售部", "month": 6, "qty": 2.02, "amt": 68.3}, {"region": "湖北", "dept": "医院销售部", "month": 7, "qty": 1.65, "amt": 55.47}, {"region": "湖北", "dept": "医院销售部", "month": 8, "qty": 1.95, "amt": 65.76}, {"region": "湖北", "dept": "医院销售部", "month": 9, "qty": 3.52, "amt": 118.88}, {"region": "湖北", "dept": "医院销售部", "month": 10, "qty": 1.2, "amt": 40.36}, {"region": "湖北", "dept": "医院销售部", "month": 11, "qty": 1.5, "amt": 50.56}, {"region": "湖北", "dept": "医院销售部", "month": 12, "qty": 2.7, "amt": 91.0}, {"region": "湖南", "dept": "医院销售部", "month": 1, "qty": 0.38, "amt": 13.0}, {"region": "湖南", "dept": "医院销售部", "month": 4, "qty": 0.6, "amt": 20.24}, {"region": "湖南", "dept": "医院销售部", "month": 5, "qty": 0.3, "amt": 10.04}, {"region": "湖南", "dept": "医院销售部", "month": 6, "qty": 0.15, "amt": 5.1}, {"region": "湖南", "dept": "医院销售部", "month": 7, "qty": 0.23, "amt": 7.49}, {"region": "湖南", "dept": "医院销售部", "month": 8, "qty": 0.23, "amt": 7.65}, {"region": "湖南", "dept": "医院销售部", "month": 9, "qty": 0.53, "amt": 17.69}, {"region": "湖南", "dept": "医院销售部", "month": 10, "qty": 0.15, "amt": 5.1}, {"region": "湖南", "dept": "医院销售部", "month": 11, "qty": 0.3, "amt": 10.02}, {"region": "湖南", "dept": "医院销售部", "month": 12, "qty": 0.15, "amt": 5.1}, {"region": "福建", "dept": "医院销售部", "month": 1, "qty": 3.15, "amt": 112.7}, {"region": "福建", "dept": "医院销售部", "month": 2, "qty": 0.38, "amt": 13.42}, {"region": "福建", "dept": "医院销售部", "month": 3, "qty": 3.52, "amt": 125.1}, {"region": "福建", "dept": "医院销售部", "month": 4, "qty": 2.55, "amt": 89.5}, {"region": "福建", "dept": "医院销售部", "month": 5, "qty": 3.23, "amt": 113.19}, {"region": "福建", "dept": "医院销售部", "month": 6, "qty": 4.05, "amt": 142.14}, {"region": "福建", "dept": "医院销售部", "month": 7, "qty": 0.9, "amt": 31.59}, {"region": "福建", "dept": "医院销售部", "month": 8, "qty": 3.45, "amt": 121.09}, {"region": "福建", "dept": "医院销售部", "month": 9, "qty": 2.25, "amt": 78.97}, {"region": "福建", "dept": "医院销售部", "month": 10, "qty": 0.75, "amt": 26.32}, {"region": "福建", "dept": "医院销售部", "month": 11, "qty": 1.73, "amt": 60.54}, {"region": "福建", "dept": "医院销售部", "month": 12, "qty": 2.62, "amt": 92.13}, {"region": "西藏", "dept": "医院销售部", "month": 4, "qty": 0.0, "amt": 0.12}, {"region": "西藏", "dept": "医院销售部", "month": 8, "qty": 0.01, "amt": 0.17}, {"region": "西藏", "dept": "医院销售部", "month": 11, "qty": 0.01, "amt": 0.17}, {"region": "贵州", "dept": "医院销售部", "month": 1, "qty": 0.68, "amt": 22.53}, {"region": "贵州", "dept": "医院销售部", "month": 2, "qty": 0.53, "amt": 17.61}, {"region": "贵州", "dept": "医院销售部", "month": 3, "qty": 0.1, "amt": 3.2}, {"region": "贵州", "dept": "医院销售部", "month": 4, "qty": 0.68, "amt": 22.51}, {"region": "贵州", "dept": "医院销售部", "month": 5, "qty": 0.15, "amt": 4.94}, {"region": "贵州", "dept": "医院销售部", "month": 6, "qty": 0.53, "amt": 17.67}, {"region": "贵州", "dept": "医院销售部", "month": 7, "qty": 0.6, "amt": 19.84}, {"region": "贵州", "dept": "医院销售部", "month": 8, "qty": 0.6, "amt": 19.8}, {"region": "贵州", "dept": "医院销售部", "month": 9, "qty": 0.07, "amt": 2.52}, {"region": "贵州", "dept": "医院销售部", "month": 10, "qty": 0.9, "amt": 29.84}, {"region": "贵州", "dept": "医院销售部", "month": 11, "qty": 0.6, "amt": 19.77}, {"region": "辽宁", "dept": "医院销售部", "month": 1, "qty": 0.82, "amt": 28.28}, {"region": "辽宁", "dept": "医院销售部", "month": 2, "qty": 0.86, "amt": 29.52}, {"region": "辽宁", "dept": "医院销售部", "month": 3, "qty": 0.68, "amt": 23.04}, {"region": "辽宁", "dept": "医院销售部", "month": 4, "qty": 1.35, "amt": 45.43}, {"region": "辽宁", "dept": "医院销售部", "month": 5, "qty": 0.82, "amt": 27.89}, {"region": "辽宁", "dept": "医院销售部", "month": 6, "qty": 0.97, "amt": 32.8}, {"region": "辽宁", "dept": "医院销售部", "month": 7, "qty": 0.6, "amt": 20.18}, {"region": "辽宁", "dept": "医院销售部", "month": 8, "qty": 1.05, "amt": 35.32}, {"region": "辽宁", "dept": "医院销售部", "month": 9, "qty": 0.97, "amt": 32.8}, {"region": "辽宁", "dept": "医院销售部", "month": 10, "qty": 0.75, "amt": 25.23}, {"region": "辽宁", "dept": "医院销售部", "month": 11, "qty": 0.97, "amt": 32.8}, {"region": "辽宁", "dept": "医院销售部", "month": 12, "qty": 0.82, "amt": 27.75}, {"region": "重庆", "dept": "医院销售部", "month": 1, "qty": 4.28, "amt": 152.95}, {"region": "重庆", "dept": "医院销售部", "month": 2, "qty": 2.7, "amt": 96.6}, {"region": "重庆", "dept": "医院销售部", "month": 3, "qty": 3.23, "amt": 115.47}, {"region": "重庆", "dept": "医院销售部", "month": 4, "qty": 4.88, "amt": 174.84}, {"region": "重庆", "dept": "医院销售部", "month": 5, "qty": 2.17, "amt": 77.7}, {"region": "重庆", "dept": "医院销售部", "month": 6, "qty": 5.4, "amt": 192.04}, {"region": "重庆", "dept": "医院销售部", "month": 7, "qty": 2.62, "amt": 92.14}, {"region": "重庆", "dept": "医院销售部", "month": 8, "qty": 2.48, "amt": 86.75}, {"region": "重庆", "dept": "医院销售部", "month": 9, "qty": 4.88, "amt": 171.74}, {"region": "重庆", "dept": "医院销售部", "month": 10, "qty": 2.85, "amt": 99.98}, {"region": "重庆", "dept": "医院销售部", "month": 11, "qty": 3.6, "amt": 126.83}, {"region": "重庆", "dept": "医院销售部", "month": 12, "qty": 0.6, "amt": 20.81}, {"region": "陕西", "dept": "医院销售部", "month": 1, "qty": 1.35, "amt": 46.84}, {"region": "陕西", "dept": "医院销售部", "month": 2, "qty": 1.2, "amt": 41.81}, {"region": "陕西", "dept": "医院销售部", "month": 3, "qty": 0.97, "amt": 33.87}, {"region": "陕西", "dept": "医院销售部", "month": 4, "qty": 1.88, "amt": 65.09}, {"region": "陕西", "dept": "医院销售部", "month": 5, "qty": 0.97, "amt": 33.67}, {"region": "陕西", "dept": "医院销售部", "month": 6, "qty": 1.39, "amt": 48.65}, {"region": "陕西", "dept": "医院销售部", "month": 7, "qty": 0.26, "amt": 7.57}, {"region": "陕西", "dept": "医院销售部", "month": 8, "qty": 1.2, "amt": 40.94}, {"region": "陕西", "dept": "医院销售部", "month": 9, "qty": 1.35, "amt": 46.02}, {"region": "陕西", "dept": "医院销售部", "month": 10, "qty": 0.75, "amt": 25.59}, {"region": "陕西", "dept": "医院销售部", "month": 11, "qty": 1.5, "amt": 50.98}, {"region": "陕西", "dept": "医院销售部", "month": 12, "qty": 1.57, "amt": 53.64}, {"region": "黑龙江", "dept": "医院销售部", "month": 1, "qty": 0.71, "amt": 24.28}, {"region": "黑龙江", "dept": "医院销售部", "month": 2, "qty": 0.19, "amt": 6.28}, {"region": "黑龙江", "dept": "医院销售部", "month": 3, "qty": 0.6, "amt": 20.33}, {"region": "黑龙江", "dept": "医院销售部", "month": 4, "qty": 0.45, "amt": 15.32}, {"region": "黑龙江", "dept": "医院销售部", "month": 5, "qty": 0.6, "amt": 20.22}, {"region": "黑龙江", "dept": "医院销售部", "month": 6, "qty": 0.71, "amt": 23.9}, {"region": "黑龙江", "dept": "医院销售部", "month": 7, "qty": 0.56, "amt": 18.87}, {"region": "黑龙江", "dept": "医院销售部", "month": 8, "qty": 0.94, "amt": 31.47}, {"region": "黑龙江", "dept": "医院销售部", "month": 9, "qty": 0.75, "amt": 25.13}, {"region": "黑龙江", "dept": "医院销售部", "month": 10, "qty": 0.3, "amt": 10.09}, {"region": "黑龙江", "dept": "医院销售部", "month": 11, "qty": 0.38, "amt": 12.66}, {"region": "黑龙江", "dept": "医院销售部", "month": 12, "qty": 0.3, "amt": 10.09}], "regionMonthly2026": [{"region": "B端-壹药网", "dept": "新营销部", "month": 1, "qty": 1.8, "amt": 64.13}, {"region": "B端-壹药网", "dept": "新营销部", "month": 2, "qty": 3.83, "amt": 136.28}, {"region": "B端-壹药网", "dept": "新营销部", "month": 3, "qty": 7.05, "amt": 251.18}, {"region": "B端-壹药网", "dept": "新营销部", "month": 4, "qty": 0.45, "amt": 16.03}, {"region": "B端-药师帮", "dept": "新营销部", "month": 1, "qty": 1.43, "amt": 53.18}, {"region": "B端-药师帮", "dept": "新营销部", "month": 2, "qty": 0.68, "amt": 25.19}, {"region": "B端-药师帮", "dept": "新营销部", "month": 3, "qty": 2.02, "amt": 75.53}, {"region": "B端-药师帮", "dept": "新营销部", "month": 4, "qty": 0.53, "amt": 19.58}, {"region": "C端-其他", "dept": "新营销部", "month": 1, "qty": 0.07, "amt": 2.81}, {"region": "C端-其他", "dept": "新营销部", "month": 3, "qty": 1.01, "amt": 36.83}, {"region": "C端-阿里", "dept": "新营销部", "month": 2, "qty": 0.07, "amt": 2.73}, {"region": "KA", "dept": "新营销部", "month": 1, "qty": 6.45, "amt": 231.09}, {"region": "KA", "dept": "新营销部", "month": 3, "qty": 1.5, "amt": 54.0}, {"region": "上海", "dept": "医院销售部", "month": 1, "qty": 0.07, "amt": 2.61}, {"region": "上海", "dept": "医院销售部", "month": 3, "qty": 0.07, "amt": 2.61}, {"region": "云南", "dept": "医院销售部", "month": 1, "qty": 0.6, "amt": 20.51}, {"region": "云南", "dept": "医院销售部", "month": 2, "qty": 0.38, "amt": 12.83}, {"region": "云南", "dept": "医院销售部", "month": 3, "qty": 0.6, "amt": 20.57}, {"region": "内蒙古", "dept": "医院销售部", "month": 1, "qty": 0.45, "amt": 14.64}, {"region": "内蒙古", "dept": "医院销售部", "month": 2, "qty": 0.38, "amt": 12.18}, {"region": "内蒙古", "dept": "医院销售部", "month": 3, "qty": 0.15, "amt": 4.83}, {"region": "内蒙古", "dept": "医院销售部", "month": 4, "qty": 0.23, "amt": 7.29}, {"region": "北京", "dept": "医院销售部", "month": 1, "qty": 0.45, "amt": 15.22}, {"region": "北京", "dept": "医院销售部", "month": 2, "qty": 0.45, "amt": 15.22}, {"region": "北京", "dept": "医院销售部", "month": 3, "qty": 1.05, "amt": 35.51}, {"region": "吉林", "dept": "医院销售部", "month": 1, "qty": 1.12, "amt": 37.84}, {"region": "吉林", "dept": "医院销售部", "month": 3, "qty": 0.38, "amt": 12.61}, {"region": "吉林", "dept": "医院销售部", "month": 4, "qty": 0.15, "amt": 5.05}, {"region": "四川", "dept": "医院销售部", "month": 1, "qty": 3.0, "amt": 103.01}, {"region": "四川", "dept": "医院销售部", "month": 2, "qty": 0.23, "amt": 7.72}, {"region": "四川", "dept": "医院销售部", "month": 3, "qty": 0.97, "amt": 33.14}, {"region": "四川", "dept": "医院销售部", "month": 4, "qty": 0.38, "amt": 12.83}, {"region": "天津", "dept": "医院销售部", "month": 3, "qty": 0.03, "amt": 1.05}, {"region": "宁夏", "dept": "医院销售部", "month": 1, "qty": 0.07, "amt": 2.55}, {"region": "宁夏", "dept": "医院销售部", "month": 3, "qty": 0.07, "amt": 2.55}, {"region": "安徽", "dept": "医院销售部", "month": 1, "qty": 0.45, "amt": 14.05}, {"region": "安徽", "dept": "医院销售部", "month": 2, "qty": 0.07, "amt": 2.66}, {"region": "安徽", "dept": "医院销售部", "month": 3, "qty": 0.11, "amt": 3.88}, {"region": "山东", "dept": "医院销售部", "month": 1, "qty": 3.23, "amt": 109.19}, {"region": "山东", "dept": "医院销售部", "month": 2, "qty": 1.57, "amt": 52.99}, {"region": "山东", "dept": "医院销售部", "month": 3, "qty": 1.88, "amt": 63.36}, {"region": "山东", "dept": "医院销售部", "month": 4, "qty": 0.23, "amt": 6.97}, {"region": "山西", "dept": "医院销售部", "month": 1, "qty": 1.05, "amt": 34.26}, {"region": "山西", "dept": "医院销售部", "month": 2, "qty": 1.2, "amt": 39.9}, {"region": "山西", "dept": "医院销售部", "month": 3, "qty": 0.97, "amt": 32.31}, {"region": "山西", "dept": "医院销售部", "month": 4, "qty": 0.15, "amt": 5.1}, {"region": "广东", "dept": "医院销售部", "month": 1, "qty": 25.27, "amt": 874.59}, {"region": "广东", "dept": "医院销售部", "month": 2, "qty": 6.38, "amt": 218.23}, {"region": "广东", "dept": "医院销售部", "month": 3, "qty": 3.98, "amt": 136.76}, {"region": "广东", "dept": "医院销售部", "month": 4, "qty": 2.85, "amt": 96.53}, {"region": "广西", "dept": "医院销售部", "month": 1, "qty": 3.0, "amt": 100.91}, {"region": "广西", "dept": "医院销售部", "month": 2, "qty": 0.53, "amt": 17.85}, {"region": "广西", "dept": "医院销售部", "month": 3, "qty": 1.43, "amt": 48.04}, {"region": "广西", "dept": "医院销售部", "month": 4, "qty": 1.8, "amt": 60.77}, {"region": "江苏", "dept": "医院销售部", "month": 1, "qty": 4.2, "amt": 143.85}, {"region": "江苏", "dept": "医院销售部", "month": 2, "qty": 0.3, "amt": 10.42}, {"region": "江苏", "dept": "医院销售部", "month": 3, "qty": 1.12, "amt": 36.85}, {"region": "江苏", "dept": "医院销售部", "month": 4, "qty": 0.75, "amt": 25.47}, {"region": "江西", "dept": "医院销售部", "month": 1, "qty": 0.33, "amt": 11.11}, {"region": "江西", "dept": "医院销售部", "month": 2, "qty": 0.23, "amt": 7.62}, {"region": "江西", "dept": "医院销售部", "month": 4, "qty": 0.07, "amt": 2.52}, {"region": "河北", "dept": "医院销售部", "month": 1, "qty": 2.17, "amt": 73.77}, {"region": "河北", "dept": "医院销售部", "month": 2, "qty": 0.07, "amt": 2.52}, {"region": "河南", "dept": "医院销售部", "month": 1, "qty": 3.41, "amt": 114.69}, {"region": "河南", "dept": "医院销售部", "month": 2, "qty": 0.97, "amt": 32.8}, {"region": "河南", "dept": "医院销售部", "month": 3, "qty": 1.2, "amt": 40.36}, {"region": "浙江", "dept": "医院销售部", "month": 1, "qty": 4.35, "amt": 152.71}, {"region": "浙江", "dept": "医院销售部", "month": 3, "qty": 2.7, "amt": 94.79}, {"region": "海南", "dept": "医院销售部", "month": 1, "qty": 0.38, "amt": 12.48}, {"region": "海南", "dept": "医院销售部", "month": 3, "qty": 0.07, "amt": 2.5}, {"region": "湖北", "dept": "医院销售部", "month": 1, "qty": 3.3, "amt": 111.22}, {"region": "湖北", "dept": "医院销售部", "month": 2, "qty": 0.23, "amt": 7.65}, {"region": "湖北", "dept": "医院销售部", "month": 3, "qty": 2.25, "amt": 75.91}, {"region": "湖北", "dept": "医院销售部", "month": 4, "qty": 0.15, "amt": 4.88}, {"region": "湖南", "dept": "医院销售部", "month": 1, "qty": 0.45, "amt": 15.14}, {"region": "湖南", "dept": "医院销售部", "month": 2, "qty": 0.15, "amt": 5.1}, {"region": "湖南", "dept": "医院销售部", "month": 4, "qty": 0.15, "amt": 5.1}, {"region": "福建", "dept": "医院销售部", "month": 1, "qty": 3.0, "amt": 105.29}, {"region": "福建", "dept": "医院销售部", "month": 2, "qty": 0.82, "amt": 28.96}, {"region": "福建", "dept": "医院销售部", "month": 3, "qty": 1.27, "amt": 44.75}, {"region": "福建", "dept": "医院销售部", "month": 4, "qty": 0.68, "amt": 23.69}, {"region": "西藏", "dept": "医院销售部", "month": 1, "qty": 0.01, "amt": 0.17}, {"region": "贵州", "dept": "医院销售部", "month": 1, "qty": 0.75, "amt": 24.66}, {"region": "贵州", "dept": "医院销售部", "month": 2, "qty": 0.38, "amt": 12.34}, {"region": "贵州", "dept": "医院销售部", "month": 3, "qty": 0.23, "amt": 7.46}, {"region": "辽宁", "dept": "医院销售部", "month": 1, "qty": 1.37, "amt": 46.1}, {"region": "辽宁", "dept": "医院销售部", "month": 2, "qty": 0.53, "amt": 17.66}, {"region": "辽宁", "dept": "医院销售部", "month": 3, "qty": 0.45, "amt": 15.27}, {"region": "辽宁", "dept": "医院销售部", "month": 4, "qty": 0.6, "amt": 20.18}, {"region": "重庆", "dept": "医院销售部", "month": 1, "qty": 7.42, "amt": 260.18}, {"region": "重庆", "dept": "医院销售部", "month": 2, "qty": 2.1, "amt": 73.72}, {"region": "重庆", "dept": "医院销售部", "month": 3, "qty": 4.42, "amt": 155.04}, {"region": "重庆", "dept": "医院销售部", "month": 4, "qty": 0.15, "amt": 5.1}, {"region": "陕西", "dept": "医院销售部", "month": 1, "qty": 0.97, "amt": 33.35}, {"region": "陕西", "dept": "医院销售部", "month": 2, "qty": 0.53, "amt": 17.8}, {"region": "陕西", "dept": "医院销售部", "month": 3, "qty": 1.05, "amt": 35.84}, {"region": "陕西", "dept": "医院销售部", "month": 4, "qty": 0.45, "amt": 15.28}, {"region": "黑龙江", "dept": "医院销售部", "month": 1, "qty": 1.27, "amt": 42.74}, {"region": "黑龙江", "dept": "医院销售部", "month": 2, "qty": 0.15, "amt": 4.94}, {"region": "黑龙江", "dept": "医院销售部", "month": 3, "qty": 0.49, "amt": 16.33}, {"region": "黑龙江", "dept": "医院销售部", "month": 4, "qty": 0.9, "amt": 30.16}]};
+
+document.getElementById('dataDate').textContent = D.latestDate;
+
+const fNum = (v) => v == null ? '0.00' : Number(v).toFixed(2);
+const pct  = (a, b) => b === 0 ? null : ((a - b) / b * 100);
+
+function yoyHtml(a, b) {
+  const p = pct(a, b);
+  if (p === null) return '<span class="yoy-na">N/A</span>';
+  const sign = p >= 0 ? '+' : '';
+  const cls  = p >= 0 ? 'yoy-up' : 'yoy-down';
+  const arrow = p >= 0 ? '▲' : '▼';
+  return `<span class="${cls}">${arrow} ${sign}${p.toFixed(1)}%</span> <span style="color:#AAB2BF">同比</span>`;
+}
+
+function getYtd(dept)    { return D.ytd.find(d => d.dept === dept) || {}; }
+function getTarget(dept) { return D.target.find(d => d.dept === dept) || {}; }
+function getMonthly(dept){ return D.deptMonthly.filter(d => d.dept === dept); }
+
+function calcGap(ytd, target, m) {
+  return ytd - (target / 12 * m);
+}
+
+function progressColor(p) {
+  if (p >= 100) return '#27AE60';
+  if (p >= 80)  return '#2E86DE';
+  if (p >= 60)  return '#F5831F';
+  return '#E74C3C';
+}
+
+function progressBarHtml(ytd, target, label) {
+  if (!target) return '';
+  const p = Math.min((ytd / target * 100), 100);
+  const color = progressColor(ytd / target * 100);
+  return `
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${p.toFixed(1)}%;background:${color};"></div></div>
+    <div class="progress-bar-label"><span>${label} ${fNum(ytd)} / ${fNum(target)}</span><span style="color:${color};font-weight:600">${(ytd/target*100).toFixed(1)}%</span></div>
+  </div>`;
+}
+
+function tableProgressHtml(prog) {
+  const p = Math.min(Math.max(prog, 0), 100);
+  const color = progressColor(prog);
+  return `<div class="tbl-progress">
+    <div class="tbl-progress-bar">
+      <div class="tbl-progress-fill" style="width:${p.toFixed(1)}%;background:${color};">
+        <span class="tbl-progress-text">${p.toFixed(1)}%</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildKpiCards(dept) {
+  const y = getYtd(dept);
+  const t = getTarget(dept);
+  const m = D.latestMonth;
+  const gapAmt = calcGap(y.ytd2026Amt, t.targetAmt, m);
+  const gapQty = calcGap(y.ytd2026Qty, t.targetQty, m);
+  const pAmt   = t.targetAmt ? (y.ytd2026Amt / t.targetAmt * 100) : 0;
+  const pQty   = t.targetQty ? (y.ytd2026Qty / t.targetQty * 100) : 0;
+  const gapAmtColor = gapAmt >= 0 ? '#27AE60' : '#E74C3C';
+  const gapQtyColor = gapQty >= 0 ? '#27AE60' : '#E74C3C';
+
+  return `
+  <div class="kpi-row">
+    <div class="kpi-card type-blue">
+      <div class="card-icon">💰</div>
+      <div class="kpi-label">2026年累计发货金额</div>
+      <div class="kpi-value">${fNum(y.ytd2026Amt)}<span class="unit">万元</span></div>
+      <div class="kpi-sub">${yoyHtml(y.ytd2026Amt, y.ytd2025Amt)}</div>
+      ${progressBarHtml(y.ytd2026Amt, t.targetAmt, '进度')}
+    </div>
+    <div class="kpi-card type-orange">
+      <div class="card-icon">📦</div>
+      <div class="kpi-label">2026年累计发货数量</div>
+      <div class="kpi-value">${fNum(y.ytd2026Qty)}<span class="unit">万盒</span></div>
+      <div class="kpi-sub">${yoyHtml(y.ytd2026Qty, y.ytd2025Qty)}</div>
+      ${progressBarHtml(y.ytd2026Qty, t.targetQty, '进度')}
+    </div>
+    <div class="kpi-card type-teal">
+      <div class="card-icon">🎯</div>
+      <div class="kpi-label">目标进度差距（金额）</div>
+      <div class="kpi-value" style="color:${gapAmtColor}">${gapAmt>=0?'+':''}${fNum(gapAmt)}<span class="unit">万元</span></div>
+      <div class="kpi-sub">
+        <span class="badge ${pAmt>=100?'badge-green':pAmt>=80?'badge-blue':pAmt>=60?'badge-orange':'badge-red'}">
+          完成 ${pAmt.toFixed(1)}%
+        </span>
+        <span>全年目标 ${fNum(t.targetAmt)} 万</span>
+      </div>
+    </div>
+    <div class="kpi-card type-purple">
+      <div class="card-icon">📊</div>
+      <div class="kpi-label">目标进度差距（数量）</div>
+      <div class="kpi-value" style="color:${gapQtyColor}">${gapQty>=0?'+':''}${fNum(gapQty)}<span class="unit">万盒</span></div>
+      <div class="kpi-sub">
+        <span class="badge ${pQty>=100?'badge-green':pQty>=80?'badge-blue':pQty>=60?'badge-orange':'badge-red'}">
+          完成 ${pQty.toFixed(1)}%
+        </span>
+        <span>全年目标 ${fNum(t.targetQty)} 万盒</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildDeptCards(dept) {
+  const areas = D.areaYtd.filter(a => a.dept === dept);
+  const areaTargets = D.areaTarget.filter(a => a.dept === dept);
+  const m = D.latestMonth;
+  const typeMap = { '华东':'type-blue','华北':'type-orange','华南':'type-green','华西':'type-purple', '新营销部':'type-teal' };
+  const iconMap = { '华东':'🌊','华北':'🏔','华南':'🌴','华西':'🏜', '新营销部':'🚀' };
+
+  let cards = areas.map(a => {
+    const t = areaTargets.find(at => at.area === a.area) || {};
+    const gap = calcGap(a.ytd2026Amt, t.targetAmt || 0, m);
+    const prog = (t.targetAmt || 0) ? (a.ytd2026Amt / t.targetAmt * 100) : 0;
+    const typ  = typeMap[a.area] || 'type-blue';
+    const icon = iconMap[a.area] || '📌';
+    return `
+    <div class="kpi-card ${typ}">
+      <div class="card-icon">${icon}</div>
+      <div class="kpi-label">${a.area} · 累计金额</div>
+      <div class="kpi-value">${fNum(a.ytd2026Amt)}<span class="unit">万元</span></div>
+      <div class="kpi-sub">${yoyHtml(a.ytd2026Amt, a.ytd2025Amt)}</div>
+      ${progressBarHtml(a.ytd2026Amt, t.targetAmt, '进度')}
+    </div>`;
+  }).join('');
+
+  const gridClass = areas.length <= 4 ? 'kpi-row' : 'kpi-row-5';
+  return `<div class="${gridClass}">${cards}</div>`;
+}
+
+/* ===== CHART COLORS ===== */
+const C = {
+  blue:       '#1B3A6B',  blueA:   'rgba(27,58,107,0.80)',
+  blue2:      '#2E86DE',  blue2A:  'rgba(46,134,222,0.80)',
+  orange:     '#F5831F',  orangeA: 'rgba(245,131,31,0.85)',
+  green:      '#27AE60',  greenA:  'rgba(39,174,96,0.80)',
+  red:        '#E74C3C',  redA:    'rgba(231,76,60,0.80)',
+  gray:       '#95A5A6',  grayA:   'rgba(149,165,166,0.70)',
+  purple:     '#8E44AD',  purpleA: 'rgba(142,68,173,0.75)',
+  teal:       '#1ABC9C',  tealA:   'rgba(26,188,156,0.75)',
+  pieColors: [
+    'rgba(27,58,107,0.82)',
+    'rgba(245,131,31,0.82)',
+    'rgba(39,174,96,0.82)',
+    'rgba(142,68,173,0.82)',
+    'rgba(26,188,156,0.82)',
+    'rgba(231,76,60,0.82)',
+  ]
+};
+
+const chartInstances = {};
+function destroyChart(id){ if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];} }
+
+// 根据屏幕宽度自动适配图表字体
+const isMobile = window.innerWidth <= 768;
+const baseFontSize = isMobile ? 11 : 16;
+const defaultFont = { family:"'Microsoft YaHei','PingFang SC',sans-serif", size:baseFontSize };
+const gridColor   = 'rgba(0,0,0,0.06)';
+
+function baseOptions(unit) {
+  return {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{ position:'top', labels:{ font:defaultFont, padding:isMobile?8:16, usePointStyle:true, pointStyleWidth:isMobile?6:10 } },
+      tooltip:{ backgroundColor:'rgba(27,58,107,0.92)', titleFont:{...defaultFont,size:baseFontSize,weight:'bold'},
+        bodyFont:defaultFont, padding:isMobile?6:10, cornerRadius:8,
+        callbacks:{ label: ctx => ` ${ctx.dataset.label}: ${ctx.raw==null?'—':Number(ctx.raw).toFixed(2)} ${unit}` }
+      }
+    },
+    scales:{
+      x:{ grid:{color:gridColor}, ticks:{font:defaultFont} },
+      y:{ beginAtZero:true, grid:{color:gridColor}, ticks:{font:defaultFont, callback: v=>v } }
+    }
+  };
+}
+
+function createMonthlyChart(canvasId, dept, metric) {
+  destroyChart(canvasId);
+  const data = getMonthly(dept);
+  const allM = Array.from({length:12},(_,i)=>i+1);
+  const labels = allM.map(m => m+'月');
+  const v25 = allM.map(m => { const r=data.find(d=>d.year===2025&&d.month===m); return r?r[metric]:0; });
+  const v26 = allM.map(m => { const r=data.find(d=>d.year===2026&&d.month===m); return r?r[metric]:null; });
+  const unit = metric==='amt'?'万元':'万盒';
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const bar2026Color = metric === 'qty' ? C.blue2A : C.orangeA;
+  const isGrouped = metric === 'qty';
+
+  // 计算目标均值线
+  const t = getTarget(dept);
+  const annualTarget = metric === 'qty' ? t.targetQty : t.targetAmt;
+  const monthlyAvg = annualTarget ? (annualTarget / 12) : 0;
+  const avgLine = allM.map(() => monthlyAvg);
+
+  const datasets = [
+    { label:'2025年', data:v25, backgroundColor:C.grayA, borderRadius:isGrouped?8:5, barPercentage:isGrouped?0.85:0.38, categoryPercentage:isGrouped?0.98:0.7 },
+    { label:'2026年', data:v26, backgroundColor:bar2026Color, borderRadius:isGrouped?8:5, barPercentage:isGrouped?0.85:0.38, categoryPercentage:isGrouped?0.98:0.7 }
+  ];
+  if (monthlyAvg > 0) {
+    datasets.push({
+      label:'目标均值('+unit+'/月)', data:avgLine, type:'line',
+      borderColor:C.orange, borderWidth:2, borderDash:[6,4],
+      pointRadius:0, fill:false, order:0
+    });
+  }
+
+  chartInstances[canvasId] = new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets },
+    options: {
+      ...baseOptions(unit),
+      plugins:{
+        ...baseOptions(unit).plugins,
+        legend:{ ...baseOptions(unit).plugins.legend }
+      }
+    }
+  });
+}
+
+function createCumulativeChart(canvasId, dept, metric) {
+  destroyChart(canvasId);
+  const data = getMonthly(dept);
+  const allM = Array.from({length:12},(_,i)=>i+1);
+  const labels = allM.map(m=>m+'月');
+  function cum(yr) {
+    let s=0;
+    return allM.map(m=>{
+      const r=data.find(d=>d.year===yr&&d.month===m);
+      s+=r?r[metric]:0;
+      return r?s:null;
+    });
+  }
+  const v25=cum(2025), v26=cum(2026);
+  const unit=metric==='amt'?'万元':'万盒';
+  const ctx=document.getElementById(canvasId).getContext('2d');
+
+  const datasets = [
+    { label:'2025年累计', data:v25, borderColor:C.blue2, backgroundColor:'rgba(46,134,222,0.08)',
+      fill:true, tension:0.35, pointRadius:3, pointBackgroundColor:C.blue2,
+      borderWidth:2.5 },
+    { label:'2026年累计', data:v26, borderColor:C.orange, backgroundColor:'rgba(245,131,31,0.10)',
+      fill:true, tension:0.35, pointRadius:4, pointBackgroundColor:C.orange,
+      borderWidth:2.5 }
+  ];
+
+  const t = getTarget(dept);
+  const annualTarget = metric === 'qty' ? t.targetQty : t.targetAmt;
+  if (metric === 'qty' && annualTarget) {
+    const tgtLine = allM.map(m => (annualTarget / 12 * m).toFixed(2));
+    datasets.push({
+      label:'全年目标线', data:tgtLine, type:'line',
+      borderColor:'#E74C3C', borderWidth:2, borderDash:[8,5],
+      pointRadius:0, fill:false, order:0
+    });
+  }
+
+  const gapPlugin = {
+    id: 'gapLabel',
+    afterDatasetsDraw(chart) {
+      const ds26 = chart.data.datasets[1];
+      const dsIdx26 = 1;
+      const meta26 = chart.getDatasetMeta(dsIdx26);
+      let lastIdx = -1, lastVal = 0;
+      for (let i = ds26.data.length - 1; i >= 0; i--) {
+        if (ds26.data[i] != null) { lastIdx = i; lastVal = ds26.data[i]; break; }
+      }
+      if (lastIdx < 0) return;
+      const m = lastIdx + 1;
+      const targetVal = annualTarget / 12 * m;
+      const gap = lastVal - targetVal;
+      const sign = gap >= 0 ? '+' : '';
+      const color = gap >= 0 ? '#27AE60' : '#E74C3C';
+      const pt = meta26.data[lastIdx];
+      if (!pt) return;
+      const cctx = chart.ctx;
+      cctx.save();
+      cctx.font = 'bold '+baseFontSize+'px Microsoft YaHei, sans-serif';
+      cctx.fillStyle = color;
+      cctx.textAlign = 'left';
+      cctx.textBaseline = 'bottom';
+      cctx.fillText('差距 ' + sign + gap.toFixed(2), pt.x + 8, pt.y - 4);
+      cctx.restore();
+    }
+  };
+
+  chartInstances[canvasId]=new Chart(ctx,{
+    type:'line',
+    data:{ labels, datasets },
+    options:baseOptions(unit),
+    plugins: metric === 'qty' ? [gapPlugin] : []
+  });
+}
+
+function createAreaPieChart(canvasId, dept) {
+  destroyChart(canvasId);
+  const areas = D.areaYtd.filter(a=>a.dept===dept);
+  // 新营销部按B端/C端/KA大区从地区数据汇总
+  const isQty = (dept === '新营销部');
+  let labels, values, unit;
+  if (isQty) {
+    unit = '万盒';
+    const m = D.latestMonth;
+    const regions = D.regionTarget.filter(r=>r.dept===dept);
+    const areaMap = {};
+    regions.forEach(r => {
+      if (!areaMap[r.area]) areaMap[r.area] = 0;
+      D.regionMonthly2026.filter(md=>md.region===r.region&&md.month<=m).forEach(md=>areaMap[r.area]+=md.qty);
+    });
+    labels = Object.keys(areaMap);
+    values = labels.map(l=>areaMap[l]);
+  } else {
+    unit = '万元';
+    labels = areas.map(a=>a.area);
+    values = areas.map(a=>a.ytd2026Amt);
+  }
+  const total=values.reduce((a,b)=>a+b,0);
+  const ctx=document.getElementById(canvasId).getContext('2d');
+  // 新营销部KA用灰色，B端蓝，C端橙
+  const bgColors = isQty
+    ? labels.map(l => l==='KA' ? 'rgba(149,165,166,0.82)' : l==='C端' ? 'rgba(245,131,31,0.82)' : 'rgba(27,58,107,0.82)')
+    : C.pieColors;
+  chartInstances[canvasId]=new Chart(ctx,{
+    type:'doughnut',
+    data:{ labels, datasets:[{
+      data:values, backgroundColor:bgColors, borderWidth:3, borderColor:'#fff',
+      hoverBorderWidth:0
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      cutout:'62%',
+      layout:{ padding:{ top:30, bottom:10, left:10, right:10 } },
+      plugins:{
+        legend:{ position:'right', labels:{font:{...defaultFont,size:baseFontSize},padding:isMobile?6:14,usePointStyle:true,pointStyleWidth:isMobile?6:10} },
+        tooltip:{ backgroundColor:'rgba(27,58,107,0.92)', titleFont:{...defaultFont,size:baseFontSize,weight:'bold'},
+          bodyFont:{...defaultFont}, padding:isMobile?6:10, cornerRadius:8,
+          callbacks:{ label: ctx => ` ${ctx.label}: ${Number(ctx.raw).toFixed(2)} ${unit} (${(ctx.raw/total*100).toFixed(1)}%)` }
+        },
+        datalabels:{
+          color:'#333',
+          font:{ weight:'bold', size:isMobile?10:14, family:"'Microsoft YaHei','PingFang SC',sans-serif" },
+          backgroundColor:'rgba(255,255,255,0.8)',
+          borderRadius:4,
+          borderColor:'rgba(0,0,0,0.1)',
+          borderWidth:1,
+          padding:{ top:4, bottom:4, left:8, right:8 },
+          formatter:(value, ctx) => {
+            const pct = (value/total*100).toFixed(1);
+            return value.toFixed(1) + unit + '\n' + pct + '%';
+          },
+          textAlign:'center',
+          clip:false,
+          anchor:'end',
+          align:'end',
+          offset:8,
+          connectorColor:'#999',
+          connectorWidth:1.5,
+          connectorPadding:6,
+          display:function(ctx2){
+            return ctx2.dataset.data[ctx2.dataIndex] / total > 0.03;
+          }
+        }
+      }
+    },
+    plugins:[ChartDataLabels]
+  });
+}
+
+function createAreaBarChart(canvasId, dept) {
+  if (dept === '新营销部') {
+    createChannelYoYChart(canvasId, dept);
+    return;
+  }
+  destroyChart(canvasId);
+  const areas   = D.areaYtd.filter(a=>a.dept===dept);
+  const targets = D.areaTarget.filter(a=>a.dept===dept);
+  const labels  = areas.map(a=>a.area);
+  const ytd25   = areas.map(a=>a.ytd2025Amt);
+  const ytd26   = areas.map(a=>a.ytd2026Amt);
+  const tgtLine = labels.map(l=>{ const t=targets.find(x=>x.area===l); return t?t.targetAmt/12*D.latestMonth:0; });
+  const ctx=document.getElementById(canvasId).getContext('2d');
+  chartInstances[canvasId]=new Chart(ctx,{
+    type:'bar',
+    data:{ labels, datasets:[
+      { label:'2025年同期', data:ytd25, backgroundColor:C.grayA, borderRadius:5, barPercentage:0.28, categoryPercentage:0.75 },
+      { label:'2026年累计', data:ytd26, backgroundColor:C.blue2A, borderRadius:5, barPercentage:0.28, categoryPercentage:0.75 },
+      { label:'目标进度线', data:tgtLine, type:'line', borderColor:C.orange, borderWidth:2,
+        borderDash:[7,4], pointRadius:4, pointBackgroundColor:C.orange, fill:false }
+    ]},
+    options:baseOptions('万元')
+  });
+}
+
+function createChannelYoYChart(canvasId, dept) {
+  destroyChart(canvasId);
+  const m = D.latestMonth;
+  const regions = D.regionTarget.filter(r=>r.dept===dept);
+  const channels = [...new Set(regions.map(r=>r.area))].sort();
+  // 每个渠道的2025和2026年YTD数量
+  const qty25 = {}, qty26 = {};
+  channels.forEach(ch => {
+    qty25[ch] = 0; qty26[ch] = 0;
+    const chRegions = regions.filter(r=>r.area===ch);
+    chRegions.forEach(r => {
+      D.regionMonthly2025.filter(md=>md.region===r.region&&md.month<=m).forEach(md=>qty25[ch]+=md.qty);
+      D.regionMonthly2026.filter(md=>md.region===r.region&&md.month<=m).forEach(md=>qty26[ch]+=md.qty);
+    });
+  });
+  const chColors = {
+    'B端': { light: 'rgba(27,58,107,0.60)', solid: 'rgba(27,58,107,0.90)' },
+    'C端': { light: 'rgba(245,131,31,0.60)', solid: 'rgba(245,131,31,0.90)' },
+    'KA':  { light: 'rgba(149,165,166,0.60)', solid: 'rgba(149,165,166,0.90)' }
+  };
+  const datasets = channels.map(ch => ({
+    label: ch,
+    data: [qty25[ch], qty26[ch]],
+    backgroundColor: chColors[ch]?.solid || 'rgba(200,200,200,0.80)',
+    hoverBackgroundColor: chColors[ch]?.solid || 'rgba(200,200,200,0.95)',
+    borderRadius: 5,
+    barPercentage: 0.7,
+    categoryPercentage: 0.65
+  }));
+
+  // 柱顶标注数值和同比
+  const topLabelPlugin = {
+    id: 'topLabel',
+    afterDatasetsDraw(chart) {
+      const cctx = chart.ctx;
+      cctx.save();
+      cctx.font = 'bold '+Math.max(baseFontSize-2,10)+'px Microsoft YaHei, sans-serif';
+      cctx.textAlign = 'center';
+      cctx.textBaseline = 'bottom';
+      channels.forEach((ch, i) => {
+        const meta = chart.getDatasetMeta(i);
+        const bar25 = meta.data[0], bar26 = meta.data[1];
+        if (bar25) { cctx.fillStyle='#888'; cctx.fillText(qty25[ch].toFixed(2), bar25.x, bar25.y - 2); }
+        if (bar26) {
+          const yoy = qty25[ch] ? ((qty26[ch]-qty25[ch])/qty25[ch]*100) : 0;
+          const sign = yoy >= 0 ? '+' : '';
+          cctx.fillStyle = yoy >= 0 ? '#27AE60' : '#E74C3C';
+          cctx.fillText(`${qty26[ch].toFixed(2)} (${sign}${yoy.toFixed(1)}%)`, bar26.x, bar26.y - 2);
+        }
+      });
+      cctx.restore();
+    }
+  };
+
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  chartInstances[canvasId] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['2025年同期', '2026年累计'],
+      datasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { ...defaultFont, size: baseFontSize, weight: 'bold' } }
+        },
+        y: {
+          grid: { color: gridColor },
+          ticks: { font: defaultFont, callback: v => v + '万盒' },
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { font: defaultFont, padding: isMobile?6:14, usePointStyle: true, pointStyleWidth: isMobile?6:10 }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(27,58,107,0.92)',
+          titleFont: { ...defaultFont, size: baseFontSize, weight: 'bold' },
+          bodyFont: defaultFont, padding: isMobile?6:10, cornerRadius: 8,
+          callbacks: {
+            title: items => items[0].label,
+            label: ctx => ` ${ctx.dataset.label}: ${Number(ctx.raw).toFixed(2)} 万盒`
+          }
+        }
+      }
+    },
+    plugins: [topLabelPlugin]
+  });
+}
+
+/* ===== AREA COLOR CLASS ===== */
+function areaTagClass(area) {
+  if(area.includes('华东')) return 'area-huadong';
+  if(area.includes('华北')) return 'area-huabei';
+  if(area.includes('华南')) return 'area-huanan';
+  if(area.includes('华西')) return 'area-huaxi';
+  if(area.includes('新营销')) return 'area-xinyx';
+  return 'area-default';
+}
+
+function buildRegionTable(dept) {
+  const m = D.latestMonth;
+  if (dept === '全部') {
+    // 总览页：按部门汇总，用数量(万盒)
+    const depts = D.target.filter(t=>t.dept!=='全部');
+    const colHeaders = ['部门','','全年目标','累计完成','同比增长率','目标差距','完成进度'];
+    let rows = depts.map(t => {
+      const cum26 = D.deptMonthly.filter(d=>d.dept===t.dept&&d.year===D.latestYear&&d.month<=m).reduce((s,d)=>s+d.qty,0);
+      const cum25 = D.deptMonthly.filter(d=>d.dept===t.dept&&d.year===2025&&d.month<=m).reduce((s,d)=>s+d.qty,0);
+      const target = t.targetQty;
+      const gap   = calcGap(cum26, target, m);
+      const prog  = target ? (cum26/target*100) : 0;
+      const yoyP  = cum25>0 ? ((cum26-cum25)/cum25*100) : null;
+      const yoyCls= yoyP===null?'badge-gray':yoyP>=0?'badge-red':'badge-green';
+      const yoyTxt= yoyP===null?'N/A':(yoyP>=0?'+':'')+yoyP.toFixed(1)+'%';
+      return `<tr>
+        <td style="font-weight:500;text-align:center">${t.dept}</td>
+        <td></td>
+        <td style="text-align:center">${fNum(target)}</td>
+        <td style="font-weight:600;color:#1B3A6B;text-align:center">${fNum(cum26)}</td>
+        <td style="text-align:center"><span class="badge ${yoyCls}">${yoyTxt}</span></td>
+        <td style="text-align:center"><span style="color:${gap>=0?'#27AE60':'#E74C3C'};font-weight:600">${gap>=0?'+':''}${fNum(gap)}</span></td>
+        <td>${tableProgressHtml(prog)}</td>
+      </tr>`;
+    }).join('');
+    return `<div class="table-box">
+      <h3>各部门目标完成明细</h3>
+      <div class="table-scroll-wrap">
+      <table>
+        <thead><tr>
+          <th style="min-width:80px">部门</th>
+          <th style="min-width:70px"></th>
+          <th style="min-width:110px">全年目标(万盒)</th>
+          <th style="min-width:110px">累计完成(万盒)</th>
+          <th style="min-width:100px">同比增长率</th>
+          <th style="min-width:120px">目标差距(万盒)</th>
+          <th style="min-width:160px">完成进度</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      </div>
+    </div>`;
+  }
+  // 非总览：按地区明细
+  const regions = D.regionTarget.filter(r=>r.dept===dept);
+
+  if (dept === '医院销售部') {
+    // 医院销售部：按数量(万盒)统计，排名降序，显示负责人
+    let regionData = regions.map(r => {
+      let cum25=0; D.regionMonthly2025.filter(md=>md.region===r.region&&md.month<=m).forEach(md=>cum25+=md.qty);
+      let cum26=0; D.regionMonthly2026.filter(md=>md.region===r.region&&md.month<=m).forEach(md=>cum26+=md.qty);
+      return { ...r, cum25, cum26 };
+    });
+    // 按销售量降序排列
+    regionData.sort((a, b) => b.cum26 - a.cum26);
+    const medals = ['🥇','🥈','🥉'];
+    let rows = regionData.map((r, idx) => {
+      const rank = idx + 1;
+      const gap   = calcGap(r.cum26, r.targetQty, m);
+      const prog  = r.targetQty ? (r.cum26/r.targetQty*100) : 0;
+      const yoyP  = r.cum25>0 ? ((r.cum26-r.cum25)/r.cum25*100) : null;
+      const yoyCls= yoyP===null?'badge-gray':yoyP>=0?'badge-red':'badge-green';
+      const yoyTxt= yoyP===null?'N/A':(yoyP>=0?'+':'')+yoyP.toFixed(1)+'%';
+      const rankDisplay = rank <= 3 ? medals[rank-1] : rank;
+      return `<tr>
+        <td>${rankDisplay}</td>
+        <td>${r.region}</td>
+        <td>${r.owner || '-'}</td>
+        <td>${fNum(r.targetQty)}</td>
+        <td style="font-weight:600;color:#1B3A6B">${fNum(r.cum26)}</td>
+        <td><span class="badge ${yoyCls}">${yoyTxt}</span></td>
+        <td><span style="color:${gap>=0?'#27AE60':'#E74C3C'};font-weight:600">${gap>=0?'+':''}${fNum(gap)}</span></td>
+        <td>${tableProgressHtml(prog)}</td>
+      </tr>`;
+    }).join('');
+    return `<div class="table-box">
+      <h3>各地区目标完成明细（${D.latestYear}年1-${m}月累计·数量万盒）</h3>
+      <div class="table-scroll-wrap">
+      <table>
+        <thead><tr>
+          <th style="min-width:60px">排名</th>
+          <th style="min-width:100px">地区</th>
+          <th style="min-width:100px">地区负责人</th>
+          <th style="min-width:110px">全年目标(万盒)</th>
+          <th style="min-width:110px">累计完成(万盒)</th>
+          <th style="min-width:100px">同比增长率</th>
+          <th style="min-width:120px">目标差距(万盒)</th>
+          <th style="min-width:160px">完成进度</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      </div>
+    </div>`;
+  }
+
+  // 新营销部：按数量统计，显示地区负责人
+  let rows = regions.map(r => {
+    let cum25=0; D.regionMonthly2025.filter(md=>md.region===r.region&&md.month<=m).forEach(md=>cum25+=md.qty);
+    let cum26=0; D.regionMonthly2026.filter(md=>md.region===r.region&&md.month<=m).forEach(md=>cum26+=md.qty);
+    const gap   = calcGap(cum26, r.targetQty, m);
+    const prog  = r.targetQty ? (cum26/r.targetQty*100) : 0;
+    const yoyP  = cum25>0 ? ((cum26-cum25)/cum25*100) : null;
+    const yoyCls= yoyP===null?'badge-gray':yoyP>=0?'badge-red':'badge-green';
+    const yoyTxt= yoyP===null?'N/A':(yoyP>=0?'+':'')+yoyP.toFixed(1)+'%';
+    return `<tr>
+      <td>${r.region}</td>
+      <td>${r.owner || '-'}</td>
+      <td><span class="area-tag ${areaTagClass(r.area)}">${r.area}</span></td>
+      <td>${fNum(r.targetQty)}</td>
+      <td style="font-weight:600;color:#1B3A6B">${fNum(cum26)}</td>
+      <td><span class="badge ${yoyCls}">${yoyTxt}</span></td>
+      <td><span style="color:${gap>=0?'#27AE60':'#E74C3C'};font-weight:600">${gap>=0?'+':''}${fNum(gap)}</span></td>
+      <td>${tableProgressHtml(prog)}</td>
+    </tr>`;
+  }).join('');
+  return `<div class="table-box">
+    <h3>各地区目标完成明细（${D.latestYear}年1-${m}月累计·数量万盒）</h3>
+    <div class="table-scroll-wrap">
+    <table>
+      <thead><tr>
+        <th style="min-width:120px">地区</th>
+        <th style="min-width:100px">地区负责人</th>
+        <th style="min-width:70px">渠道</th>
+        <th style="min-width:110px">全年目标(万盒)</th>
+        <th style="min-width:110px">累计完成(万盒)</th>
+        <th style="min-width:100px">同比增长率</th>
+        <th style="min-width:120px">目标差距(万盒)</th>
+        <th style="min-width:160px">完成进度</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    </div>
+  </div>`;
+}
+
+function buildDeptPage(dept, pageId) {
+  const container = document.getElementById(pageId);
+  const hasAreas  = D.areaYtd.filter(a=>a.dept===dept).length > 0;
+  const areaLabel = dept==='医院销售部' ? '大区' : '渠道';
+  const uid       = dept==='全部'?'ov':dept==='医院销售部'?'hosp':'mkt';
+  let html = '';
+
+  html += `<div class="section-title">核心指标总览</div>`;
+  html += buildKpiCards(dept);
+
+  if (dept === '全部') {
+    html += buildRegionTable(dept);
+  }
+
+  // 医院销售部和新营销部不显示渠道/大区维度KPI
+  if (hasAreas && dept === '总览') {
+    // 仅总览页可展示（当前总览页用部门表格替代）
+  }
+
+  html += `<div class="section-title">月度发货趋势对比</div>`;
+  html += `<div class="chart-row">
+    <div class="chart-box"><h3>月度发货数量对比（万盒）</h3><div style="height:300px"><canvas id="${uid}-qty-bar"></canvas></div></div>
+    <div class="chart-box"><h3>累计发货数量趋势（万盒）</h3><div style="height:300px"><canvas id="${uid}-qty-cum"></canvas></div></div>
+  </div>`;
+
+
+  // 大区/渠道维度分析图表
+  if (hasAreas && dept !== '医院销售部') {
+    const chartTitle = dept === '新营销部'
+      ? '各渠道销量占比（万盒）'
+      : `各${areaLabel}累计金额占比（万元）`;
+    const barTitle = dept === '新营销部'
+      ? '各渠道销量同比情况'
+      : `各${areaLabel}发货金额 vs 目标进度线`;
+    html += `<div class="section-title">${areaLabel}维度分析</div>`;
+    html += `<div class="chart-row">
+      <div class="chart-box"><h3>${chartTitle}</h3><div style="height:300px"><canvas id="${uid}-pie"></canvas></div></div>
+      <div class="chart-box"><h3>${barTitle}</h3><div style="height:300px"><canvas id="${uid}-area-bar"></canvas></div></div>
+    </div>`;
+  }
+
+  if (dept !== '全部') {
+    html += buildRegionTable(dept);
+  }
+
+  container.innerHTML = html;
+
+  setTimeout(() => {
+    createMonthlyChart(uid+'-qty-bar', dept, 'qty');
+    createCumulativeChart(uid+'-qty-cum', dept, 'qty');
+    if(hasAreas && dept !== '医院销售部'){ createAreaPieChart(uid+'-pie',dept); createAreaBarChart(uid+'-area-bar',dept); }
+  }, 50);
+}
+
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map = { overview:['page-overview',0,'全部'], hospital:['page-hospital',1,'医院销售部'], marketing:['page-marketing',2,'新营销部'] };
+  const [pid, idx, dept] = map[page];
+  document.getElementById(pid).classList.add('active');
+  document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  buildDeptPage(dept, pid);
+}
+
+switchPage('overview');
+
+/* ===== DATA REFRESH ===== */
+let _refreshing = false;
+function refreshData() {
+  if (_refreshing) return;
+  const btn = document.getElementById('refreshBtn');
+  const icon = document.getElementById('refreshIcon');
+  _refreshing = true;
+  btn.classList.add('spinning');
+  btn.querySelector('span').textContent = '更新中…';
+  btn.classList.add('disabled');
+
+  // Attempt to fetch new data from the local server
+  const ctrlUrl = window.__DASHBOARD_CTRL_URL || 'http://localhost:18765';
+  fetch(ctrlUrl + '/api/refresh', { method:'POST', cache:'no-cache' })
+    .then(r => {
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    })
+    .then(newData => {
+      // Update global data object
+      window.D = newData;
+      // Rebuild current page
+      const activeNav = document.querySelector('.nav-btn.active');
+      const pageMap = { 0:'overview', 1:'hospital', 2:'marketing' };
+      const idx = activeNav ? Array.from(document.querySelectorAll('.nav-btn')).indexOf(activeNav) : 0;
+      const page = pageMap[idx] || 'overview';
+      switchPage(page);
+      showToast('数据已更新', 'ok');
+    })
+    .catch(err => {
+      console.warn('Refresh failed, will reload page:', err);
+      showToast('正在刷新页面…', 'info');
+      // Fallback: just reload the page (works if HTML was regenerated externally)
+      setTimeout(() => window.location.reload(), 600);
+    })
+    .finally(() => {
+      _refreshing = false;
+      btn.classList.remove('spinning');
+      btn.querySelector('span').textContent = '刷新数据';
+      btn.classList.remove('disabled');
+    });
+}
+
+// Simple toast notification
+function showToast(msg, type) {
+  let existing = document.getElementById('_toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.id = '_toast';
+  t.style.cssText = 'position:fixed;top:100px;left:50%;transform:translateX(-50%);' +
+    'padding:10px 24px;border-radius:10px;font-size:14px;z-index:99999;' +
+    'box-shadow:0 4px 20px rgba(0,0,0,.15);transition:opacity .4s;';
+  if (type === 'ok') { t.style.background = '#27AE60'; t.style.color = '#fff'; }
+  else { t.style.background = '#1B3A6B'; t.style.color = '#fff'; }
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 2000);
+}
+
+</script>
+</body>
+</html>
