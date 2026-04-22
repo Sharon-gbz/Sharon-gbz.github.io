@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>重庆TOP终端销售看板</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    background: linear-gradient(135deg, #0c1a2e 0%, #132744 50%, #0e2035 100%);
+    color: #e0e6ed; min-height: 100vh; padding: 24px;
+  }
+  .dashboard {
+    max-width: 1400px; margin: 0 auto;
+  }
+  .header {
+    text-align: center; padding: 20px 0 30px; position: relative;
+  }
+  .header h1 {
+    font-size: 32px; font-weight: 700; letter-spacing: 4px;
+    background: linear-gradient(90deg, #5ce0d8, #4facfe, #00f2fe);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 40px rgba(79,172,254,0.3);
+  }
+  .header .sub {
+    font-size: 13px; color: #6b8299; margin-top: 6px; letter-spacing: 1px;
+  }
+  .header::after {
+    content: ''; display: block; margin: 18px auto 0;
+    width: 300px; height: 1px;
+    background: linear-gradient(90deg, transparent, #4facfe, transparent);
+  }
+
+  /* Section */
+  .section { margin-bottom: 28px; }
+  .section-title {
+    font-size: 16px; font-weight: 600; color: #7eb8da; margin-bottom: 16px;
+    padding-left: 12px; border-left: 3px solid #4facfe;
+    letter-spacing: 1px;
+  }
+
+  /* KPI Cards */
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .kpi-card {
+    background: rgba(20, 45, 75, 0.6); border: 1px solid rgba(79,172,254,0.15);
+    border-radius: 12px; padding: 20px; text-align: center;
+    backdrop-filter: blur(10px); transition: transform 0.2s, box-shadow 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(79,172,254,0.15);
+    border-color: rgba(79,172,254,0.35);
+  }
+  .kpi-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .kpi-card:hover::before { opacity: 1; }
+  .kpi-label {
+    font-size: 12px; color: #7b9bb8; margin-bottom: 10px; letter-spacing: 1px;
+  }
+  .kpi-value {
+    font-size: 26px; font-weight: 700; color: #e8f0f8;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-unit { font-size: 13px; font-weight: 400; color: #7b9bb8; margin-left: 2px; }
+  .kpi-card.accent-green .kpi-value { color: #5ce0d8; }
+  .kpi-card.accent-blue .kpi-value { color: #4facfe; }
+  .kpi-card.accent-orange .kpi-value { color: #f5a623; }
+  .kpi-card.accent-red .kpi-value { color: #ff6b6b; }
+  .kpi-card.accent-purple .kpi-value { color: #a78bfa; }
+  .kpi-card.accent-cyan .kpi-value { color: #22d3ee; }
+  .kpi-card.accent-pink .kpi-value { color: #f472b6; }
+
+  /* Row layout */
+  .row-2 { display: grid; grid-template-columns: 380px 1fr; gap: 24px; }
+  @media (max-width: 900px) {
+    .row-2 { grid-template-columns: 1fr; }
+  }
+
+  /* Chart container */
+  .chart-box {
+    background: rgba(20, 45, 75, 0.5); border: 1px solid rgba(79,172,254,0.12);
+    border-radius: 12px; padding: 20px;
+  }
+  .ring-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  .ring-card {
+    background: rgba(20, 45, 75, 0.4); border: 1px solid rgba(79,172,254,0.1);
+    border-radius: 10px; padding: 16px 8px; text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .ring-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79,172,254,0.12);
+  }
+  .ring-chart { width: 100%; height: 180px; }
+  .ring-label {
+    font-size: 14px; font-weight: 600; margin-top: 4px;
+    letter-spacing: 1px;
+  }
+  .ring-stats {
+    font-size: 11px; color: #6b8299; margin-top: 2px; line-height: 1.6;
+  }
+
+  /* Terminal Table */
+  .table-wrap {
+    background: rgba(20, 45, 75, 0.5); border: 1px solid rgba(79,172,254,0.12);
+    border-radius: 12px; padding: 20px; overflow-x: auto;
+  }
+  .terminal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .terminal-table thead th {
+    text-align: left; padding: 10px 12px; font-size: 12px; font-weight: 600;
+    color: #7b9bb8; border-bottom: 1px solid rgba(79,172,254,0.2);
+    white-space: nowrap;
+  }
+  .terminal-table tbody tr {
+    cursor: pointer; transition: background 0.15s;
+    border-bottom: 1px solid rgba(79,172,254,0.06);
+  }
+  .terminal-table tbody tr:hover { background: rgba(79,172,254,0.08); }
+  .terminal-table tbody td {
+    padding: 11px 12px; white-space: nowrap;
+  }
+  .progress-bar {
+    display: inline-block; width: 80px; height: 6px; border-radius: 3px;
+    background: rgba(255,255,255,0.08); vertical-align: middle; margin-right: 6px;
+    overflow: hidden;
+  }
+  .progress-bar .fill {
+    height: 100%; border-radius: 3px; transition: width 0.6s;
+  }
+  .rate-good { color: #5ce0d8; }
+  .rate-mid { color: #f5a623; }
+  .rate-low { color: #ff6b6b; }
+  .fill-good { background: linear-gradient(90deg, #2dd4bf, #5ce0d8); }
+  .fill-mid { background: linear-gradient(90deg, #f59e0b, #f5a623); }
+  .fill-low { background: linear-gradient(90deg, #ef4444, #ff6b6b); }
+
+  /* Drill-down */
+  .drill-overlay {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6); z-index: 100; backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s;
+  }
+  .drill-overlay.active { display: flex; align-items: center; justify-content: center; }
+  .drill-panel {
+    background: #132744; border: 1px solid rgba(79,172,254,0.25);
+    border-radius: 16px; width: 92%; max-width: 1100px; max-height: 80vh;
+    overflow: hidden; display: flex; flex-direction: column;
+    animation: slideUp 0.3s;
+  }
+  .drill-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 24px; border-bottom: 1px solid rgba(79,172,254,0.15);
+  }
+  .drill-header h3 { font-size: 16px; color: #4facfe; }
+  .drill-close {
+    background: none; border: 1px solid rgba(79,172,254,0.3); color: #7b9bb8;
+    width: 32px; height: 32px; border-radius: 8px; cursor: pointer;
+    font-size: 18px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .drill-close:hover { background: rgba(79,172,254,0.15); color: #e0e6ed; }
+  .drill-body { padding: 0; overflow-y: auto; }
+  .drill-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .drill-table thead th {
+    text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 600;
+    color: #7b9bb8; border-bottom: 1px solid rgba(79,172,254,0.2);
+    position: sticky; top: 0; background: #132744; z-index: 1;
+    white-space: nowrap;
+  }
+  .drill-table tbody td {
+    padding: 12px 20px; border-bottom: 1px solid rgba(79,172,254,0.06);
+  }
+  .drill-table tbody tr:hover { background: rgba(79,172,254,0.06); }
+
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-brand { background: rgba(79,172,254,0.15); color: #4facfe; }
+  .badge-trade { background: rgba(92,224,216,0.15); color: #5ce0d8; }
+  .badge-agent { background: rgba(167,139,250,0.15); color: #a78bfa; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* Tab Switcher */
+  .tab-switcher {
+    display: flex; gap: 4px; background: rgba(20,45,75,0.6);
+    border-radius: 10px; padding: 4px; margin-bottom: 16px;
+    border: 1px solid rgba(79,172,254,0.1);
+  }
+  .tab-btn {
+    flex: 1; padding: 10px 16px; border: none; border-radius: 8px;
+    background: transparent; color: #7b9bb8; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.25s; letter-spacing: 0.5px;
+    font-family: inherit;
+  }
+  .tab-btn:hover { color: #c0d0e0; background: rgba(79,172,254,0.06); }
+  .tab-btn.active {
+    background: rgba(79,172,254,0.15); color: #4facfe;
+    box-shadow: 0 2px 10px rgba(79,172,254,0.1);
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+</style>
+</head>
+<body>
+<div class="dashboard">
+  <div class="header">
+    <h1>重庆TOP终端销售看板</h1>
+    <div class="sub">数据截至 2026年3月 · 重庆TOP医院终端销售分析</div>
+  </div>
+
+  <!-- 第一部分：KPI 卡片 -->
+  <div class="section">
+    <div class="section-title">核心经营指标</div>
+    <div class="kpi-grid" id="kpiGrid"></div>
+  </div>
+
+  <!-- 第二部分 + 第四部分 -->
+  <div class="row-2">
+    <div class="section">
+      <div class="section-title">销售类型完成进度</div>
+      <div class="chart-box">
+        <div class="ring-grid">
+          <div class="ring-card">
+            <div id="ring-brand" class="ring-chart"></div>
+            <div class="ring-label" style="color:#4facfe">品牌品</div>
+            <div class="ring-stats" id="ring-brand-stats"></div>
+          </div>
+          <div class="ring-card">
+            <div id="ring-trade" class="ring-chart"></div>
+            <div class="ring-label" style="color:#5ce0d8">商销品</div>
+            <div class="ring-stats" id="ring-trade-stats"></div>
+          </div>
+          <div class="ring-card">
+            <div id="ring-agent" class="ring-chart"></div>
+            <div class="ring-label" style="color:#a78bfa">代理品</div>
+            <div class="ring-stats" id="ring-agent-stats"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchTab('terminal', this)">终端销售排名</button>
+        <button class="tab-btn" onclick="switchTab('product', this)">产品销售排名</button>
+      </div>
+      <!-- 终端排名面板 -->
+      <div class="tab-panel active" id="panel-terminal">
+        <div class="table-wrap">
+          <table class="terminal-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>终端名称</th>
+                <th>终端等级</th>
+                <th>在销产品数</th>
+                <th>目标销售金额</th>
+                <th>累计销售金额</th>
+                <th>完成率</th>
+              </tr>
+            </thead>
+            <tbody id="terminalTbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- 产品排名面板 -->
+      <div class="tab-panel" id="panel-product">
+        <div class="table-wrap">
+          <table class="terminal-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>产品名称</th>
+                <th>在销终端数</th>
+                <th>目标金额</th>
+                <th>累计销售金额</th>
+                <th>完成率</th>
+              </tr>
+            </thead>
+            <tbody id="productTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 下钻弹窗 -->
+<div class="drill-overlay" id="drillOverlay">
+  <div class="drill-panel">
+    <div class="drill-header">
+      <h3 id="drillTitle">终端详情</h3>
+      <button class="drill-close" onclick="closeDrill()">✕</button>
+    </div>
+    <div class="drill-body">
+      <table class="drill-table">
+        <thead>
+          <tr>
+            <th>药品名称</th>
+            <th>分类</th>
+            <th>目标金额</th>
+            <th>累计销售金额</th>
+            <th>金额完成率</th>
+            <th>目标量</th>
+            <th>累计完成量</th>
+            <th>累计完成率</th>
+            <th>费用率</th>
+          </tr>
+        </thead>
+        <tbody id="drillTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- 产品下钻弹窗 -->
+<div class="drill-overlay" id="drugDrillOverlay">
+  <div class="drill-panel">
+    <div class="drill-header">
+      <h3 id="drugDrillTitle">产品终端明细</h3>
+      <button class="drill-close" onclick="closeDrugDrill()">✕</button>
+    </div>
+    <div class="drill-body">
+      <table class="drill-table">
+        <thead>
+          <tr>
+            <th>终端名称</th>
+            <th>等级</th>
+            <th>目标量</th>
+            <th>累计完成量</th>
+            <th>累计完成率</th>
+            <th>完成率</th>
+          </tr>
+        </thead>
+        <tbody id="drugDrillTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ DATA ============
+const salesData = [{"t": "重庆市中医院", "cat": "商销品", "drug": "硫酸氢氯吡格雷片", "target_qty": 560226.0, "cur_qty": 0.0, "fee": 0.5, "target_amt": 435112.9914601768, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "阿托伐他汀钙片", "target_qty": 208250.4, "cur_qty": 0.0, "fee": 0.45, "target_amt": 25886.49883691532, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "瑞舒伐他汀钙片", "target_qty": 364089.6, "cur_qty": 0.0, "fee": 0.2, "target_amt": 59280.01614159302, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "苯磺酸氨氯地平片", "target_qty": 1112869.2, "cur_qty": 0.0, "fee": 0.2, "target_amt": 82533.10928571426, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "阿卡波糖片", "target_qty": 3404437.1999999997, "cur_qty": null, "fee": 0.04, "target_amt": 434186.2540513274, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "氯化钾缓释片", "target_qty": 302284.8, "cur_qty": 0.0, "fee": 0.4, "target_amt": 70776.1070442478, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "富马酸替诺福韦二吡呋酯片", "target_qty": 170956.8, "cur_qty": 0.0, "fee": 0.0, "target_amt": 49776.66945132738, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "丙泊酚中/长链脂肪乳注射液", "target_qty": 14064.0, "cur_qty": 0.0, "fee": 0.2, "target_amt": 90569.67079646018, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "注射用艾司奥美拉唑钠", "target_qty": 51585.6, "cur_qty": 0.0, "fee": 0.5, "target_amt": 130105.27433628318, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "硫辛酸注射液", "target_qty": 3819.6, "cur_qty": null, "fee": 0.45, "target_amt": 19491.790619469026, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "丙泊酚中/长链脂肪乳注射液", "target_qty": 14064.0, "cur_qty": 0.0, "fee": 0.2, "target_amt": 90569.67079646018, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "注射用艾司奥美拉唑钠", "target_qty": 51585.6, "cur_qty": 0.0, "fee": 0.5, "target_amt": 130105.27433628318, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "琥珀酸美托洛尔缓释片", "target_qty": 1134552.0, "cur_qty": null, "fee": 0.4, "target_amt": 411417.33734513243, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "注射用美罗培南", "target_qty": 38830.2, "cur_qty": null, "fee": 0.45, "target_amt": 303597.1831858407, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "注射用伏立康唑", "target_qty": 1183.2, "cur_qty": null, "fee": 0.5, "target_amt": 34964.60707964602, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "商销品", "drug": "恩替卡韦片", "target_qty": 3000.0, "cur_qty": 0.0, "fee": null, "target_amt": 416.9911504424771, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "商销品", "drug": "阿托伐他汀钙片", "target_qty": 2769273.6, "cur_qty": 0.0, "fee": 0.45, "target_amt": 344233.6620986097, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "商销品", "drug": "恩替卡韦片", "target_qty": 2622374.4, "cur_qty": 222750.0, "fee": 0.0, "target_amt": 364502.3059823002, "cur_amt": 35539.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "商销品", "drug": "阿卡波糖片", "target_qty": 1374912.0, "cur_qty": 135000.0, "fee": 0.04, "target_amt": 175349.94945132744, "cur_amt": 19763.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "商销品", "drug": "氯化钾缓释片", "target_qty": 340255.2, "cur_qty": 0.0, "fee": 0.4, "target_amt": 79666.38897345134, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "商销品", "drug": "富马酸替诺福韦二吡呋酯片", "target_qty": 46910.4, "cur_qty": 115200.0, "fee": 0.0, "target_amt": 13658.675610619457, "cur_amt": 38501.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "商销品", "drug": "硫辛酸注射液", "target_qty": 8950.8, "cur_qty": null, "fee": 0.45, "target_amt": 45676.80371681416, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "商销品", "drug": "富马酸丙酚替诺福韦片", "target_qty": 2004232.8, "cur_qty": 0.0, "fee": 0.0, "target_amt": 722292.3928495581, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "商销品", "drug": "琥珀酸美托洛尔缓释片", "target_qty": 843818.4, "cur_qty": null, "fee": 0.4, "target_amt": 305989.9584424776, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "商销品", "drug": "注射用二氯醋酸二异丙胺", "target_qty": 54000.0, "cur_qty": 11400.0, "fee": null, "target_amt": 340116.45769911504, "cur_amt": 233586.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "商销品", "drug": "氯化钾颗粒", "target_qty": 6300.0, "cur_qty": 0.0, "fee": null, "target_amt": 1721.3495575221239, "cur_amt": 0.0, "lv": "三甲"}, {"t": "陆军军医大学第一附属医院", "cat": "商销品", "drug": "阿托伐他汀钙片", "target_qty": 2245540.8, "cur_qty": 0.0, "fee": 0.45, "target_amt": 279131.22523388144, "cur_amt": 0.0, "lv": "三甲"}, {"t": "陆军军医大学第一附属医院", "cat": "商销品", "drug": "苯磺酸氨氯地平片", "target_qty": 389671.2, "cur_qty": 84000.0, "fee": 0.2, "target_amt": 28898.97189633375, "cur_amt": 18840.0, "lv": "三甲"}, {"t": "陆军军医大学第一附属医院", "cat": "商销品", "drug": "恩替卡韦片", "target_qty": 796500.0, "cur_qty": 0.0, "fee": null, "target_amt": 110711.15044247766, "cur_amt": 0.0, "lv": "三甲"}, {"t": "陆军军医大学第一附属医院", "cat": "商销品", "drug": "雷贝拉唑钠肠溶片", "target_qty": 272400.0, "cur_qty": 58050.0, "fee": null, "target_amt": 68244.63716814159, "cur_amt": 14543.0, "lv": "三甲"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "商销品", "drug": "阿托伐他汀钙片", "target_qty": 483840.0, "cur_qty": 0.0, "fee": 0.45, "target_amt": 60143.575221239, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "商销品", "drug": "瑞舒伐他汀钙片", "target_qty": 53668.8, "cur_qty": 0.0, "fee": 0.2, "target_amt": 8738.198867256653, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "商销品", "drug": "瑞舒伐他汀钙片", "target_qty": 22994.4, "cur_qty": 0.0, "fee": 0.2, "target_amt": 3743.881734513281, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "商销品", "drug": "苯磺酸氨氯地平片", "target_qty": 144748.8, "cur_qty": 34020.0, "fee": 0.2, "target_amt": 10734.926017699112, "cur_amt": 11567.0, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "商销品", "drug": "氯化钾缓释片", "target_qty": 186624.0, "cur_qty": 0.0, "fee": 0.4, "target_amt": 43695.61486725664, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "商销品", "drug": "中/长链脂肪乳注射液（C6~24）", "target_qty": 3710.4, "cur_qty": 0.0, "fee": 0.45, "target_amt": 106651.01522123895, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "商销品", "drug": "注射用伏立康唑", "target_qty": 2371.2, "cur_qty": null, "fee": 0.5, "target_amt": 70071.05840707965, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "商销品", "drug": "注射用二氯醋酸二异丙胺", "target_qty": 22500.0, "cur_qty": 7800.0, "fee": null, "target_amt": 141715.19070796462, "cur_amt": 159822.0, "lv": "三级"}, {"t": "重庆大学附属三峡医院", "cat": "商销品", "drug": "阿托伐他汀钙片", "target_qty": 4189840.8, "cur_qty": 0.0, "fee": 0.45, "target_amt": 520816.8099367894, "cur_amt": 0.0, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "商销品", "drug": "氯化钾缓释片", "target_qty": 170698.8, "cur_qty": 0.0, "fee": 0.4, "target_amt": 39966.93363716814, "cur_amt": 0.0, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "商销品", "drug": "盐酸二甲双胍缓释片", "target_qty": 2354688.0, "cur_qty": null, "fee": 0.35, "target_amt": 231613.7798230089, "cur_amt": 0.0, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "商销品", "drug": "注射用水溶性维生素", "target_qty": 18000.0, "cur_qty": 7500.0, "fee": null, "target_amt": 37290.77203539823, "cur_amt": 44175.0, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "商销品", "drug": "注射用拉氧头孢钠", "target_qty": 8110.0, "cur_qty": 12600.0, "fee": null, "target_amt": 53102.25716504425, "cur_amt": 97776.0, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "商销品", "drug": "阿魏酸钠", "target_qty": 67000.0, "cur_qty": 0.0, "fee": null, "target_amt": 531968.7878761062, "cur_amt": 0.0, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "商销品", "drug": "阿卡波糖片", "target_qty": 0.0, "cur_qty": 180000.0, "fee": null, "target_amt": 0.0, "cur_amt": 22956.0, "lv": "二级"}, {"t": "重庆医科大学附属第一医院", "cat": "商销品", "drug": "苯磺酸氨氯地平片", "target_qty": 1810606.8, "cur_qty": 336000.0, "fee": null, "target_amt": 134279.0409671302, "cur_amt": 79200.0, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "商销品", "drug": "富马酸替诺福韦二吡呋酯片", "target_qty": 351998.4, "cur_qty": 139050.0, "fee": 0.0, "target_amt": 102489.6816283185, "cur_amt": 47972.0, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "商销品", "drug": "注射用美罗培南", "target_qty": 91192.8, "cur_qty": null, "fee": 0.45, "target_amt": 712998.5734513276, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "商销品", "drug": "注射用水溶性维生素", "target_qty": 15700.0, "cur_qty": 3300.0, "fee": null, "target_amt": 32525.840053097345, "cur_amt": 7260.0, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "商销品", "drug": "注射用二氯醋酸二异丙胺", "target_qty": 30900.0, "cur_qty": 7650.0, "fee": null, "target_amt": 194622.19523893806, "cur_amt": 156748.0, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "商销品", "drug": "阿魏酸钠", "target_qty": 4600.0, "cur_qty": 1500.0, "fee": null, "target_amt": 36523.23021238938, "cur_amt": 17610.0, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "商销品", "drug": "注射用二氯醋酸二异丙胺", "target_qty": 360.0, "cur_qty": 0.0, "fee": null, "target_amt": 2267.4430513274337, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "商销品", "drug": "阿魏酸钠", "target_qty": 4150.0, "cur_qty": 0.0, "fee": null, "target_amt": 32950.30551769911, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "商销品", "drug": "富马酸替诺福韦二吡呋酯片", "target_qty": 12300.0, "cur_qty": 0.0, "fee": null, "target_amt": 3581.3318584070767, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "商销品", "drug": "苯磺酸氨氯地平片", "target_qty": 243600.0, "cur_qty": 0.0, "fee": null, "target_amt": 18065.97345132743, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属儿童医院", "cat": "商销品", "drug": "恩替卡韦片", "target_qty": 40867.2, "cur_qty": 0.0, "fee": 0.0, "target_amt": 5680.4202477876, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "商销品", "drug": "中/长链脂肪乳注射液（C6~24）", "target_qty": 1660.8, "cur_qty": 0.0, "fee": 0.45, "target_amt": 47737.711858407085, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "商销品", "drug": "注射用奥美拉唑钠", "target_qty": 23846.4, "cur_qty": 0.0, "fee": 0.3, "target_amt": 20047.85840707965, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "商销品", "drug": "注射用伏立康唑", "target_qty": 4771.2, "cur_qty": null, "fee": 0.5, "target_amt": 140993.18230088495, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "商销品", "drug": "注射用水溶性维生素", "target_qty": 46000.0, "cur_qty": 6000.0, "fee": null, "target_amt": 95298.63964601769, "cur_amt": 13200.0, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "商销品", "drug": "注射用拉氧头孢钠", "target_qty": 4100.0, "cur_qty": 2250.0, "fee": null, "target_amt": 26845.777358407082, "cur_amt": 17460.0, "lv": "三甲"}, {"t": "中国人民解放军陆军军医大学第二附属医院", "cat": "商销品", "drug": "注射用艾司奥美拉唑钠", "target_qty": 61690.8, "cur_qty": 0.0, "fee": 0.5, "target_amt": 155591.8407079646, "cur_amt": 0.0, "lv": "三甲"}, {"t": "中国人民解放军陆军军医大学第二附属医院", "cat": "商销品", "drug": "注射用艾司奥美拉唑钠", "target_qty": 61690.8, "cur_qty": 0.0, "fee": 0.5, "target_amt": 155591.8407079646, "cur_amt": 0.0, "lv": "三甲"}, {"t": "中国人民解放军陆军军医大学第二附属医院", "cat": "商销品", "drug": "拉米夫定", "target_qty": 490.0, "cur_qty": 0.0, "fee": null, "target_amt": 1932.4882345132746, "cur_amt": 0.0, "lv": "三甲"}, {"t": "中国人民解放军陆军特色医学中心", "cat": "商销品", "drug": "苯磺酸氨氯地平片", "target_qty": 112000.0, "cur_qty": 0.0, "fee": null, "target_amt": 8306.194690265485, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "品牌品", "drug": "盐酸舍曲林片", "target_qty": 39352.8, "cur_qty": 0.0, "fee": 0.4, "target_amt": 24085.306619469033, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "品牌品", "drug": "盐酸度洛西汀肠溶胶囊", "target_qty": 163584.0, "cur_qty": 44400.0, "fee": 0.0, "target_amt": 66150.18477876106, "cur_amt": 17937.600000000002, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "品牌品", "drug": "左氧氟沙星片", "target_qty": 168000.0, "cur_qty": 21600.0, "fee": 0.25, "target_amt": 1169458.407079646, "cur_amt": 149472.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "品牌品", "drug": "谷胱甘肽片0.1g", "target_qty": 1296000.0, "cur_qty": 518400.0, "fee": 0.28, "target_amt": 1636406.442477876, "cur_amt": 664948.6701696, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "品牌品", "drug": "注射用谷胱甘肽", "target_qty": 48999.96, "cur_qty": 12000.0, "fee": 0.28, "target_amt": 401235.9556460177, "cur_amt": 99840.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "品牌品", "drug": "阿法骨化醇片", "target_qty": 972000.0, "cur_qty": 324000.0, "fee": null, "target_amt": 544806.0, "cur_amt": 184463.892, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "品牌品", "drug": "炎琥宁80mg", "target_qty": 41690.0, "cur_qty": 5500.0, "fee": 0.2854, "target_amt": 149309.23008849556, "cur_amt": 20004.6, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "品牌品", "drug": "硫酸异帕米星注射液", "target_qty": 3600.0, "cur_qty": 610.0, "fee": 0.315, "target_amt": 187040.70796460175, "cur_amt": 31695.600000000002, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "代理品", "drug": "前列地尔干乳剂", "target_qty": 6500.0, "cur_qty": null, "fee": 0.54, "target_amt": 584165.9292035399, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "代理品", "drug": "甲苯磺酸索拉非尼片", "target_qty": 18201.6, "cur_qty": 6000.0, "fee": 0.25, "target_amt": 135981.8563106796, "cur_amt": 27720.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "代理品", "drug": "注射用培美曲塞二钠", "target_qty": null, "cur_qty": null, "fee": 0.5, "target_amt": 0.0, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第二医院", "cat": "代理品", "drug": "注射用培美曲塞二钠", "target_qty": null, "cur_qty": null, "fee": 0.5, "target_amt": 0.0, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "品牌品", "drug": "盐酸舍曲林片", "target_qty": 66232.8, "cur_qty": 0.0, "fee": 0.4, "target_amt": 40536.81812389381, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "品牌品", "drug": "谷胱甘肽片0.1g", "target_qty": 1382400.0, "cur_qty": 362880.0, "fee": 0.28, "target_amt": 1745500.2053097347, "cur_amt": 465464.06911872, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "品牌品", "drug": "依匹斯汀10mg", "target_qty": 168000.0, "cur_qty": 63000.0, "fee": 0.45, "target_amt": 485861.94690265483, "cur_amt": 188790.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "品牌品", "drug": "注射用谷胱甘肽", "target_qty": 122000.04, "cur_qty": 30000.0, "fee": 0.28, "target_amt": 998996.7877168141, "cur_amt": 249600.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "品牌品", "drug": "阿法骨化醇片", "target_qty": 1044000.0, "cur_qty": 324000.0, "fee": null, "target_amt": 585162.0, "cur_amt": 172035.252, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "品牌品", "drug": "炎琥宁80mg", "target_qty": 230.0, "cur_qty": null, "fee": null, "target_amt": 823.7256637168141, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "品牌品", "drug": "盐酸度洛西汀肠溶胶囊", "target_qty": 192000.0, "cur_qty": 57600.0, "fee": 0.0, "target_amt": 77641.06194690266, "cur_amt": 23270.4, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "代理品", "drug": "前列地尔干乳剂", "target_qty": 2400.0, "cur_qty": null, "fee": 0.54, "target_amt": 215692.03539823013, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆市中医院", "cat": "代理品", "drug": "甲苯磺酸索拉非尼片", "target_qty": 4424.4, "cur_qty": 60.0, "fee": 0.25, "target_amt": 33054.13398058252, "cur_amt": 277.2, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "品牌品", "drug": "盐酸舍曲林片", "target_qty": 19200.0, "cur_qty": 0.0, "fee": 0.4, "target_amt": 11751.0796460177, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "品牌品", "drug": "左氧氟沙星注射液", "target_qty": 30.0, "cur_qty": 0.0, "fee": null, "target_amt": 2120.0973451327436, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "品牌品", "drug": "谷胱甘肽片0.1g", "target_qty": 648000.0, "cur_qty": 103680.0, "fee": null, "target_amt": 818203.221238938, "cur_amt": 132989.73403392002, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "品牌品", "drug": "注射用谷胱甘肽", "target_qty": 39999.96, "cur_qty": null, "fee": 0.33, "target_amt": 327539.49546902656, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "品牌品", "drug": "阿法骨化醇片", "target_qty": 7200.0, "cur_qty": 0.0, "fee": null, "target_amt": 4035.6, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "品牌品", "drug": "炎琥宁80mg", "target_qty": 2150.0, "cur_qty": null, "fee": null, "target_amt": 7700.04424778761, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属儿童医院", "cat": "代理品", "drug": "前列地尔干乳剂", "target_qty": 2200.0, "cur_qty": null, "fee": 0.54, "target_amt": 197717.6991150443, "cur_amt": 0.0, "lv": "三甲"}, {"t": "中国人民解放军陆军军医大学第二附属医院", "cat": "品牌品", "drug": "盐酸度洛西汀肠溶胶囊", "target_qty": 162144.0, "cur_qty": 84600.0, "fee": 0.0, "target_amt": 65567.87681415929, "cur_amt": 34178.4, "lv": "三甲"}, {"t": "中国人民解放军陆军军医大学第二附属医院", "cat": "品牌品", "drug": "左氧氟沙星注射液", "target_qty": 2400.0, "cur_qty": 270.0, "fee": 0.45, "target_amt": 169607.7876106195, "cur_amt": 18981.0, "lv": "三甲"}, {"t": "中国人民解放军陆军军医大学第二附属医院", "cat": "品牌品", "drug": "左氧氟沙星片", "target_qty": 28800.0, "cur_qty": 1080.0, "fee": 0.35, "target_amt": 200478.58407079644, "cur_amt": 7473.6, "lv": "三甲"}, {"t": "中国人民解放军陆军军医大学第二附属医院", "cat": "品牌品", "drug": "谷胱甘肽片0.1g", "target_qty": 1944000.0, "cur_qty": 794880.0, "fee": 0.28, "target_amt": 2454609.6637168145, "cur_amt": 1019587.96092672, "lv": "三甲"}, {"t": "中国人民解放军陆军军医大学第二附属医院", "cat": "品牌品", "drug": "阿法骨化醇片", "target_qty": 198000.0, "cur_qty": 0.0, "fee": null, "target_amt": 110979.0, "cur_amt": 0.0, "lv": "三甲"}, {"t": "中国人民解放军陆军军医大学第二附属医院", "cat": "品牌品", "drug": "注射用谷胱甘肽", "target_qty": 153780.0, "cur_qty": 31499.0, "fee": 0.28, "target_amt": 1718185.3008849558, "cur_amt": 238132.43999999997, "lv": "三甲"}, {"t": "中国人民解放军陆军军医大学第二附属医院", "cat": "代理品", "drug": "甲苯磺酸索拉非尼片", "target_qty": 28063.2, "cur_qty": 7200.0, "fee": 0.2, "target_amt": 209656.62524271844, "cur_amt": 33264.0, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "品牌品", "drug": "盐酸度洛西汀肠溶胶囊", "target_qty": 931899.6, "cur_qty": 371700.0, "fee": 0.0, "target_amt": 376842.0550619469, "cur_amt": 357575.39999999997, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "品牌品", "drug": "左氧氟沙星片", "target_qty": 24000.0, "cur_qty": 500.0, "fee": 0.4, "target_amt": 167065.4867256637, "cur_amt": 3460.0, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "品牌品", "drug": "谷胱甘肽片0.1g", "target_qty": 1425600.0, "cur_qty": 396000.0, "fee": null, "target_amt": 1800047.0867256639, "cur_amt": 507946.900824, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "品牌品", "drug": "依匹斯汀10mg", "target_qty": 600000.0, "cur_qty": 106440.0, "fee": 0.43, "target_amt": 1735221.2389380531, "cur_amt": 318965.2, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "品牌品", "drug": "注射用谷胱甘肽", "target_qty": 52950.0, "cur_qty": null, "fee": 0.33, "target_amt": 433580.8407079646, "cur_amt": 0.0, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "品牌品", "drug": "阿法骨化醇片", "target_qty": 3960000.0, "cur_qty": 1102500.0, "fee": null, "target_amt": 2219580.0, "cur_amt": 585397.7325, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "品牌品", "drug": "炎琥宁80mg", "target_qty": 1980.0, "cur_qty": 1000.0, "fee": null, "target_amt": 7091.203539823008, "cur_amt": 2637.1699999999996, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "代理品", "drug": "前列地尔干乳剂", "target_qty": 4460.0, "cur_qty": null, "fee": 0.66, "target_amt": 400827.6991150443, "cur_amt": 0, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院", "cat": "代理品", "drug": "甲苯磺酸索拉非尼片", "target_qty": 15529.2, "cur_qty": 1200.0, "fee": 0.25, "target_amt": 116016.6932038835, "cur_amt": 5544.0, "lv": "三甲"}, {"t": "中国人民解放军陆军特色医学中心", "cat": "品牌品", "drug": "盐酸度洛西汀肠溶胶囊", "target_qty": 481075.2, "cur_qty": 151200.0, "fee": 0.0, "target_amt": 194537.4448141593, "cur_amt": 145454.4, "lv": "三甲"}, {"t": "中国人民解放军陆军特色医学中心", "cat": "品牌品", "drug": "左氧氟沙星片", "target_qty": 28800.0, "cur_qty": 4820.0, "fee": 0.25, "target_amt": 200478.58407079644, "cur_amt": 33354.4, "lv": "三甲"}, {"t": "中国人民解放军陆军特色医学中心", "cat": "品牌品", "drug": "谷胱甘肽片0.1g", "target_qty": 993600.0, "cur_qty": 267840.0, "fee": 0.28, "target_amt": 1254578.2725663718, "cur_amt": 343556.81292096, "lv": "三甲"}, {"t": "中国人民解放军陆军特色医学中心", "cat": "品牌品", "drug": "阿法骨化醇片", "target_qty": 1692000.0, "cur_qty": 418470.0, "fee": null, "target_amt": 948366.0, "cur_amt": 238248.78050999998, "lv": "三甲"}, {"t": "中国人民解放军陆军特色医学中心", "cat": "品牌品", "drug": "注射用谷胱甘肽", "target_qty": 11640.0, "cur_qty": 3600.0, "fee": 0.28, "target_amt": 95314.08849557523, "cur_amt": 27216.0, "lv": "三甲"}, {"t": "中国人民解放军陆军特色医学中心", "cat": "代理品", "drug": "甲苯磺酸索拉非尼片", "target_qty": 9390.0, "cur_qty": 2400.0, "fee": 0.25, "target_amt": 70151.50485436893, "cur_amt": 11088.0, "lv": "三甲"}, {"t": "重庆大学附属三峡医院", "cat": "品牌品", "drug": "盐酸度洛西汀肠溶胶囊", "target_qty": 298598.4, "cur_qty": 100740.0, "fee": 0.0, "target_amt": 120747.37953982301, "cur_amt": 40698.96, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "品牌品", "drug": "阿立哌唑口崩片", "target_qty": 7581.6, "cur_qty": 0.0, "fee": 0.35, "target_amt": 2482.638530973452, "cur_amt": 0.0, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "品牌品", "drug": "谷胱甘肽片0.1g", "target_qty": 2160000.0, "cur_qty": 209520.0, "fee": 0.3, "target_amt": 2727344.0707964604, "cur_amt": 268750.08752688003, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "品牌品", "drug": "依匹斯汀10mg", "target_qty": 43200.0, "cur_qty": 19176.0, "fee": 0.4, "target_amt": 124935.92920353982, "cur_amt": 56105.78, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "品牌品", "drug": "阿法骨化醇片", "target_qty": 288000.0, "cur_qty": 108000.0, "fee": 0.28, "target_amt": 161424.0, "cur_amt": 61487.964, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "品牌品", "drug": "盐酸度洛西汀肠溶胶囊", "target_qty": 0.0, "cur_qty": 0.0, "fee": 0.0, "target_amt": 0.0, "cur_amt": 0.0, "lv": "二级"}, {"t": "重庆大学附属三峡医院", "cat": "代理品", "drug": "甲苯磺酸索拉非尼片", "target_qty": 1500.0, "cur_qty": null, "fee": 0.25, "target_amt": 11206.31067961165, "cur_amt": 0.0, "lv": "二级"}, {"t": "陆军军医大学第一附属医院", "cat": "品牌品", "drug": "谷胱甘肽片0.1g", "target_qty": 1944000.0, "cur_qty": 414720.0, "fee": 0.28, "target_amt": 2454609.6637168145, "cur_amt": 531958.9361356801, "lv": "三甲"}, {"t": "陆军军医大学第一附属医院", "cat": "品牌品", "drug": "阿法骨化醇片", "target_qty": 3600000.0, "cur_qty": 863970.0, "fee": null, "target_amt": 2017800.0, "cur_amt": 491886.63201, "lv": "三甲"}, {"t": "陆军军医大学第一附属医院", "cat": "品牌品", "drug": "注射用谷胱甘肽", "target_qty": 89100.0, "cur_qty": 21600.0, "fee": 0.28, "target_amt": 729594.9557522124, "cur_amt": 163296.0, "lv": "三甲"}, {"t": "陆军军医大学第一附属医院", "cat": "品牌品", "drug": "炎琥宁80mg", "target_qty": 17520.0, "cur_qty": null, "fee": 0.2854, "target_amt": 62746.407079646015, "cur_amt": 0.0, "lv": "三甲"}, {"t": "陆军军医大学第一附属医院", "cat": "品牌品", "drug": "盐酸度洛西汀肠溶胶囊", "target_qty": 0.0, "cur_qty": 0.0, "fee": 0.0, "target_amt": 0.0, "cur_amt": 0.0, "lv": "三甲"}, {"t": "陆军军医大学第一附属医院", "cat": "品牌品", "drug": "硫酸异帕米星注射液", "target_qty": 240.0, "cur_qty": 0.0, "fee": 0.315, "target_amt": 12469.38053097345, "cur_amt": 0.0, "lv": "三甲"}, {"t": "陆军军医大学第一附属医院", "cat": "代理品", "drug": "前列地尔干乳剂", "target_qty": 1800.0, "cur_qty": null, "fee": 0.57, "target_amt": 161769.02654867258, "cur_amt": 0.0, "lv": "三甲"}, {"t": "陆军军医大学第一附属医院", "cat": "代理品", "drug": "甲苯磺酸索拉非尼片", "target_qty": 16500.0, "cur_qty": 8400.0, "fee": 0.25, "target_amt": 123269.41747572814, "cur_amt": 38808.0, "lv": "三甲"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "品牌品", "drug": "左氧氟沙星片", "target_qty": 24960.0, "cur_qty": 0.0, "fee": 0.25, "target_amt": 173748.10619469025, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "品牌品", "drug": "谷胱甘肽片0.1g", "target_qty": 259200.0, "cur_qty": 0.0, "fee": null, "target_amt": 327281.28849557525, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "品牌品", "drug": "依匹斯汀10mg", "target_qty": 38400.0, "cur_qty": 0.0, "fee": 0.43, "target_amt": 111054.15929203539, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "品牌品", "drug": "注射用谷胱甘肽", "target_qty": 6000.0, "cur_qty": 0.0, "fee": null, "target_amt": 34393.19469026549, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "品牌品", "drug": "阿法骨化醇片", "target_qty": 288000.0, "cur_qty": 0.0, "fee": null, "target_amt": 161424.0, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "品牌品", "drug": "炎琥宁80mg", "target_qty": 8780.0, "cur_qty": null, "fee": null, "target_amt": 31444.831858407077, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "品牌品", "drug": "盐酸度洛西汀肠溶胶囊", "target_qty": 0.0, "cur_qty": 0.0, "fee": 0.0, "target_amt": 0.0, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "品牌品", "drug": "盐酸度洛西汀肠溶胶囊", "target_qty": 0.0, "cur_qty": 0.0, "fee": 0.0, "target_amt": 0.0, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆医科大学附属第一医院第一分院", "cat": "代理品", "drug": "甲苯磺酸索拉非尼片", "target_qty": 1500.0, "cur_qty": null, "fee": 0.25, "target_amt": 11206.31067961165, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "品牌品", "drug": "谷胱甘肽片0.1g", "target_qty": 432000.0, "cur_qty": 82080.0, "fee": 0.28, "target_amt": 545468.814159292, "cur_amt": 105283.53944352, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "品牌品", "drug": "阿法骨化醇片", "target_qty": 36000.0, "cur_qty": 5400.0, "fee": null, "target_amt": 20178.0, "cur_amt": 3074.3982, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "品牌品", "drug": "注射用谷胱甘肽", "target_qty": 34080.0, "cur_qty": 0.0, "fee": 0.28, "target_amt": 445814.65486725664, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "品牌品", "drug": "炎琥宁80mg", "target_qty": 120.0, "cur_qty": null, "fee": null, "target_amt": 429.7699115044248, "cur_amt": 0.0, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "代理品", "drug": "甲苯磺酸索拉非尼片", "target_qty": 18000.0, "cur_qty": 750.0, "fee": 0.25, "target_amt": 134475.7281553398, "cur_amt": 3465.0, "lv": "三级"}, {"t": "重庆大学附属肿瘤医院（重庆市肿瘤研究所、重庆市肿瘤医院、重庆市癌症中心）", "cat": "代理品", "drug": "亚叶酸钙注射液", "target_qty": 10000.0, "cur_qty": 2800.0, "fee": 0.54, "target_amt": 221359.22330097086, "cur_amt": 55608.0, "lv": "三级"}, {"t": "重庆市中医院(道门口部）", "cat": "品牌品", "drug": "依匹斯汀10mg", "target_qty": 1200000.0, "cur_qty": 306000.0, "fee": 0.45, "target_amt": 3470442.4778761063, "cur_amt": 916980.0, "lv": "三甲"}, {"t": "重庆市中医院(道门口部）", "cat": "品牌品", "drug": "盐酸度洛西汀肠溶胶囊", "target_qty": 28000.0, "cur_qty": 8400.0, "fee": 0.0, "target_amt": 11322.654867256637, "cur_amt": 3393.6000000000004, "lv": "三甲"}];
+
+const TARGET_TERMINAL_COUNT = 11;
+
+// ============ CALCULATIONS ============
+const totalTarget = salesData.reduce((s, r) => s + r.target_amt, 0);
+const totalCurrent = salesData.reduce((s, r) => s + r.cur_amt, 0);
+const totalFee = 11602190.34;
+const completionRate = totalTarget > 0 ? (totalCurrent / totalTarget * 100) : 0;
+const activeTerminals = [...new Set(salesData.map(r => r.t))].length;
+const coverageRate = TARGET_TERMINAL_COUNT > 0 ? (activeTerminals / TARGET_TERMINAL_COUNT * 100) : 0;
+
+// By category
+const catMap = {};
+salesData.forEach(r => {
+  if (!catMap[r.cat]) catMap[r.cat] = { target: 0, current: 0 };
+  catMap[r.cat].target += r.target_amt;
+  catMap[r.cat].current += r.cur_amt;
+});
+
+// Terminal summary
+const termMap = {};
+salesData.forEach(r => {
+  if (!termMap[r.t]) termMap[r.t] = { target: 0, current: 0, drugs: new Set(), lv: r.lv, cats: new Set() };
+  termMap[r.t].target += r.target_amt;
+  termMap[r.t].current += r.cur_amt;
+  termMap[r.t].drugs.add(r.drug);
+  termMap[r.t].cats.add(r.cat);
+});
+const termList = Object.entries(termMap)
+  .map(([t, v]) => ({ name: t, ...v, drugCount: v.drugs.size, catList: [...v.cats] }))
+  .sort((a, b) => b.target - a.target);
+
+// ============ RENDER KPI ============
+function fmtWan(v) {
+  if (v >= 10000) return (v / 10000).toFixed(1) + '<span class="kpi-unit">万</span>';
+  return Math.round(v).toLocaleString();
+}
+function fmtPct(v) { return v.toFixed(1) + '<span class="kpi-unit">%</span>'; }
+
+document.getElementById('kpiGrid').innerHTML = `
+  <div class="kpi-card accent-blue">
+    <div class="kpi-label">销售目标金额</div>
+    <div class="kpi-value">${fmtWan(totalTarget)}</div>
+  </div>
+  <div class="kpi-card accent-green">
+    <div class="kpi-label">当前完成金额</div>
+    <div class="kpi-value">${fmtWan(totalCurrent)}</div>
+  </div>
+  <div class="kpi-card accent-orange">
+    <div class="kpi-label">完成率</div>
+    <div class="kpi-value">${fmtPct(completionRate)}</div>
+  </div>
+  <div class="kpi-card accent-purple">
+    <div class="kpi-label">目标终端数</div>
+    <div class="kpi-value">${TARGET_TERMINAL_COUNT}<span class="kpi-unit">家</span></div>
+  </div>
+  <div class="kpi-card accent-cyan">
+    <div class="kpi-label">在销终端数</div>
+    <div class="kpi-value">${activeTerminals}<span class="kpi-unit">家</span></div>
+  </div>
+  <div class="kpi-card accent-green">
+    <div class="kpi-label">终端覆盖率</div>
+    <div class="kpi-value">${fmtPct(coverageRate)}</div>
+  </div>
+  <div class="kpi-card accent-pink">
+    <div class="kpi-label">26年预估销售费用</div>
+    <div class="kpi-value">${fmtWan(totalFee)}</div>
+  </div>
+`;
+
+// ============ RENDER 3 RING CHARTS ============
+const catConfig = [
+  { key: '品牌品', chartId: 'ring-brand', statsId: 'ring-brand-stats', color: '#4facfe', bgColor: 'rgba(79,172,254,0.12)' },
+  { key: '商销品', chartId: 'ring-trade', statsId: 'ring-trade-stats', color: '#5ce0d8', bgColor: 'rgba(92,224,216,0.12)' },
+  { key: '代理品', chartId: 'ring-agent', statsId: 'ring-agent-stats', color: '#a78bfa', bgColor: 'rgba(167,139,250,0.12)' }
+];
+
+const ringCharts = [];
+catConfig.forEach(cfg => {
+  const d = catMap[cfg.key] || { target: 0, current: 0 };
+  const rate = d.target > 0 ? (d.current / d.target * 100) : 0;
+  const chart = echarts.init(document.getElementById(cfg.chartId));
+  ringCharts.push(chart);
+
+  chart.setOption({
+    series: [{
+      type: 'pie',
+      radius: ['62%', '82%'],
+      center: ['50%', '50%'],
+      silent: true,
+      label: {
+        show: true, position: 'center',
+        formatter: rate.toFixed(1) + '%',
+        fontSize: 22, fontWeight: 700, color: cfg.color,
+        fontFamily: '-apple-system, sans-serif'
+      },
+      emphasis: { disabled: true },
+      data: [
+        { value: d.current, itemStyle: { color: cfg.color } },
+        { value: d.target - d.current, itemStyle: { color: cfg.bgColor } }
+      ],
+      itemStyle: { borderRadius: 6 }
+    }]
+  });
+
+  document.getElementById(cfg.statsId).innerHTML =
+    `目标 ${(d.target / 10000).toFixed(1)}万 · 完成 ${(d.current / 10000).toFixed(1)}万`;
+});
+
+// ============ TAB SWITCHER ============
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+// ============ RENDER TABLE ============
+function getRateClass(rate) {
+  if (rate >= 25) return 'good';
+  if (rate >= 10) return 'mid';
+  return 'low';
+}
+function renderRate(rate) {
+  const cls = getRateClass(rate);
+  const w = Math.min(rate, 100);
+  return `<div class="progress-bar"><div class="fill fill-${cls}" style="width:${w}%"></div></div>
+          <span class="rate-${cls}">${rate.toFixed(1)}%</span>`;
+}
+
+const tbody = document.getElementById('terminalTbody');
+termList.forEach((t, i) => {
+  const rate = t.target > 0 ? (t.current / t.target * 100) : 0;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="color:#7b9bb8">${i + 1}</td>
+    <td style="font-weight:600;color:#e0e6ed;max-width:260px;overflow:hidden;text-overflow:ellipsis" title="${t.name}">${t.name}</td>
+    <td><span class="badge badge-brand">${t.lv}</span></td>
+    <td style="color:#c0d0e0">${t.drugCount}</td>
+    <td style="color:#c0d0e0">${(t.target / 10000).toFixed(1)}万</td>
+    <td style="color:#c0d0e0">${(t.current / 10000).toFixed(1)}万</td>
+    <td>${renderRate(rate)}</td>
+  `;
+  tr.onclick = () => openDrill(t.name);
+  tbody.appendChild(tr);
+});
+
+// ============ RENDER PRODUCT TABLE ============
+const drugMap = {};
+salesData.forEach(r => {
+  if (!drugMap[r.drug]) drugMap[r.drug] = { terminals: new Set(), target_amt: 0, cur_amt: 0 };
+  drugMap[r.drug].terminals.add(r.t);
+  drugMap[r.drug].target_amt += r.target_amt;
+  drugMap[r.drug].cur_amt += r.cur_amt;
+});
+const drugList = Object.entries(drugMap)
+  .map(([name, v]) => ({ name, termCount: v.terminals.size, target: v.target_amt, current: v.cur_amt }))
+  .sort((a, b) => b.target - a.target);
+
+const productTbody = document.getElementById('productTbody');
+drugList.forEach((d, i) => {
+  const rate = d.target > 0 ? (d.current / d.target * 100) : 0;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="color:#7b9bb8">${i + 1}</td>
+    <td style="font-weight:600;color:#e0e6ed;max-width:260px;overflow:hidden;text-overflow:ellipsis" title="${d.name}">${d.name}</td>
+    <td style="color:#c0d0e0">${d.termCount}</td>
+    <td style="color:#c0d0e0">${(d.target / 10000).toFixed(1)}万</td>
+    <td style="color:#c0d0e0">${(d.current / 10000).toFixed(1)}万</td>
+    <td>${renderRate(rate)}</td>
+  `;
+  tr.style.cursor = 'pointer';
+  tr.onclick = () => openDrugDrill(d.name);
+  productTbody.appendChild(tr);
+});
+
+// ============ DRILL DOWN ============
+function openDrill(terminalName) {
+  document.getElementById('drillTitle').textContent = terminalName + ' — 药品明细';
+  const drugs = salesData.filter(r => r.t === terminalName);
+  const drillTbody = document.getElementById('drillTbody');
+  drillTbody.innerHTML = '';
+  
+  drugs.sort((a, b) => b.target_amt - a.target_amt).forEach(r => {
+    const cplRate = r.target_qty > 0 ? (r.cur_qty / r.target_qty * 100) : 0;
+    const amtRate = r.target_amt > 0 ? (r.cur_amt / r.target_amt * 100) : 0;
+    const feeRate = r.fee != null ? (r.fee * 100).toFixed(1) + '%' : '-';
+    const catCls = r.cat === '品牌品' ? 'badge-brand' : r.cat === '商销品' ? 'badge-trade' : 'badge-agent';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:500;color:#e0e6ed">${r.drug}</td>
+      <td><span class="badge ${catCls}">${r.cat}</span></td>
+      <td style="color:#c0d0e0">${(r.target_amt / 10000).toFixed(2)}万</td>
+      <td style="color:#c0d0e0">${(r.cur_amt / 10000).toFixed(2)}万</td>
+      <td>${renderRate(amtRate)}</td>
+      <td style="color:#c0d0e0">${r.target_qty != null ? r.target_qty.toLocaleString() : '-'}</td>
+      <td style="color:#c0d0e0">${r.cur_qty != null ? r.cur_qty.toLocaleString() : '-'}</td>
+      <td>${renderRate(cplRate)}</td>
+      <td style="color:#c0d0e0">${feeRate}</td>
+    `;
+    drillTbody.appendChild(tr);
+  });
+
+  document.getElementById('drillOverlay').classList.add('active');
+}
+
+function closeDrill() {
+  document.getElementById('drillOverlay').classList.remove('active');
+}
+document.getElementById('drillOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeDrill();
+});
+
+// ============ DRILL DOWN: Drug -> Terminals ============
+function openDrugDrill(drugName) {
+  document.getElementById('drugDrillTitle').textContent = drugName + ' — 终端明细';
+  const rows = salesData.filter(r => r.drug === drugName);
+  const drugDrillTbody = document.getElementById('drugDrillTbody');
+  drugDrillTbody.innerHTML = '';
+
+  rows.forEach(r => {
+    const cplRate = r.target_qty > 0 ? (r.cur_qty / r.target_qty * 100) : 0;
+    const amtRate = r.target_amt > 0 ? (r.cur_amt / r.target_amt * 100) : 0;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:500;color:#e0e6ed;max-width:300px;overflow:hidden;text-overflow:ellipsis" title="${r.t}">${r.t}</td>
+      <td><span class="badge badge-brand">${r.lv}</span></td>
+      <td style="color:#c0d0e0">${r.target_qty != null ? r.target_qty.toLocaleString() : '-'}</td>
+      <td style="color:#c0d0e0">${r.cur_qty != null ? r.cur_qty.toLocaleString() : '-'}</td>
+      <td>${renderRate(cplRate)}</td>
+      <td>${renderRate(amtRate)}</td>
+    `;
+    drugDrillTbody.appendChild(tr);
+  });
+
+  document.getElementById('drugDrillOverlay').classList.add('active');
+}
+
+function closeDrugDrill() {
+  document.getElementById('drugDrillOverlay').classList.remove('active');
+}
+document.getElementById('drugDrillOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeDrugDrill();
+});
+
+window.addEventListener('resize', () => ringCharts.forEach(c => c.resize()));
+</script>
+</body>
+</html>
