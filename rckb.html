@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>荣昌公司销售看板</title>
+<title>重庆-荣昌公司销售看板</title>
+<meta property="og:title" content="重庆-荣昌公司销售看板">
+<meta property="og:description" content="荣昌公司2026年度销售数据看板，涵盖目标完成率、终端覆盖、产品进度等核心指标">
+<meta property="og:image" content="https://sharon-gbz.github.io/logo.png">
+<meta property="og:type" content="website">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <style>
   :root {
@@ -51,6 +55,7 @@
   .header-logo {
     width: 40px;
     height: 40px;
+    object-fit: contain;
   }
   .header-title {
     font-size: 20px;
@@ -410,16 +415,7 @@
 <!-- 顶栏 -->
 <div class="header">
   <div class="header-left">
-    <svg class="header-logo" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95"/>
-        <stop offset="100%" style="stop-color:#e3f2fd;stop-opacity:0.85"/>
-      </linearGradient>
-    </defs>
-    <polygon points="20,1 38,11 38,29 20,39 2,29 2,11" fill="url(#hg)"/>
-    <text x="20" y="20" text-anchor="middle" dominant-baseline="central" fill="#1565C0" font-size="12" font-weight="700" font-family="PingFang SC,Microsoft YaHei,sans-serif">荣昌</text>
-  </svg>
+    <img class="header-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAALBklEQVR4nO3dD3AU1R3A8cuRu9zlAgkGMPxXAQHlTwQraKiO1losoqNTLRValKntaBEpSi2dotR/zJiOVi11yky1ptZRa7StrtVxrMWqCPVfTWz5I1JACKJEArlckksunYduOEJ87h23t2/f+35mMhAIScT73u+93b0lEAAAAAAAAAAAAAAAAFDSM+/ue93r7wGHK+jxPhQJ44JJZdP5n+E9AlEkjlkTS8fZv2bVNW0QPxKJ9whEoTDS2ZEIhOIdAvFwOfVFcaQjFG8RiKJh9EQo3iAQBZZTmWB/kl8E4pMw0jFN8odAFFxOOUUo7iMQH4bRE6G4h0AUX05lgv1J7hGIBmGkY5rkFoH4bDnlFKHkBoFoFkZPhHJ0CMTHy6lMsD/JDoFoHkY6pknmCESj5ZRThOIcgRgURk8su74cgWi6nHKKaSJHIIaG0ROh9M74QExZTjlFKIczNhDCkGN/YnAgpi+nnLJ42a9ZgRBGdiyDQzEiEJZTuWEZGIrWgRCGOyyDbkukbSAsp9xlGTJNtAuEMPLL0jwUbQJhOeUtS9NQfB8IYajF0mx/4utAWE6pydJomvgyEMLwB0uDUHwVCMspf7J8vOzyRSCE4X+WT6eJ8oGwnNKL5bNQlA2EMPRm+SQU5QJhOWUWS/H9iTKBEIa5LIWniRKBsJyCqqF4GghhQPVQPAmE5RT8sj/JayCEAb9Nk7wFwnIKfgzF9UAIA34OxbVAWE5Bh/1JMOAybq0DNx9X4ok4/cnYd4EAfn7yJRBAgkAACQIBJAgEkCAQQIJAAAkCASQIBJAgEECCQAAJAgEkCASQIBBAgkAACQIBJAgEkCAQQIJAAAkCASQIBJAgEECCQAAJAgEkCASQIBBAgkAAiULZb5pkz/72ggk3rO1nv//zS45vXTRzRJuTP3vvc9uLbntya8R+v/6Xp+8f1C/c5db3ivxhggASBAJIsMTykeqn/xepfnpbkZffw8zKAcmaa05uCRhC60C+fU9d7KX3GrP6bxR7ivR9RSbS9zJO7Fl9VlM2XwfuY4kFmDpBdLf5V1X7S4sLXT9aNmXZur4f7m018slU60CWzBrRNm9GRbuTj21KdBQsqdkUtd//1rRByfMrBySd/Nm/vfNJ6Il1e0L2+3d978REadT9By7cp3Ug00aXdmRyHiQQCHQHMm5orHP21IGOAtn6cUI8u3YHct6k8iTnQfRg5NgEnNJ6guhuzOJXMzpahswxQQAJJoiPDegb6iooEFsnd+090F6QMvSQA4F8Tmyqsz1hJy5qdHphYy6tvfW0AxzmdRdLLMDECfLoa7vDi36/sfuwrcoyubQe+cUEAUycICbgMK/7jAlkwdlD2qtOLHN8Zt1N9Tua+9z97HZPL1uHM8YEUjmyr+NLR9wWi/QRB00JxAeMCURHXM3rPgJx6Ksr3ijZuCveR/x87JBY5z9XnNocyLOls49rFW/5/rpvrZx2IGAojmIBEgQCmLjEmnNGRbt4CyjonJOP6XB6WcuOva3BqcvW9Q0oqHrumMT8s4Yo+XecK0wQQIJAABOXWMK1D26IPrb2o3CuP684mjXoB2tKc/G5zj75mI7HrpsYd/rxt142qvWH5w7z5LqtzbtbglU3/UvJ5Z5bmCCABIEApi6xrjlvePvFpw3K6vKSVCoQuPlPW6JiWSH7uGtnDm+rGpv9NV7lJSFDX6vnD1oHMn5orHP80FhWf3bpw5sOiyPUpyCQ7PzssRwsCATsl6A+tKYhfOm0Y5PiNkE5+rahEK0DyUZXVyCw/PH3Iw+93NC9uV/4jeFtL9Q1FtqXmowZHOucMCyWql2/J7Q/0VEw59664r8urYyPGBBJuf39LX98S0S8uf118Bn2IGk6U12BxTUbo6tf3Nl9pe1Fpw5MLr/khCOuf7p7/tiEuEJY/HzXp23BC6vfiW356OAN5KARJsjnmls7C67+3X+jz/97b/cdEr8+sbxj1YLxLb3dOCQSCnb9YeGE+AV3vl2y7ePWoIjkoup3Sh5ZNDE+aUSJa8utkkifrmj44CDz5AmksTnp/m1UFEIggUBAPMDnraovtpdQ9uUgD159Ujxc+MWPh2NLw121P54sIont3tceFLcvnX3n27H7rhyXuNCl157ceOFxbZwHyR/jlwR/eePj0Lm3v9l9Kbu9rKr50YR4uPDL/3rEvqN2yeT4kP5FB/cfifZUwVWr/1P8i9oPIu0dHKDyO2MDOdDaWbD4oY1R8WBuaunoHhPfP2do+2+vOqlFNjl6GlNRnHrmJ5XxEwZFU/ZGf9XzO4pmrnzrsPDgP0YG8uzbn4Sqblpf8siru7uPVIkgquedmLhjzuiEOIybqWHlkZR14ynN6XeUF689/9ptb5bcUvtBJN7WadTaXRdGBbKxoSV4+X11sSvuf69Y7BnsXx9cVpR66vrK5vlnDj6qS7fL+4a6nrx+cjz984hl1q+f31F0+vL1JTUvN4RZdvmLEZv0nY1twbuf3Vb0x1d2h8WRmHSzpgxI3vXdsYn+sdz8gzfihKKYRNPGlHX89JHNUXGeRPy6CPKGhzdF77K2FYnzKnPOqEiKI1KZfn7Og+SX1oFs3ZMI3vvc9qLH134Uts+C28qKC7tWXDqq9fIqd15UJf6Fqmmj+3UufGBDdO3mpu6/Z3E4+GePvh+9/amtkYu/Mig5d0ZF+5Tj+3Xm4R7UyIJ2gYgN8ov1jYUP/GNn0d/rGwt7uyu5OAS78jujEwP7hV09zDS8PJL68w2VcbHXEfuQT+OHziGIPcnDrzSExZs4AnZ+5YCOpbNHth7DtVlK0S4Q8SBc8cSW6KaGIy8yFNdL3XbZqNYzx/fP2w3kxGQQU+Kbp5Qnq5/eFql5edcR+xAxVcSPTuLg9SD5pd0mXTzIapdMbh458NB1URVl4ZTYF7y0fGpzPuNI1z8W6hJHyF675bQDl04/NlmYdqhMLLXE73nxfcGwCWKf4X7suknxK+9/r3jujMHJ+WcObisKqfFcIE4srlowrmXZRccFf/PCh0X1O5qD91wxNsEeRE1aBiKIk3Zrbs7/zd0yOW/iZGqIfUy2/7BPro2pKFbme8kXbQPJNS/upAjvqbHuABRFIIAEgQASBAJIEAggQSCABIEAEgQCSBAIIEEggASBABIEAkgQCCBBIICXgVh1TRvc/howj1XXtCEfjy3X76XxzLv7Xhc/zppYOs7trwUzWGlhXDCpbLqbXysvN5uxIxEIBdnqOTHcjkPI692YCAV+CcPmye3KCAWqh2Hz9H5+7E+gwj5DxvMbXjJNoNrUUCoQG6GYzVIsDOUCsRGKeSxFllO+CMTG/kR/lqJTwxeBCEwTPVk+CMMXgdgIRQ+Wj8LwVSA2QvEvS+F9hjaB2Nif+Iflw6nh+0AEponaLJ+H4ftAbISiHsunyyktA7Gx7PKepcnU0DIQgWniDUvDMLQMxEYo+WFpHIbWgdgIxT2WRvsMYwOxsT/JHcuAqWFcIALT5OhYhoVhXCA2QsmcZchyqjfGBWIjlC9nGTo10hkbiI39yZEI4xDjAxGYJoeYvJzqDYGkMTkUpkbvCMTwUAhDjkAM3Z8QhjMEYuA0YZ/hHIEYFApTI3MEYsCyizCyRyCaTxOWU0eHQDQNhamRGwSiWSiEkVsEosn+hDDcQSAaTBP2Ge4hEB+HwtRwH4H4MBTCyB8C8dn+hOVUfhGIT6YJU8MbBKJ4KIThLQJRNBTCUAOBKLg/YZ+hDgJRcJrYeMkr4CAUAAAAAAAAAAAAAEAgf/4PowFYQYXgxn8AAAAASUVORK5CYII=" alt="荣昌">
     <div>
       <div class="header-title">重庆-荣昌公司销售看板</div>
     </div>
