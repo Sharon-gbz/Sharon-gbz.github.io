@@ -19,7 +19,7 @@
     --card-border: rgba(25,118,210,0.15);
     --text: #1a2a3a;
     --text-muted: #5c7a9a;
-    --green: #2E7D32;
+    --green: #F5670F;
     --orange: #E65100;
     --red: #C62828;
     --yellow: #F9A825;
@@ -38,7 +38,7 @@
   .header {
     background: linear-gradient(90deg, #1565C0 0%, #1976D2 50%, #1565C0 100%);
     border-bottom: none;
-    padding: 12px 24px;
+    padding: 16px 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -50,40 +50,40 @@
   .header-left {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
   }
   .header-logo {
-    width: 40px;
-    height: 40px;
+    width: 52px;
+    height: 52px;
     object-fit: contain;
   }
   .header-title {
-    font-size: 20px;
+    font-size: 26px;
     font-weight: 700;
     color: #ffffff;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
   }
-  .header-right { display: flex; align-items: center; gap: 8px; }
-  .time-display { color: rgba(255,255,255,0.8); font-size: 13px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .time-display { color: rgba(255,255,255,0.85); font-size: 15px; }
 
   .slicer-bar {
     background: #ffffff;
     border-bottom: 1px solid rgba(25,118,210,0.12);
-    padding: 10px 24px;
+    padding: 12px 24px;
     display: flex;
     align-items: center;
     gap: 10px;
     box-shadow: 0 1px 4px rgba(21,101,192,0.06);
   }
-  .slicer-label { color: var(--text-muted); font-size: 13px; margin-right: 4px; }
+  .slicer-label { color: var(--text-muted); font-size: 14px; margin-right: 4px; }
   .slicer-btn {
-    padding: 4px 16px;
+    padding: 8px 20px;
     border: 1px solid rgba(25,118,210,0.3);
     background: transparent;
     color: #1976D2;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
     transition: all .2s;
   }
   .slicer-btn:hover { border-color: #1976D2; background: rgba(25,118,210,0.06); }
@@ -123,7 +123,7 @@
   }
   .kpi-card.blue::before { background: linear-gradient(90deg,#1565C0,#42A5F5); }
   .kpi-card.cyan::before { background: linear-gradient(90deg,#0277BD,#29B6F6); }
-  .kpi-card.green::before { background: linear-gradient(90deg,#2E7D32,#66BB6A); }
+  .kpi-card.green::before { background: linear-gradient(90deg,#F5670F,#FFA726); }
   .kpi-card.orange::before { background: linear-gradient(90deg,#E65100,#FFA726); }
   .kpi-card.purple::before { background: linear-gradient(90deg,#6A1B9A,#AB47BC); }
   .kpi-card.red::before { background: linear-gradient(90deg,#B71C1C,#EF5350); }
@@ -137,7 +137,7 @@
     font-size: 10px;
     margin-top: 4px;
   }
-  .kpi-tag.good { background: rgba(46,125,50,.1); color: #2E7D32; }
+  .kpi-tag.good { background: rgba(245,103,15,.1); color: #F5670F; }
   .kpi-tag.warn { background: rgba(230,81,0,.1); color: #E65100; }
   .kpi-tag.bad  { background: rgba(198,40,40,.1); color: #C62828; }
 
@@ -146,7 +146,9 @@
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     margin-bottom: 16px;
+    align-items: start;
   }
+  .chart-row-main { grid-template-columns: 1fr 1fr; }
   .chart-card {
     background: #ffffff;
     border: 1px solid rgba(25,118,210,0.12);
@@ -313,7 +315,7 @@
   .color-blue { color: #1565C0; }
   .color-link { color: #1976D2; }
   .color-muted { color: #aab; }
-  .color-green { color: #2E7D32; }
+  .color-green { color: #F5670F; }
   .color-muted { color: #B0BEC5; }
   .font-bold { font-weight: 700; }
   .text-right { text-align: right; }
@@ -336,9 +338,9 @@
     .header { padding: 10px 14px; }
     .header-title { font-size: 16px; letter-spacing: 1px; }
     .time-display { font-size: 11px; }
-    .slicer-bar { padding: 8px 14px; gap: 6px; flex-wrap: wrap; }
-    .slicer-label { font-size: 11px; width: 100%; margin-bottom: 2px; }
-    .slicer-btn { padding: 3px 12px; font-size: 11px; }
+    .slicer-bar { padding: 12px 14px; gap: 8px; flex-wrap: wrap; }
+    .slicer-label { font-size: 13px; width: 100%; margin-bottom: 4px; }
+    .slicer-btn { padding: 10px 18px; font-size: 14px; }
     .main { padding: 10px 14px; }
     .kpi-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .kpi-card { padding: 10px 8px; }
@@ -346,10 +348,14 @@
     .kpi-label { font-size: 9px; }
     .kpi-sub { font-size: 9px; }
     .chart-row { grid-template-columns: 1fr; gap: 10px; }
+    .chart-row-main { grid-template-columns: 1fr; }
+    .chart-row-main [style*="grid-row"] { grid-row: auto; }
+    .chart-row-main .chart-progress { order: 3; }
     .chart-card { padding: 12px; }
     .chart-title { font-size: 12px; }
     #coverageChart, #progressChart { height: 220px !important; }
     #ringCharts { height: auto !important; }
+    #progressChart { height: 300px !important; }
     .section-title { font-size: 13px; }
     .filter-bar { gap: 8px; flex-wrap: wrap; }
     .filter-bar label { font-size: 11px; }
@@ -362,9 +368,9 @@
   @media screen and (max-width: 480px) {
     .header { padding: 8px 12px; }
     .header-title { font-size: 14px; letter-spacing: 0.5px; }
-    .slicer-bar { padding: 6px 10px; gap: 5px; }
-    .slicer-label { font-size: 10px; }
-    .slicer-btn { padding: 2px 10px; font-size: 10px; border-radius: 15px; }
+    .slicer-bar { padding: 10px 10px; gap: 8px; }
+    .slicer-label { font-size: 12px; }
+    .slicer-btn { padding: 10px 16px; font-size: 14px; border-radius: 18px; }
     .main { padding: 8px 10px; }
     .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .kpi-card { padding: 10px 8px; border-radius: 8px; }
@@ -374,10 +380,14 @@
     .kpi-sub { font-size: 8px; margin-top: 2px; }
     .kpi-tag { font-size: 9px; }
     .chart-row { gap: 8px; }
+    .chart-row-main { grid-template-columns: 1fr; }
+    .chart-row-main [style*="grid-row"] { grid-row: auto; }
+    .chart-row-main .chart-progress { order: 3; }
     .chart-card { padding: 10px; border-radius: 8px; }
     .chart-title { font-size: 11px; margin-bottom: 8px; }
     #coverageChart, #progressChart { height: 200px !important; }
     #ringCharts { height: auto !important; }
+    #progressChart { height: 300px !important; }
     .tab-bar { margin-bottom: 8px; }
     .tab-btn { padding: 4px 10px; font-size: 11px; }
     .filter-bar { gap: 6px; }
@@ -469,23 +479,22 @@
     </div>
   </div>
 
-  <!-- 第一部分：终端覆盖情况 -->
-  <div class="chart-card" style="margin-bottom:16px;">
-    <div class="chart-title">终端覆盖情况（按医院等级）</div>
-    <div id="coverageChart" class="chart-body" style="height:220px;"></div>
-  </div>
-
-  <!-- 第二部分：各类产品完成进度 & 销售进度 -->
-  <div class="chart-row">
-    <!-- 左：各类产品完成进度（三个圆环） -->
+  <!-- 第一部分：三栏布局 - 左(终端覆盖+产品进度) 右(销售进度TOP10) -->
+  <div class="chart-row chart-row-main" style="align-items:stretch;">
+    <!-- 上左：终端覆盖情况 -->
+    <div class="chart-card">
+      <div class="chart-title">终端覆盖情况（按医院等级）</div>
+      <div id="coverageChart" class="chart-body" style="height:220px;"></div>
+    </div>
+    <!-- 上右：销售进度展示 -->
+    <div class="chart-card chart-progress" style="grid-row: span 2;">
+      <div class="chart-title">销售进度展示 TOP10（按完成金额降序）</div>
+      <div id="progressChart" class="chart-body" style="height:100%;"></div>
+    </div>
+    <!-- 下左：各类产品完成进度 -->
     <div class="chart-card">
       <div class="chart-title">各类产品完成进度</div>
       <div id="ringCharts" class="chart-body" style="position:relative;"></div>
-    </div>
-    <!-- 右：销售进度展示 -->
-    <div class="chart-card">
-      <div class="chart-title">销售进度展示 TOP5（目标 vs 完成）</div>
-      <div id="progressChart" class="chart-body" style="height:340px;"></div>
     </div>
   </div>
 
@@ -7937,7 +7946,7 @@ function fmtWan(n) {
 }
 
 function rateColor(r) {
-  if (r >= 80) return '#2E7D32';
+  if (r >= 80) return '#F5670F';
   if (r >= 50) return '#F9A825';
   if (r >= 20) return '#E65100';
   return '#C62828';
@@ -8018,13 +8027,24 @@ function renderRings() {
   // Pre-compute layout params
   var isMobile = window.innerWidth <= 480;
   var isTablet = window.innerWidth <= 768;
+  // Calculate ring size based on container width to prevent overlap
+  var containerW = container.clientWidth || 400;
+  var isMobile = window.innerWidth <= 480;
+  var isTablet = window.innerWidth <= 768;
   var ringRadius, ringCY, chartHeight;
   if (isMobile) {
     ringRadius = [28, 42]; ringCY = 72; chartHeight = 130;
   } else if (isTablet) {
     ringRadius = [38, 56]; ringCY = 92; chartHeight = 170;
   } else {
-    ringRadius = [50, 70]; ringCY = 110; chartHeight = 200;
+    // Desktop: ensure 3 rings don't overlap (outer diameter < containerW/3)
+    var maxOuterR = Math.floor(containerW / 3 / 2) - 6;
+    maxOuterR = Math.min(maxOuterR, 70); // cap at 70px
+    maxOuterR = Math.max(maxOuterR, 30); // min 30px
+    var innerR = Math.round(maxOuterR * 0.7);
+    ringRadius = [innerR, maxOuterR];
+    ringCY = Math.round(maxOuterR + 40);
+    chartHeight = maxOuterR * 2 + 60;
   }
 
   // Build all 3 rings inside a single ECharts chart
@@ -8175,34 +8195,34 @@ function renderCoverage() {
       textStyle: { color: '#5c7a9a', fontSize: 11 },
       itemWidth: 12, itemHeight: 12,
     },
-    grid: { left: '3%', right: '8%', bottom: '8%', top: '16%', containLabel: true },
+    grid: { left: '3%', right: '4%', bottom: '8%', top: '16%', containLabel: true },
     xAxis: {
-      type: 'value',
-      minInterval: 5,
-      axisLabel: { color: '#5c7a9a', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f4f8' } },
-    },
-    yAxis: {
       type: 'category',
       data: grades.map(g => g + '医院'),
       axisLine: { lineStyle: { color: '#dde6f0' } },
       axisTick: { show: false },
       axisLabel: { color: '#1a2a3a', fontSize: 12, fontWeight: 600 },
     },
+    yAxis: {
+      type: 'value',
+      minInterval: 5,
+      axisLabel: { color: '#5c7a9a', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f4f8' } },
+    },
     series: [
       {
         name: '目标终端',
         type: 'bar',
         barGap: '20%',
-        barMaxWidth: 28,
+        barMaxWidth: 40,
         data: targetCounts,
         itemStyle: {
-          color: { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#1565C0' }, { offset: 1, color: '#42A5F5' }] },
-          borderRadius: [0, 4, 4, 0],
+          color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: '#1565C0' }, { offset: 1, color: '#42A5F5' }] },
+          borderRadius: [4, 4, 0, 0],
         },
         label: {
           show: true,
-          position: 'right',
+          position: 'top',
           formatter: p => p.value + ' 家',
           color: '#1565C0',
           fontSize: 12,
@@ -8212,17 +8232,17 @@ function renderCoverage() {
       {
         name: '在销终端',
         type: 'bar',
-        barMaxWidth: 28,
+        barMaxWidth: 40,
         data: activeCounts,
         itemStyle: {
-          color: { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#2E7D32' }, { offset: 1, color: '#66BB6A' }] },
-          borderRadius: [0, 4, 4, 0],
+          color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: '#F5670F' }, { offset: 1, color: '#FFA726' }] },
+          borderRadius: [4, 4, 0, 0],
         },
         label: {
           show: true,
-          position: 'right',
+          position: 'top',
           formatter: p => p.value + ' 家',
-          color: '#2E7D32',
+          color: '#F5670F',
           fontSize: 12,
           fontWeight: 600,
         },
@@ -8236,11 +8256,15 @@ function renderProgress() {
   if (!progressChart) {
     progressChart = echarts.init(document.getElementById('progressChart'));
   }
-  const products = getProductAgg().filter(p => p.totalSales > 0).slice(0, 5);
+  const products = getProductAgg().filter(p => p.totalSales > 0).sort((a, b) => b.totalSales - a.totalSales).slice(0, 10);
   const names = products.map(p => p.drugName);
   const targets = products.map(p => Math.round(p.totalTarget));
   const sales = products.map(p => Math.round(p.totalSales));
   const colorMap = { '\u54c1\u724c\u54c1': '#1976D2', '\u5546\u9500\u54c1': '#0288D1', '\u4ee3\u7406\u54c1': '#7B1FA2' };
+  const isMobile = window.innerWidth <= 768;
+  const barW = isMobile ? 32 : 26;
+  const barGap = isMobile ? '35%' : '45%';
+  const labelSize = isMobile ? 12 : 11;
 
   const option = {
     backgroundColor: 'transparent',
@@ -8267,37 +8291,37 @@ function renderProgress() {
       textStyle: { color: '#5c7a9a', fontSize: 11 },
       itemWidth: 10, itemHeight: 10,
     },
-    grid: { left: '3%', right: '4%', bottom: '18%', top: '6%', containLabel: true },
+    grid: { left: '2%', right: '5%', bottom: '10%', top: '4%', containLabel: true },
     xAxis: {
-      type: 'category',
-      data: names,
-      axisLine: { lineStyle: { color: '#dde6f0' } },
-      axisLabel: {
-        color: '#5c7a9a', fontSize: 10,
-        rotate: names.length > 10 ? 35 : 0,
-        overflow: 'truncate',
-        width: 70,
-      },
+      type: 'value',
+      show: false,
+      splitLine: { show: false },
     },
     yAxis: {
-      type: 'value',
+      type: 'category',
+      data: names,
+      inverse: true,
+      axisLine: { lineStyle: { color: '#dde6f0' } },
+      axisTick: { show: false },
       axisLabel: {
-        color: '#5c7a9a', fontSize: 10,
-        formatter: v => fmtWan(v)
+        color: '#1a2a3a', fontSize: 11, fontWeight: 600,
+        overflow: 'truncate',
+        width: 100,
       },
-      splitLine: { lineStyle: { color: '#f0f4f8' } },
     },
     series: [
       {
         name: '\u76ee\u6807\u91d1\u989d',
         type: 'bar',
-        barGap: '10%',
-        barMaxWidth: 40,
+        barGap: '-100%',
+        barMaxWidth: barW,
+        barCategoryGap: barGap,
+        z: 1,
         data: targets,
         itemStyle: {
-          color: '#1976D220',
-          borderRadius: [4,4,0,0],
-          borderColor: '#1976D260',
+          color: '#1976D218',
+          borderRadius: [0,4,4,0],
+          borderColor: '#1976D240',
           borderWidth: 1,
         },
         label: { show: false },
@@ -8305,23 +8329,25 @@ function renderProgress() {
       {
         name: '\u5b8c\u6210\u91d1\u989d',
         type: 'bar',
-        barMaxWidth: 40,
+        barMaxWidth: barW,
+        barCategoryGap: barGap,
+        z: 2,
         data: sales,
         itemStyle: {
           color: p => {
             const prod = products[p.dataIndex];
             const c = colorMap[prod.productType] || '#1976D2';
-            return { type:'linear', x:0,y:0,x2:0,y2:1, colorStops:[{offset:0,color:c},{offset:1,color:c+'cc'}] };
+            return { type:'linear', x:0,y:0,x2:1,y2:0, colorStops:[{offset:0,color:c},{offset:1,color:c+'cc'}] };
           },
-          borderRadius: [4,4,0,0],
+          borderRadius: [0,4,4,0],
         },
         label: {
           show: true,
-          position: 'top',
+          position: 'right',
           formatter: p => products[p.dataIndex].completion + '%',
           color: p => rateColor(products[p.dataIndex].completion),
-          fontSize: 10,
-          fontWeight: 600,
+          fontSize: 11,
+          fontWeight: 700,
         }
       }
     ]
@@ -8414,7 +8440,7 @@ function renderTerminalTable() {
     if (search && !r.terminal.toLowerCase().includes(search)) return false;
     if (grade && r.grade !== grade) return false;
     return true;
-  });
+  }).sort((a, b) => b.totalTarget - a.totalTarget);
 
   const tbody = document.getElementById('terminalTbody');
   let html = '';
@@ -8461,7 +8487,7 @@ function renderTerminalTable() {
       drillRows.forEach(d => {
         const dcr = d.completion || 0;
         const dfr = d.feeRate || 0;
-        const frColor = dfr > 100 ? '#C62828' : dfr > 50 ? '#E65100' : '#2E7D32';
+        const frColor = dfr > 100 ? '#C62828' : dfr > 50 ? '#E65100' : '#F5670F';
         html += '<tr style="border-bottom:1px solid #e8eef5;">' +
           '<td class="text-center" style="padding:1px 3px;">' + d.drugName + '</td>' +
           '<td class="text-center" style="padding:1px 3px;">' + fmt(d.targetAmount, 1) + '</td>' +
@@ -8496,7 +8522,7 @@ function renderProductTable() {
   let rows = getProductAgg().filter(r => {
     if (search && !r.drugName.toLowerCase().includes(search)) return false;
     return true;
-  });
+  }).sort((a, b) => b.totalTarget - a.totalTarget);
 
   const tbody = document.getElementById('productTbody');
   let html = '';
@@ -8537,7 +8563,7 @@ function renderProductTable() {
       drillRows.forEach(d => {
         const dcr = d.completion || 0;
         const dfr = d.feeRate || 0;
-        const frColor = dfr > 100 ? '#C62828' : dfr > 50 ? '#E65100' : '#2E7D32';
+        const frColor = dfr > 100 ? '#C62828' : dfr > 50 ? '#E65100' : '#F5670F';
         html += '<tr style="border-bottom:1px solid #e8eef5;">' +
           '<td class="text-center" style="padding:1px 3px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + d.terminal + '">' + d.terminal + '</td>' +
           '<td class="text-center" style="padding:1px 3px;"><span style="color:#1565C0;font-size:9px;background:#EBF3FB;padding:1px 3px;border-radius:3px;">' + (d.grade || '\u2014') + '</span></td>' +
