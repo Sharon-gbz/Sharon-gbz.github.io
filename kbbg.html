@@ -419,11 +419,169 @@
         .info-stat-warning .info-stat-label { color: rgba(255,255,255,0.8); }
         .info-stat-warning .info-stat-value { color: white; }
         
-        /* 响应式 */
+        /* 响应式 - 桌面端 */
         @media (max-width: 1200px) {
             .kpi-grid { grid-template-columns: repeat(3, 1fr); }
             .charts { grid-template-columns: 1fr; }
             .info-stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        /* 响应式 - 平板 */
+        @media (max-width: 992px) {
+            .container { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 20px; }
+            .region-tabs { flex-wrap: wrap; }
+            .region-tab { padding: 10px 20px; font-size: 13px; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .kpi-card { padding: 18px; }
+            .kpi-value { font-size: 22px; }
+            .chart-container { height: 250px; }
+            .bar-chart-container { height: 300px; }
+            .detail-tabs { flex-wrap: wrap; gap: 8px; }
+            .detail-tab { padding: 10px 20px; font-size: 13px; border-radius: 8px 8px 0 0; margin-bottom: 0; }
+            .filter-bar { padding: 12px 16px; }
+            .detail-table { font-size: 12px; }
+            .detail-table th, .detail-table td { padding: 10px 6px; }
+            .info-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .info-stat { padding: 14px; }
+            .info-stat-value { font-size: 18px; }
+        }
+        
+        /* 响应式 - 手机横屏 */
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .header { padding: 15px; }
+            .header h1 { font-size: 16px; letter-spacing: 0; }
+            .header h1::before { font-size: 20px; }
+            .region-tabs { gap: 8px; }
+            .region-tab { padding: 8px 14px; font-size: 12px; border-radius: 20px; }
+            .region-tab::before { content: ''; }
+            .region-tab[data-region="全部"]::before { content: '🏠'; margin-right: 4px; }
+            .region-tab[data-region="江津"]::before { content: '🏢'; margin-right: 4px; }
+            .region-tab[data-region="南川"]::before { content: '🏥'; margin-right: 4px; }
+            .region-tab[data-region="綦江"]::before { content: '🏨'; margin-right: 4px; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .kpi-card { padding: 14px; border-radius: 14px; }
+            .kpi-icon { width: 45px; height: 45px; font-size: 20px; border-radius: 12px; margin-bottom: 10px; }
+            .kpi-title { font-size: 11px; }
+            .kpi-value { font-size: 18px; }
+            .kpi-unit { font-size: 10px; }
+            .chart-box { padding: 16px; border-radius: 16px; }
+            .chart-header { margin-bottom: 16px; padding-bottom: 12px; }
+            .chart-title { font-size: 14px; }
+            .chart-container { height: 200px; }
+            .bar-chart-container { height: 250px; }
+            .category-selector { gap: 8px; margin-bottom: 16px; }
+            .category-btn { padding: 8px 16px; font-size: 12px; border-radius: 18px; }
+            .detail-area { padding: 16px; border-radius: 16px; }
+            .detail-tabs { gap: 6px; padding-bottom: 12px; }
+            .detail-tab { padding: 8px 14px; font-size: 12px; }
+            .filter-bar { padding: 10px 12px; gap: 12px; }
+            .filter-label { font-size: 12px; }
+            .filter-select, .filter-input { padding: 8px 12px; font-size: 12px; }
+            .filter-input { width: 160px; }
+            .table-wrapper { border-radius: 12px; }
+            .table-container { max-height: 350px; }
+            .detail-table { font-size: 11px; }
+            .detail-table th, .detail-table td { padding: 8px 4px; }
+            .th-content { gap: 4px; }
+            .sort-icon { font-size: 8px; }
+            .pagination { padding: 10px 12px; flex-wrap: wrap; gap: 10px; }
+            .pagination-info { font-size: 11px; }
+            .pagination-btn { padding: 6px 12px; font-size: 11px; }
+            .info-card { padding: 16px; border-radius: 14px; margin-bottom: 16px; }
+            .info-card-header { margin-bottom: 14px; padding-bottom: 12px; }
+            .info-card-icon { width: 40px; height: 40px; font-size: 18px; border-radius: 10px; }
+            .info-card-title { font-size: 15px; }
+            .info-card-subtitle { font-size: 11px; }
+            .info-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .info-stat { padding: 12px; border-radius: 10px; }
+            .info-stat-label { font-size: 10px; margin-bottom: 6px; }
+            .info-stat-value { font-size: 16px; }
+            .info-stat-unit { font-size: 9px; }
+            .search-container { max-width: 100%; }
+            .search-box input { padding: 12px 50px 12px 40px; font-size: 14px; }
+            .search-icon { left: 12px; font-size: 18px; }
+            .clear-btn { right: 40px; padding: 4px 10px; font-size: 11px; }
+        }
+        
+        /* 响应式 - 手机竖屏（最小尺寸） */
+        @media (max-width: 480px) {
+            .container { padding: 10px; }
+            .header { padding: 12px; }
+            .header h1 { font-size: 14px; margin-bottom: 12px; }
+            .header h1::before { font-size: 18px; }
+            .region-tabs { gap: 6px; }
+            .region-tab { padding: 6px 10px; font-size: 11px; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .kpi-card { padding: 12px 8px; border-radius: 12px; }
+            .kpi-card::before { height: 3px; }
+            .kpi-icon { width: 38px; height: 38px; font-size: 18px; border-radius: 10px; margin-bottom: 8px; }
+            .kpi-title { font-size: 10px; margin-bottom: 6px; }
+            .kpi-value { font-size: 16px; }
+            .kpi-unit { font-size: 9px; }
+            .chart-box { padding: 12px; border-radius: 12px; }
+            .chart-header { margin-bottom: 12px; padding-bottom: 10px; }
+            .chart-title { font-size: 13px; }
+            .chart-container { height: 180px; }
+            .bar-chart-container { height: 220px; }
+            .category-selector { gap: 6px; margin-bottom: 12px; }
+            .category-btn { padding: 6px 12px; font-size: 11px; }
+            .detail-area { padding: 12px; border-radius: 12px; }
+            .detail-tabs { gap: 4px; padding-bottom: 10px; margin-bottom: 16px; }
+            .detail-tab { padding: 6px 10px; font-size: 11px; border-radius: 6px 6px 0 0; }
+            .filter-bar { padding: 8px 10px; gap: 8px; border-radius: 10px; }
+            .filter-group { gap: 6px; }
+            .filter-label { font-size: 11px; }
+            .filter-select, .filter-input { padding: 6px 10px; font-size: 11px; border-radius: 6px; }
+            .filter-input { width: 120px; }
+            .table-wrapper { border-radius: 8px; margin-bottom: 12px; }
+            .table-container { max-height: 280px; }
+            .table-container::-webkit-scrollbar { width: 6px; }
+            .detail-table { font-size: 10px; }
+            .detail-table th { padding: 8px 3px; font-size: 10px; }
+            .detail-table td { padding: 6px 3px; }
+            .th-content { font-size: 10px; }
+            .sort-icon { font-size: 7px; }
+            .pagination { padding: 8px 10px; }
+            .pagination-info { font-size: 10px; }
+            .pagination-btn { padding: 5px 10px; font-size: 10px; border-radius: 6px; }
+            .info-card { padding: 12px; border-radius: 12px; margin-bottom: 12px; }
+            .info-card-header { margin-bottom: 10px; padding-bottom: 10px; gap: 8px; }
+            .info-card-icon { width: 34px; height: 34px; font-size: 16px; border-radius: 8px; }
+            .info-card-title { font-size: 13px; }
+            .info-card-subtitle { font-size: 10px; }
+            .info-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .info-stat { padding: 10px 6px; border-radius: 8px; }
+            .info-stat-label { font-size: 9px; margin-bottom: 4px; }
+            .info-stat-value { font-size: 14px; }
+            .info-stat-unit { font-size: 8px; }
+            .category-tag { padding: 3px 8px; font-size: 10px; }
+            .highlight-num { padding: 2px 8px; font-size: 10px; border-radius: 8px; }
+            .search-section { margin-bottom: 16px; }
+            .search-container { padding: 4px; border-radius: 12px; }
+            .search-box input { padding: 10px 45px 10px 36px; font-size: 13px; }
+            .search-icon { left: 10px; font-size: 16px; }
+            .clear-btn { right: 36px; padding: 4px 8px; font-size: 10px; }
+            .clear-all-btn { right: 10px; font-size: 18px; }
+            .search-dropdown { max-height: 200px; border-radius: 8px; }
+            .search-item { padding: 10px 12px; }
+            .search-item-name { font-size: 12px; }
+            .search-item-meta { font-size: 10px; }
+        }
+        
+        /* 横屏模式额外调整 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header { padding: 10px 20px; }
+            .header h1 { font-size: 16px; margin-bottom: 10px; }
+            .kpi-grid { grid-template-columns: repeat(6, 1fr); }
+            .kpi-card { padding: 10px; }
+            .kpi-icon { width: 35px; height: 35px; font-size: 16px; }
+            .kpi-title { font-size: 10px; }
+            .kpi-value { font-size: 16px; }
+            .chart-container { height: 150px; }
+            .bar-chart-container { height: 180px; }
         }
     </style>
 </head>
