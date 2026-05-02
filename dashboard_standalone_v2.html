@@ -466,6 +466,105 @@
   th.sortable { cursor: pointer; user-select: none; }
   th.sortable:hover { color: var(--primary); }
   .sort-arrow { font-size: 11px; margin-left: 2px; color: var(--text-sub); }
+
+/* ========== 移动端适配 ========== */
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+
+  .header { padding: 0 12px; }
+  .header-inner { padding: 10px 0; gap: 8px; }
+  .header-logo { width: 36px; height: 36px; }
+  .header-title { font-size: 15px; letter-spacing: 0; }
+  .header-sub { font-size: 10px; }
+  .header-tag { padding: 3px 8px; font-size: 11px; }
+  .header-right { gap: 8px; }
+  .update-time { font-size: 11px; }
+
+  .container { padding: 12px 10px 32px; }
+
+  /* Tab 导航：横向滚动 */
+  .page-tabs {
+    display: flex; gap: 4px;
+    overflow-x: auto; white-space: nowrap;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .page-tabs::-webkit-scrollbar { display: none; }
+  .page-tab-btn {
+    padding: 7px 14px; font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  /* KPI卡片：2列网格 */
+  .kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .kpi-card { padding: 12px 14px; gap: 3px; }
+  .kpi-icon { width: 32px; height: 32px; font-size: 14px; right: 10px; top: 10px; }
+  .kpi-value { font-size: 20px; }
+  .kpi-label { font-size: 11px; }
+  .kpi-sub-row { font-size: 10px; }
+
+  /* 图表高度缩小 */
+  .chart-container { height: 220px; }
+  .rank-chart-wrap { height: 220px; }
+
+  /* 卡片 */
+  .card-header { padding: 12px 14px 10px; }
+  .card-title { font-size: 14px; }
+  .card-body { padding: 10px 0 10px 0; }
+
+  /* 三大产品线进度圆环：竖排单列 */
+  .dept-progress-wrap {
+    flex-direction: column; align-items: center;
+    padding: 12px 10px 16px; gap: 12px;
+  }
+  .dept-ring-card { width: 100%; max-width: 320px; flex-direction: row; padding: 14px 16px; align-items: center; gap: 16px; }
+  .dept-ring-label { margin-bottom: 0; font-size: 13px; white-space: normal; }
+  .dept-ring-svg-wrap { width: 90px; height: 90px; flex-shrink: 0; }
+  .dept-ring-svg { width: 90px; height: 90px; }
+  .dept-ring-pct { font-size: 16px; }
+  .dept-ring-nums { text-align: left; margin-top: 0; }
+
+  /* 排名切换按钮 */
+  .rank-toggle { gap: 6px; }
+  .toggle-btn { padding: 5px 12px; font-size: 12px; }
+
+  /* 图例 */
+  .legend { flex-wrap: wrap; gap: 10px 16px; }
+
+  /* 所有表格：外层可横向滚动 */
+  .region-table-wrap,
+  .rank-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  .region-table, .rank-table {
+    font-size: 12px; min-width: 480px;
+  }
+  .region-table thead th, .rank-table thead th {
+    padding: 8px 8px; font-size: 11px; white-space: nowrap;
+  }
+  .region-table td, .rank-table td { padding: 7px 8px; }
+
+  /* 弹窗下钻：占满屏幕 */
+  .drill-modal-content {
+    width: 98%; max-height: 90vh; border-radius: 10px;
+  }
+  .drill-modal-header { padding: 12px 14px; }
+  .drill-modal-title { font-size: 14px; }
+  .drill-modal-body { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .drill-table { font-size: 12px; min-width: 500px; }
+  .drill-table thead th { padding: 8px 8px; font-size: 11px; white-space: nowrap; }
+  .drill-table tbody td { padding: 7px 8px; }
+}
+
+@media (max-width: 420px) {
+  .kpi-value { font-size: 18px; }
+  .kpi-row { gap: 8px; }
+}
+
 </style>
 </head>
 <body>
