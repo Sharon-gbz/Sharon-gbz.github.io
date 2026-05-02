@@ -2760,7 +2760,7 @@ function renderRankTable() {
     
     const data = getRankData();
     
-    // 排序：默认按26年目标金额降序；用户点击列头时按目标排序
+    // 排序：默认按累计金额降序；用户点击列头时按目标排序
     let sorted;
     if (rankTargetSortField) {
         sorted = [...data].sort((a, b) => {
@@ -2769,11 +2769,11 @@ function renderRankTable() {
             return rankTargetSortDir === 'desc' ? valB - valA : valA - valB;
         }).slice(0, 10);
     } else {
-        // 默认：按26年目标金额降序，无目标排最后
+        // 默认：按累计金额降序，无金额排最后
         sorted = [...data].sort((a, b) => {
-            if (a.targetAmt === 0 && b.targetAmt > 0) return 1;
-            if (b.targetAmt === 0 && a.targetAmt > 0) return -1;
-            return b.targetAmt - a.targetAmt;
+            if (a.amt === 0 && b.amt > 0) return 1;
+            if (b.amt === 0 && a.amt > 0) return -1;
+            return b.amt - a.amt;
         }).slice(0, 10);
     }
     
