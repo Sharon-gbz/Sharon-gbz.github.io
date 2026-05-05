@@ -319,7 +319,7 @@ function renderTerminalTable() {
   });
   termData = Object.values(agg).sort(function(a,b){return b.s58-a.s58;});
   termCurPage = 1;
-  document.getElementById('terminal-thead').innerHTML = '<tr><th>#</th><th>终端名称</th><th>区域</th><th>品数</th><th>1-4月销售</th><th>1-4月费用</th><th>1-4月费率</th><th>5-12月销售</th><th>5-12月费用</th><th>5-12月费率</th></tr>';
+  document.getElementById('terminal-thead').innerHTML = '<tr><th>#</th><th>终端名称</th><th>区域</th><th>品种</th><th>1-4月销售</th><th>1-4月费用</th><th>1-4月费率</th><th>5-12月销售</th><th>5-12月费用</th><th>5-12月费率</th></tr>';
   document.getElementById('table-note').textContent = '共 '+termData.length+' 条';
   renderTermPage();
   renderTermPager();
@@ -332,7 +332,8 @@ function renderTermPage() {
   page.forEach(function(d,i){
     var r14 = d.s14>0?(d.f14/d.s14*100):0;
     var r58 = d.s58>0?(d.f58/d.s58*100):0;
-    html += '<tr><td>'+(start+i+1)+'</td><td style="text-align:left;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+d.terminal+'">'+d.terminal+'</td><td>'+d.region+'</td><td style="color:#047BA5;font-weight:700">'+d.pc+'</td><td>'+(d.s14>0?d.s14.toFixed(2):'—')+'</td><td>'+(d.f14>0?d.f14.toFixed(2):'—')+'</td><td style="color:'+(r14>30?'#c00':'#2E7D32')+'">'+(r14>0?r14.toFixed(1)+'%':'—')+'</td><td style="font-weight:700">'+d.s58.toFixed(2)+'</td><td>'+d.f58.toFixed(2)+'</td><td style="color:'+(r58>30?'#c00':'#2E7D32')+';font-weight:700">'+(r58>0?r58.toFixed(1)+'%':'—')+'</td></tr>';
+    var escT = (d.terminal||'').replace(/'/g,"\\'");
+    html += '<tr><td>'+(start+i+1)+'</td><td style="text-align:left;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+d.terminal+'">'+d.terminal+'</td><td>'+d.region+'</td><td style="color:#047BA5;font-weight:700;cursor:pointer"><a class="drill-link" href="javascript:void(0)" onclick="showTerminalProducts(\''+escT+'\')">'+d.pc+'</a></td><td>'+(d.s14>0?d.s14.toFixed(2):'—')+'</td><td>'+(d.f14>0?d.f14.toFixed(2):'—')+'</td><td style="color:'+(r14>30?'#c00':'#2E7D32')+'">'+(r14>0?r14.toFixed(1)+'%':'—')+'</td><td style="font-weight:700">'+d.s58.toFixed(2)+'</td><td>'+d.f58.toFixed(2)+'</td><td style="color:'+(r58>30?'#c00':'#2E7D32')+';font-weight:700">'+(r58>0?r58.toFixed(1)+'%':'—')+'</td></tr>';
   });
   document.getElementById('terminal-tbody').innerHTML = html;
 }
@@ -464,6 +465,13 @@ function showRepDrill(hospital, rep) {
   var rows = DRILL_DATA.filter(function(d){ return d.hospital===hospital && d.rep===rep; });
   if(!rows.length){ alert('无明细数据'); return; }
   showDrillModal(hospital+' — '+rep, rows);
+}
+
+function showTerminalProducts(hospital) {
+  // 从DRILL_DATA中过滤出该终端的所有产品记录，并按产品去重聚合
+  var rows = DRILL_DATA.filter(function(d){ return d.hospital === hospital; });
+  if(!rows.length){ alert('该终端无产品数据'); return; }
+  showDrillModal(hospital+' — 产品明细', rows);
 }
 
 function showDrillModal(title, rows) {
